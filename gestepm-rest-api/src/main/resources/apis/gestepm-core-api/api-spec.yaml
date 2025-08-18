@@ -1207,6 +1207,411 @@ paths:
       operationId: export-inspection-materials-v1
       description: export-inspection-materials-v1
       parameters: []
+  /v1/projects:
+    get:
+      summary: V1 - List projects
+      responses:
+        '200':
+          $ref: '#/components/responses/ProjectList'
+      operationId: list-projects-v1
+      description: list-projects-v1
+      parameters:
+        - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-meta
+        - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-links
+        - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-expand
+        - $ref: ../../base-api-spec.yaml#/components/parameters/filter-pagination-offset
+        - $ref: ../../base-api-spec.yaml#/components/parameters/filter-pagination-limit
+        - $ref: ../../base-api-spec.yaml#/components/parameters/filter-order
+        - $ref: ../../base-api-spec.yaml#/components/parameters/filter-order-by
+        - schema:
+            type: array
+            items:
+              type: integer
+          in: query
+          name: ids
+          description: Filter by project identificator.
+        - schema:
+            type: string
+          in: query
+          name: nameContains
+          description: Filter by name contains.
+        - schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - NORMAL
+                - STATION
+                - OFFICE
+                - TELEWORKING
+          in: query
+          name: types
+          description: Filter by project types.
+        - schema:
+            type: array
+            items:
+              type: integer
+          in: query
+          name: activityCenterIds
+          description: Filter by activity center ids.
+        - schema:
+            type: integer
+          in: query
+          name: state
+          description: Filter by project state.
+        - schema:
+            type: array
+            items:
+              type: integer
+          in: query
+          name: responsibleIds
+          description: Filter by responsible ids.
+        - schema:
+            type: array
+            items:
+              type: integer
+          in: query
+          name: memberIds
+          description: Filter by member ids.
+        - schema:
+            type: boolean
+          in: query
+          name: role
+          description: Filter by user role id.
+      tags:
+        - project-v1
+    post:
+      summary: V1 - Create project
+      operationId: create-project-v1
+      responses:
+        '200':
+          $ref: '#/components/responses/Project'
+      tags:
+        - project-v1
+      description: create-project-v1
+      requestBody:
+        $ref: '#/components/requestBodies/CreateProject'
+    parameters: []
+  '/v1/projects/{projectId}':
+    parameters:
+      - $ref: '#/components/parameters/Project-Id'
+    get:
+      summary: V1 - Find project
+      tags:
+        - project-v1
+      responses:
+        '200':
+          $ref: '#/components/responses/Project'
+        '404':
+          description: project-not-found
+          content:
+            application/json:
+              schema:
+                $ref: ../../base-api-spec.yaml#/components/schemas/ResError
+      operationId: find-project-by-id-v1
+      description: find-project-by-id-v1
+      parameters:
+        - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-meta
+        - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-links
+        - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-expand
+    put:
+      summary: V1 - Update project
+      operationId: update-project-v1
+      responses:
+        '200':
+          $ref: '#/components/responses/Project'
+        '404':
+          description: project-not-found
+      tags:
+        - project-v1
+      description: update-project-v1
+      requestBody:
+        $ref: '#/components/requestBodies/UpdateProject'
+    delete:
+      summary: V1 - Delete project
+      operationId: delete-project-v1
+      responses:
+        '200':
+          description: '**OK**'
+          content:
+            application/json:
+              schema:
+                $ref: ../../base-api-spec.yaml#/components/schemas/ResSuccess
+        '404':
+          description: project-not-found
+          content:
+            application/json:
+              schema:
+                $ref: ../../base-api-spec.yaml#/components/schemas/ResError
+      tags:
+        - project-v1
+      description: delete-project-v1
+  '/v1/projects/{projectId}/duplicate':
+    parameters:
+      - $ref: '#/components/parameters/Project-Id'
+    post:
+      summary: V1 - Duplicate project
+      tags:
+        - project-v1
+      responses:
+        '200':
+          $ref: '#/components/responses/Project'
+        '404':
+          description: project-not-found
+          content:
+            application/json:
+              schema:
+                $ref: ../../base-api-spec.yaml#/components/schemas/ResError
+      operationId: duplicate-project-by-id-v1
+      description: duplicate-project-by-id-v1
+      parameters: []
+  '/v1/projects/{projectId}/customer':
+    parameters:
+      - $ref: '#/components/parameters/Project-Id'
+    get:
+      summary: V1 - Find project customer
+      tags:
+        - project-customer-v1
+      responses:
+        '200':
+          $ref: '#/components/responses/Customer'
+        '404':
+          description: project-not-found
+          content:
+            application/json:
+              schema:
+                $ref: ../../base-api-spec.yaml#/components/schemas/ResError
+      operationId: find-customer-by-project-id-v1
+      description: find-customer-by-project-id-v1
+    post:
+      summary: V1 - Create project customer
+      operationId: create-project-customer-v1
+      responses:
+        '200':
+          $ref: '#/components/responses/Customer'
+        '404':
+          description: project-not-found
+          content:
+            application/json:
+              schema:
+                $ref: ../../base-api-spec.yaml#/components/schemas/ResError
+      tags:
+        - project-customer-v1
+      description: create-project-customer-v1
+      requestBody:
+        $ref: '#/components/requestBodies/CreateCustomer'
+  '/v1/projects/{projectId}/leaders':
+    parameters:
+      - $ref: '#/components/parameters/Project-Id'
+    post:
+      summary: V1 - Create project leader
+      operationId: create-project-leader-v1
+      responses:
+        '200':
+          description: '**OK**'
+          content:
+            application/json:
+              schema:
+                $ref: ../../base-api-spec.yaml#/components/schemas/ResSuccess
+        '404':
+          description: project-not-found | leader-already-exist
+          content:
+            application/json:
+              schema:
+                $ref: ../../base-api-spec.yaml#/components/schemas/ResError
+      tags:
+        - project-leader-v1
+      description: create-project-leader-v1
+      requestBody:
+        $ref: '#/components/requestBodies/CreateProjectLeader'
+  '/v1/projects/{projectId}/leaders/{userId}':
+    parameters:
+      - $ref: '#/components/parameters/Project-Id'
+      - $ref: '#/components/parameters/User-Id'
+    delete:
+      summary: V1 - Delete project leader
+      operationId: delete-project-leader-v1
+      responses:
+        '200':
+          description: '**OK**'
+          content:
+            application/json:
+              schema:
+                $ref: ../../base-api-spec.yaml#/components/schemas/ResSuccess
+        '404':
+          description: project-not-found | leader-not-found
+          content:
+            application/json:
+              schema:
+                $ref: ../../base-api-spec.yaml#/components/schemas/ResError
+      tags:
+        - project-leader-v1
+      description: delete-project-leader-v1
+  '/v1/projects/{projectId}/materials':
+    parameters:
+      - $ref: '#/components/parameters/Project-Id'
+    post:
+      summary: V1 - Create project material
+      operationId: create-project-material-v1
+      responses:
+        '200':
+          $ref: '#/components/responses/ProjectMaterial'
+        '404':
+          description: project-not-found
+          content:
+            application/json:
+              schema:
+                $ref: ../../base-api-spec.yaml#/components/schemas/ResError
+      tags:
+        - project-material-v1
+      description: create-project-material-v1
+      requestBody:
+        $ref: '#/components/requestBodies/CreateProjectMaterial'
+    get:
+      summary: V1 - Find project material
+      tags:
+        - project-material-v1
+      responses:
+        '200':
+          $ref: '#/components/responses/ProjectMaterialList'
+        '404':
+          description: project-not-found
+          content:
+            application/json:
+              schema:
+                $ref: ../../base-api-spec.yaml#/components/schemas/ResError
+      operationId: list-project-materials-v1
+      description: list-project-materials-v1
+      parameters:
+        - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-meta
+        - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-links
+        - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-expand
+        - $ref: ../../base-api-spec.yaml#/components/parameters/filter-pagination-offset
+        - $ref: ../../base-api-spec.yaml#/components/parameters/filter-pagination-limit
+        - $ref: ../../base-api-spec.yaml#/components/parameters/filter-order
+        - $ref: ../../base-api-spec.yaml#/components/parameters/filter-order-by
+        - schema:
+            type: array
+            items:
+              type: integer
+          in: query
+          name: ids
+          description: Filter by project material identificator.
+        - schema:
+            type: array
+            items:
+              type: integer
+          in: query
+          name: projectIds
+          description: Filter by project ids.
+        - schema:
+            type: string
+          in: query
+          name: nameContains
+          description: Filter by name contains.
+        - schema:
+            type: boolean
+          in: query
+          name: required
+          description: Filter by project material required.
+  '/v1/projects/{projectId}/materials/{materialId}':
+    parameters:
+      - $ref: '#/components/parameters/Project-Id'
+      - $ref: '#/components/parameters/Material-Id'
+    get:
+      summary: V1 - Find project material
+      tags:
+        - project-material-v1
+      responses:
+        '200':
+          $ref: '#/components/responses/ProjectMaterial'
+        '404':
+          description: project-not-found | project-material-not-found
+      operationId: find-project-material-by-id-v1
+      description: find-project-material-by-id-v1
+      parameters:
+        - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-meta
+        - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-links
+        - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-expand
+    put:
+      summary: V1 - Update project material
+      operationId: update-project-material-v1
+      responses:
+        '200':
+          $ref: '#/components/responses/ProjectMaterial'
+        '404':
+          description: project-not-found | project-material-not-found
+      description: update-project-material-v1
+      requestBody:
+        $ref: '#/components/requestBodies/UpdateProjectMaterial'
+      tags:
+        - project-material-v1
+    delete:
+      summary: V1 - Delete project material
+      operationId: delete-project-material-v1
+      responses:
+        '200':
+          description: '**OK**'
+          content:
+            application/json:
+              schema:
+                $ref: ../../base-api-spec.yaml#/components/schemas/ResSuccess
+        '404':
+          description: project-not-found | material-not-found
+          content:
+            application/json:
+              schema:
+                $ref: ../../base-api-spec.yaml#/components/schemas/ResError
+      tags:
+        - project-material-v1
+      description: delete-project-material-v1
+  '/v1/projects/{projectId}/members':
+    parameters:
+      - $ref: '#/components/parameters/Project-Id'
+    post:
+      summary: V1 - Create project member
+      operationId: create-project-member-v1
+      responses:
+        '200':
+          description: '**OK**'
+          content:
+            application/json:
+              schema:
+                $ref: ../../base-api-spec.yaml#/components/schemas/ResSuccess
+        '404':
+          description: project-not-found | member-already-exist
+          content:
+            application/json:
+              schema:
+                $ref: ../../base-api-spec.yaml#/components/schemas/ResError
+      tags:
+        - project-member-v1
+      description: create-project-member-v1
+      requestBody:
+        $ref: '#/components/requestBodies/CreateProjectMember'
+  '/v1/projects/{projectId}/members/{userId}':
+    parameters:
+      - $ref: '#/components/parameters/Project-Id'
+      - $ref: '#/components/parameters/User-Id'
+    delete:
+      summary: V1 - Delete project member
+      operationId: delete-project-member-v1
+      responses:
+        '200':
+          description: '**OK**'
+          content:
+            application/json:
+              schema:
+                $ref: ../../base-api-spec.yaml#/components/schemas/ResSuccess
+        '404':
+          description: project-not-found | member-not-found
+          content:
+            application/json:
+              schema:
+                $ref: ../../base-api-spec.yaml#/components/schemas/ResError
+      tags:
+        - project-member-v1
+      description: delete-project-member-v1
   /v1/shares/programmed:
     get:
       summary: V1 - List programmed shares
@@ -1575,6 +1980,25 @@ paths:
         - work-share-v1
       requestBody:
         $ref: '#/components/requestBodies/CreateWorkShare'
+  '/v1/shares/work/{shareId}/export':
+    parameters:
+      - $ref: '#/components/parameters/Share-Id'
+    get:
+      summary: V1 - Export work share
+      responses:
+        '200':
+          $ref: '#/components/responses/WorkShareExport'
+        '404':
+          description: work-share-not-found
+          content:
+            application/json:
+              schema:
+                $ref: ../../base-api-spec.yaml#/components/schemas/ResError
+      operationId: export-work-share-v1
+      description: export-work-share-v1
+      parameters: []
+      tags:
+        - work-share-v1
   '/v1/shares/work/{shareId}':
     parameters:
       - $ref: '#/components/parameters/Share-Id'
@@ -1772,25 +2196,6 @@ paths:
       tags:
         - work-share-file-v1
       description: delete-work-share-file-v1
-  '/v1/shares/work/{shareId}/export':
-    parameters:
-      - $ref: '#/components/parameters/Share-Id'
-    get:
-      summary: V1 - Export work share
-      responses:
-        '200':
-          $ref: '#/components/responses/WorkShareExport'
-        '404':
-          description: work-share-not-found
-          content:
-            application/json:
-              schema:
-                $ref: ../../base-api-spec.yaml#/components/schemas/ResError
-      operationId: export-work-share-v1
-      description: export-work-share-v1
-      parameters: []
-      tags:
-        - work-share-v1
   /v1/signings/teleworking:
     get:
       summary: V1 - List teleworking signings
@@ -1910,76 +2315,6 @@ paths:
       description: delete-teleworking-signing-v1
       tags:
         - teleworking-signing-v1
-      x-stoplight:
-        id: hiazkg7df8mo0
-  '/v1/signings/warehouse/{warehouseSigningId}':
-    get:
-      summary: v1 - Find warehouse signing
-      tags:
-        - warehouse-signing-v1
-      responses:
-        '200':
-          $ref: '#/components/responses/WarehouseSigning'
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: ../../base-api-spec.yaml#/components/schemas/ResError
-      operationId: find-warehouse-signing-by-id-v1
-      x-stoplight:
-        id: 0umlzrfg5k2l3
-      parameters:
-        - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-meta
-        - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-links
-        - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-expand
-      description: find-warehouse-signing-by-id-v1
-    parameters:
-      - schema:
-          type: string
-        name: warehouseSigningId
-        in: path
-        required: true
-    patch:
-      summary: v1 - Update warehouse signing
-      responses:
-        '200':
-          $ref: '#/components/responses/WarehouseSigning'
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: ../../base-api-spec.yaml#/components/schemas/ResError
-      operationId: update-warehouse-signing-v1
-      x-stoplight:
-        id: vye0lwqwqebse
-      requestBody:
-        $ref: '#/components/requestBodies/UpdateWarehouseSigning'
-      tags:
-        - warehouse-signing-v1
-      description: update-warehouse-signing-v1
-    delete:
-      summary: v1 - Delete warehouse signing
-      tags:
-        - warehouse-signing-v1
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: ../../base-api-spec.yaml#/components/schemas/ResSuccess
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: ../../base-api-spec.yaml#/components/schemas/ResError
-      operationId: delete-warehouse-signing-v1
-      x-stoplight:
-        id: obwffjg8fyncl
-      description: delete-warehouse-signing-v1
   /v1/signings/warehouse:
     get:
       summary: v1 - List warehouse signing
@@ -2047,31 +2382,78 @@ paths:
         - warehouse-signing-v1
       description: create-warehouse-signing-v1
     parameters: []
-  '/v1/signings/warehouse/{id}/workshop-signings':
+  '/v1/signings/warehouse/{warehouseSigningId}':
+    get:
+      summary: v1 - Find warehouse signing
+      tags:
+        - warehouse-signing-v1
+      responses:
+        '200':
+          $ref: '#/components/responses/WarehouseSigning'
+        '404':
+          description: warehouse-signing-not-found
+          content:
+            application/json:
+              schema:
+                $ref: ../../base-api-spec.yaml#/components/schemas/ResError
+      operationId: find-warehouse-signing-by-id-v1
+      x-stoplight:
+        id: 0umlzrfg5k2l3
+      parameters:
+        - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-meta
+        - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-links
+        - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-expand
+      description: find-warehouse-signing-by-id-v1
     parameters:
-      - schema:
-          type: string
-        name: id
-        in: path
-        required: true
+      - $ref: '#/components/parameters/Warehouse-Signing-Id'
+    patch:
+      summary: v1 - Update warehouse signing
+      responses:
+        '200':
+          $ref: '#/components/responses/WarehouseSigning'
+        '404':
+          description: warehouse-signing-not-found
+          content:
+            application/json:
+              schema:
+                $ref: ../../base-api-spec.yaml#/components/schemas/ResError
+      operationId: update-warehouse-signing-v1
+      x-stoplight:
+        id: vye0lwqwqebse
+      requestBody:
+        $ref: '#/components/requestBodies/UpdateWarehouseSigning'
+      tags:
+        - warehouse-signing-v1
+      description: update-warehouse-signing-v1
+    delete:
+      summary: v1 - Delete warehouse signing
+      tags:
+        - warehouse-signing-v1
+      responses:
+        '200':
+          description: '**OK**'
+          content:
+            application/json:
+              schema:
+                $ref: ../../base-api-spec.yaml#/components/schemas/ResSuccess
+        '404':
+          description: warehouse-signing-not-found
+          content:
+            application/json:
+              schema:
+                $ref: ../../base-api-spec.yaml#/components/schemas/ResError
+      operationId: delete-warehouse-signing-v1
+      x-stoplight:
+        id: obwffjg8fyncl
+      description: delete-warehouse-signing-v1
+  '/v1/signings/warehouse/{warehouseSigningId}/workshop-signings':
+    parameters:
+      - $ref: '#/components/parameters/Warehouse-Signing-Id'
     get:
       summary: v1 - List workshop signing
       responses:
         '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  metaData:
-                    $ref: ../../base-api-spec.yaml#/components/schemas/Meta
-                  data:
-                    type: array
-                    x-stoplight:
-                      id: e66u27y441950
-                    items:
-                      $ref: '#/components/schemas/WorkshopSigning'
+          $ref: '#/components/responses/WorkshopSigningList'
       operationId: list-workshop-signings-v1
       x-stoplight:
         id: 06vfmtaj1eo8x
@@ -2118,18 +2500,9 @@ paths:
         - workshop-signing-v1
       responses:
         '200':
-          description: ''
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  metaData:
-                    $ref: ../../base-api-spec.yaml#/components/schemas/Meta
-                  data:
-                    $ref: '#/components/schemas/WorkshopSigning'
+          $ref: '#/components/responses/WorkshopSigning'
         '404':
-          description: user-not-found | project-not-found
+          description: user-not-found | project-not-found | warehouse-signing-not-found
           content:
             application/json:
               schema:
@@ -2140,25 +2513,17 @@ paths:
       requestBody:
         $ref: '#/components/requestBodies/CreateWorkshopSigning'
       description: create-workshop-signing-v1
-  '/v1/signings/warehouse/{id}/workshop-signings/{workshopSigningId}':
+  '/v1/signings/warehouse/{warehouseSigningId}/workshop-signings/{workshopSigningId}':
     parameters:
-      - schema:
-          type: string
-        name: id
-        in: path
-        required: true
-      - schema:
-          type: string
-        name: workshopSigningId
-        in: path
-        required: true
+      - $ref: '#/components/parameters/Warehouse-Signing-Id'
+      - $ref: '#/components/parameters/Workshop-Signing-Id'
     get:
       summary: v1 - Find workshop signing
       responses:
         '200':
           $ref: '#/components/responses/WorkshopSigning'
         '404':
-          description: Not Found
+          description: ' warehouse-signing-not-found | workshop-signing-not-found'
           content:
             application/json:
               schema:
@@ -2181,7 +2546,7 @@ paths:
         '200':
           $ref: '#/components/responses/WorkshopSigning'
         '404':
-          description: Not Found
+          description: ' warehouse-signing-not-found | workshop-signing-not-found'
           content:
             application/json:
               schema:
@@ -2198,13 +2563,13 @@ paths:
         - workshop-signing-v1
       responses:
         '200':
-          description: OK
+          description: '**OK**'
           content:
             application/json:
               schema:
                 $ref: ../../base-api-spec.yaml#/components/schemas/ResSuccess
         '404':
-          description: Not Found
+          description: ' warehouse-signing-not-found | workshop-signing-not-found'
           headers: {}
           content:
             application/json:
@@ -2252,6 +2617,7 @@ paths:
                 - DISPLACEMENT_SHARES
                 - INSPECTIONS
                 - MANUAL_SIGNINGS
+                - OFFICE_SIGNING
                 - PERSONAL_SIGNINGS
                 - PROGRAMMED_SHARES
                 - TELEWORKING_SIGNING
@@ -2371,6 +2737,16 @@ paths:
           in: query
           name: levelIds
           description: Filter by level id.
+        - schema:
+            type: integer
+          in: query
+          name: leadingProjectId
+          description: Filter by leading project id.
+        - schema:
+            type: integer
+          in: query
+          name: memberProjectId
+          description: Filter by member project id.
       tags:
         - user-v1
     post:
@@ -2787,6 +3163,55 @@ components:
           type: string
           x-stoplight:
             id: ll4sov9aexq0v
+        type:
+          type: string
+          enum:
+            - NORMAL
+            - STATION
+            - OFFICE
+            - TELEWORKING
+          x-stoplight:
+            id: 0p30i71dxed4x
+        objectiveCost:
+          type: number
+          x-stoplight:
+            id: uti97ajby18br
+        startDate:
+          type: string
+          x-stoplight:
+            id: d0ej6bz003y22
+          format: date
+        endDate:
+          type: string
+          x-stoplight:
+            id: uzeirrd29qxt9
+          format: date
+        activityCenter:
+          $ref: ../gestepm-master-data-api/api-spec.yaml#/components/schemas/ActivityCenter
+        forumId:
+          type: integer
+          x-stoplight:
+            id: dvu6fkl5xwqpw
+        state:
+          type: integer
+          x-stoplight:
+            id: tromrcn4vvmwc
+        responsible:
+          x-stoplight:
+            id: thgh3qi3x9aoc
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+      required:
+        - id
+        - name
+        - type
+        - objectiveCost
+        - startDate
+        - endDate
+        - activityCenter
+        - state
+        - responsible
     ShareFile:
       title: ShareFile
       x-stoplight:
@@ -3094,6 +3519,7 @@ components:
             - DISPLACEMENT_SHARES
             - INSPECTIONS
             - MANUAL_SIGNINGS
+            - OFFICE_SIGNING
             - PERSONAL_SIGNINGS
             - PROGRAMMED_SHARES
             - TELEWORKING_SIGNING
@@ -3236,10 +3662,66 @@ components:
         - startDate
         - createdAt
         - createdBy
+    Customer:
+      title: Customer
+      x-stoplight:
+        id: r149zjmuc1183
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          x-stoplight:
+            id: jz6lb45c58f3u
+        mainEmail:
+          type: string
+          x-stoplight:
+            id: vdes6l89seqzy
+          format: email
+        secondaryEmail:
+          type: string
+          x-stoplight:
+            id: nm1203pdpa3d1
+          format: email
+        project:
+          $ref: '#/components/schemas/Project'
+      required:
+        - id
+        - name
+        - project
+    ProjectMaterial:
+      title: ProjectMaterial
+      x-stoplight:
+        id: lhjmr1z4qgnd3
+      type: object
+      properties:
+        id:
+          type: integer
+        project:
+          $ref: '#/components/schemas/Project'
+        nameEs:
+          type: string
+          x-stoplight:
+            id: kkkw48b6k78jm
+        nameFr:
+          type: string
+          x-stoplight:
+            id: naxe1exctw9wz
+        required:
+          type: boolean
+          x-stoplight:
+            id: pjzwzixclj19j
+      required:
+        - id
+        - project
+        - nameEs
+        - nameFr
+        - required
     WarehouseSigning:
       title: WarehouseSigning
       x-stoplight:
-        id: cu63wu4mu3fcb
+        id: il6ntgzjryq7t
       type: object
       required:
         - id
@@ -3250,7 +3732,7 @@ components:
         id:
           type: integer
           x-stoplight:
-            id: m43bsoycf8iw6
+            id: 97le3orb0r6lm
         user:
           $ref: '#/components/schemas/User'
         project:
@@ -3258,17 +3740,17 @@ components:
         startedAt:
           type: string
           x-stoplight:
-            id: 8aiecsyq5q74c
+            id: 32h728sl8oov3
           format: date-time
         closedAt:
           type: string
           x-stoplight:
-            id: otytqgwp23gyw
+            id: 8yvfv3exkqv1h
           format: date-time
     WorkshopSigning:
       title: WorkshopSigning
       x-stoplight:
-        id: arjexvtsqsizz
+        id: vs2vqh15gqvt8
       type: object
       required:
         - id
@@ -3280,7 +3762,7 @@ components:
         id:
           type: integer
           x-stoplight:
-            id: gzadavt9pxze9
+            id: fipqgkzy9icy3
         warehouse:
           $ref: '#/components/schemas/WarehouseSigning'
         user:
@@ -3290,12 +3772,12 @@ components:
         startedAt:
           type: string
           x-stoplight:
-            id: xmb28vje8fhl9
+            id: rruuvl31h0nuq
           format: date-time
         closedAt:
           type: string
           x-stoplight:
-            id: tra8f1qpgvmbp
+            id: yf3vqpzj6hd8r
           format: date-time
   securitySchemes:
     bearerAuth:
@@ -3557,6 +4039,56 @@ components:
           schema:
             type: string
             format: binary
+    WarehouseSigning:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              metadata:
+                $ref: ../../base-api-spec.yaml#/components/schemas/Meta
+              data:
+                $ref: '#/components/schemas/WarehouseSigning'
+    WarehouseSigningList:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              metadata:
+                $ref: ../../base-api-spec.yaml#/components/schemas/Meta
+              data:
+                x-stoplight:
+                  id: wfrz0o66843af
+                type: array
+                items:
+                  $ref: '#/components/schemas/WarehouseSigning'
+    WorkshopSigning:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              metadata:
+                $ref: ../../base-api-spec.yaml#/components/schemas/Meta
+              data:
+                $ref: '#/components/schemas/WorkshopSigning'
+    WorkshopSigningList:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              metadata:
+                $ref: ../../base-api-spec.yaml#/components/schemas/Meta
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WorkshopSigning'
     WorkShare:
       description: Example response
       content:
@@ -3641,7 +4173,7 @@ components:
           schema:
             type: string
             format: binary
-    WarehouseSigning:
+    Project:
       description: Example response
       content:
         application/json:
@@ -3651,8 +4183,8 @@ components:
               metadata:
                 $ref: ../../base-api-spec.yaml#/components/schemas/Meta
               data:
-                $ref: '#/components/schemas/WarehouseSigning'
-    WarehouseSigningList:
+                $ref: '#/components/schemas/Project'
+    ProjectList:
       description: Example response
       content:
         application/json:
@@ -3662,12 +4194,10 @@ components:
               metadata:
                 $ref: ../../base-api-spec.yaml#/components/schemas/Meta
               data:
-                x-stoplight:
-                  id: m0cj7bszv3z3k
                 type: array
                 items:
-                  $ref: '#/components/schemas/WarehouseSigning'
-    WorkshopSigning:
+                  $ref: '#/components/schemas/Project'
+    Customer:
       description: Example response
       content:
         application/json:
@@ -3677,7 +4207,31 @@ components:
               metadata:
                 $ref: ../../base-api-spec.yaml#/components/schemas/Meta
               data:
-                $ref: '#/components/schemas/WorkshopSigning'
+                $ref: '#/components/schemas/Customer'
+    ProjectMaterial:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              metadata:
+                $ref: ../../base-api-spec.yaml#/components/schemas/Meta
+              data:
+                $ref: '#/components/schemas/ProjectMaterial'
+    ProjectMaterialList:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              metadata:
+                $ref: ../../base-api-spec.yaml#/components/schemas/Meta
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProjectMaterial'
   requestBodies:
     CreateNoProgrammedShare:
       content:
@@ -4468,6 +5022,214 @@ components:
                 type: integer
                 x-stoplight:
                   id: 62h2alswvyo76
+              state:
+                type: integer
+                x-stoplight:
+                  id: 6manpi7j4nctq
+    CreateProject:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                x-stoplight:
+                  id: lrh64vywrmh5a
+              type:
+                type: string
+                enum:
+                  - NORMAL
+                  - STATION
+                  - OFFICE
+                  - TELEWORKING
+                x-stoplight:
+                  id: 7qxwkrwkxhkpq
+              objectiveCost:
+                type: number
+                x-stoplight:
+                  id: 4x2eqds7gtlp6
+              startDate:
+                type: string
+                x-stoplight:
+                  id: j7190r4vub7il
+                format: date
+              endDate:
+                type: string
+                x-stoplight:
+                  id: igufzp9as1y2y
+                format: date
+              activityCenterId:
+                type: integer
+                x-stoplight:
+                  id: kbdow3b2dq57r
+              forumId:
+                type: integer
+                x-stoplight:
+                  id: ssf3q76pxj0bb
+              responsibleIds:
+                type: array
+                x-stoplight:
+                  id: 7fe8yopp661dm
+                items:
+                  x-stoplight:
+                    id: 07vel087tmqjz
+                  type: integer
+            required:
+              - name
+              - objectiveCost
+              - startDate
+              - endDate
+              - activityCenterId
+              - responsibleIds
+    UpdateProject:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                x-stoplight:
+                  id: lzx6r53rkdv5d
+              type:
+                type: string
+                enum:
+                  - NORMAL
+                  - STATION
+                  - OFFICE
+                  - TELEWORKING
+                x-stoplight:
+                  id: iik38j966ouj7
+              objectiveCost:
+                type: number
+                x-stoplight:
+                  id: uhczt44utnjla
+              startDate:
+                type: string
+                x-stoplight:
+                  id: 4nw3s89in1ykk
+                format: date
+              endDate:
+                type: string
+                x-stoplight:
+                  id: cftc06vktuh3v
+                format: date
+              activityCenterId:
+                type: integer
+                x-stoplight:
+                  id: 7kbkres4eizeb
+              forumId:
+                type: integer
+                x-stoplight:
+                  id: 2eci6oizbft3u
+              state:
+                type: integer
+                x-stoplight:
+                  id: 8meg9aztp0suz
+              responsibleIds:
+                type: array
+                x-stoplight:
+                  id: mjc0agmpxayo7
+                items:
+                  x-stoplight:
+                    id: qbmlacaq1yf3d
+                  type: integer
+            required:
+              - name
+              - type
+              - objectiveCost
+              - startDate
+              - endDate
+              - activityCenterId
+              - state
+              - responsibleIds
+    CreateProjectMember:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              userId:
+                type: integer
+                x-stoplight:
+                  id: j3k27bm3t89gr
+    CreateProjectLeader:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              userId:
+                type: integer
+                x-stoplight:
+                  id: er62r87yojwi2
+    CreateCustomer:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                x-stoplight:
+                  id: j3972vi9deftu
+              mainEmail:
+                type: string
+                x-stoplight:
+                  id: cc4dks9xed5d3
+                format: email
+              secondaryEmail:
+                type: string
+                x-stoplight:
+                  id: mjrrdjt7843d7
+                format: email
+            required:
+              - name
+    CreateProjectMaterial:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              nameEs:
+                type: string
+                x-stoplight:
+                  id: yblix6vp1hg07
+              nameFr:
+                type: string
+                x-stoplight:
+                  id: n3ixiykrslv99
+              required:
+                type: boolean
+                x-stoplight:
+                  id: d9tbucgnrq307
+            required:
+              - nameEs
+              - nameFr
+              - required
+    UpdateProjectMaterial:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              nameEs:
+                type: string
+                x-stoplight:
+                  id: guj0njun0h64v
+              nameFr:
+                type: string
+                x-stoplight:
+                  id: 2ji9z75qp6emt
+              required:
+                type: boolean
+                x-stoplight:
+                  id: q4v4jawbs4vct
+            required:
+              - nameEs
+              - nameFr
+              - required
     CreateWarehouseSigning:
       content:
         application/json:
@@ -4592,6 +5354,34 @@ components:
       schema:
         type: integer
       description: User identificator.
+    Project-Id:
+      name: projectId
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: Project identificator.
+    Material-Id:
+      name: materialId
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: Project material identificator.
+    Warehouse-Signing-Id:
+      name: warehouseSigningId
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: Warehouse signing identificator.
+    Workshop-Signing-Id:
+      name: workshopSigningId
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: Workshop signing identificator.
 tags:
   - name: personal-expense-sheet-v1
     description: V1 - Personal Expense Sheets
@@ -4623,18 +5413,28 @@ tags:
     description: V1 - Programmed Share Break
   - name: programmed-share-file-v1
     description: V1 - Programmed Share File
+  - name: project-v1
+    description: V1 - Project
+  - name: project-customer-v1
+    description: V1 - Project Customer
+  - name: project-material-v1
+    description: V1 - Project Material
+  - name: project-member-v1
+    description: V1 - Project Member
+  - name: project-leader-v1
+    description: V1 - Project Leader
   - name: share-v1
     description: V1 - Share
   - name: teleworking-signing-v1
     description: V1 - Teleworking Signing
-  - name: warehouse-signing-v1
-    description: V1 - Warehouse Signing
-  - name: workshop-signing-v1
-    description: V1 - Workshop Signing
   - name: time-control-v1
     description: V1 - Time control
   - name: user-v1
     description: V1 - User
+  - name: warehouse-signing-v1
+    description: V1 - Warehouse Signing
+  - name: workshop-signing-v1
+    description: V1 - Workshop Signing
   - name: work-share-v1
     description: V1 - Work Share
   - name: work-share-break-v1

@@ -1,0 +1,94 @@
+sql:
+
+  qry-list-of-ws: |
+
+    SELECT
+      ws.warehouse_signing_id,
+      ws.user_id,
+      ws.project_id,
+      pr.name AS project_name,
+      ws.started_at,
+      ws.closed_at
+    FROM ${sch-gestepm}.warehouse_signing ws
+    LEFT JOIN ${sch-gestepm}.project pr ON ws.project_id = pr.project_id
+
+    #whereToken #filter
+    GROUP BY ws.warehouse_signing_id
+    #orderByToken
+
+  qry-page-of-ws: |
+
+    ${sql.qry-list-of-ws}
+    ${sql.paginated-query}
+
+  qry-count-of-ws: |
+
+    SELECT COUNT(DISTINCT warehouse_signing_id) AS "count"
+    FROM (
+      SELECT ws.warehouse_signing_id
+      FROM ${sch-gestepm}.warehouse_signing ws      
+      #whereToken #filter
+    ) final
+
+  qry-create-ws: |
+
+    INSERT INTO ${sch-gestepm}.warehouse_signing (
+      user_id,
+      project_id,
+      started_at
+    )
+    VALUES (
+      :attr_ws_user_id,
+      :attr_ws_project_id,
+      :attr_ws_started_at
+    )
+
+  qry-update-ws: |
+
+    UPDATE
+      ${sch-gestepm}.warehouse_signing
+    SET
+      started_at = :attr_ws_started_at,
+      closed_at = :attr_ws_closed_at
+    WHERE
+      warehouse_signing_id = :attr_ws_id
+
+  qry-delete-ws: |
+
+    DELETE FROM ${sch-gestepm}.warehouse_signing WHERE warehouse_signing_id = :attr_ws_id
+
+  filter-ws-by-params: |
+
+    -- [AND
+      -- ${sql.predicate-for-ws-ids}
+      -- ${sql.predicate-for-ws-u-id}
+      -- ${sql.predicate-for-ws-p-id}
+      -- ${sql.predicate-for-ws-current}
+    -- AND]
+
+  filter-ws-by-id: |
+
+    -- [AND
+      -- ${sql.predicate-for-ws-id}
+    -- AND]
+
+  predicate-for-ws-id: |
+
+    ws.warehouse_signing_id = :attr_ws_id
+
+  predicate-for-ws-ids: |
+
+    ws.warehouse_signing_id IN (:attr_ws_ids)
+
+  predicate-for-ws-u-id: |
+
+    ws.user_id IN (:attr_ws_user_id)
+
+  predicate-for-ws-p-id: |
+
+    ws.project_id IN (:attr_ws_project_id)
+
+  predicate-for-ws-current: |
+    
+    ((:attr_ws_current IS TRUE AND ws.closed_at IS NULL) OR (:attr_ws_current IS FALSE AND ws.closed_at IS NOT NULL))
+

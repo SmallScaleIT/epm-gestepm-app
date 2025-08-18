@@ -1,0 +1,97 @@
+sql:
+
+  qry-list-of-wsh: |
+
+    SELECT
+      wsh.workshop_signing_id,
+      wsh.warehouse_signing_id,
+      wsh.user_id,
+      wsh.project_id,
+      pr.name AS project_name,
+      wsh.started_at,
+      wsh.closed_at
+    FROM ${sch-gestepm}.workshop_signing wsh
+    LEFT JOIN ${sch-gestepm}.project pr ON wsh.project_id = pr.project_id
+
+    #whereToken #filter
+    GROUP BY wsh.workshop_signing_id
+    #orderByToken
+
+  qry-page-of-wsh: |
+
+    ${sql.qry-list-of-wsh}
+    ${sql.paginated-query}
+
+  qry-count-of-wsh: |
+
+    SELECT COUNT(DISTINCT workshop_signing_id) AS "count"
+    FROM (
+      SELECT wsh.workshop_signing_id
+      FROM ${sch-gestepm}.workshop_signing wsh      
+      #whereToken #filter
+    ) final
+
+  qry-create-wsh: |
+
+    INSERT INTO ${sch-gestepm}.workshop_signing (
+      user_id,
+      project_id,
+      warehouse_signing_id,
+      started_at
+    )
+    VALUES (
+      :attr_wsh_user_id,
+      :attr_wsh_project_id,
+      :attr_wsh_warehouse_id,
+      :attr_wsh_started_at
+    )
+
+  qry-update-wsh: |
+
+    UPDATE
+      ${sch-gestepm}.workshop_signing
+    SET
+      started_at = :attr_wsh_started_at,
+      closed_at = :attr_wsh_closed_at
+    WHERE
+      workshop_signing_id = :attr_wsh_id
+
+  qry-delete-wsh: |
+
+    DELETE FROM ${sch-gestepm}.workshop_signing WHERE workshop_signing_id = :attr_wsh_id
+
+  filter-wsh-by-params: |
+
+    -- [AND
+      -- ${sql.predicate-for-wsh-ids}
+      -- ${sql.predicate-for-wsh-u-id}
+      -- ${sql.predicate-for-wsh-p-id}
+      -- ${sql.predicate-for-wsh-current}
+    -- AND]
+
+  filter-wsh-by-id: |
+
+    -- [AND
+      -- ${sql.predicate-for-wsh-id}
+    -- AND]
+
+  predicate-for-wsh-id: |
+
+    wsh.workshop_signing_id = :attr_wsh_id
+
+  predicate-for-wsh-ids: |
+
+    wsh.workshop_signing_id IN (:attr_wsh_ids)
+
+  predicate-for-wsh-u-id: |
+
+    wsh.user_id IN (:attr_wsh_user_id)
+
+  predicate-for-wsh-p-id: |
+
+    wsh.project_id IN (:attr_wsh_project_id)
+
+  predicate-for-wsh-current: |
+    
+    ((:attr_wsh_current IS TRUE AND wsh.closed_at IS NULL) OR (:attr_wsh_current IS FALSE AND wsh.closed_at IS NOT NULL))
+
