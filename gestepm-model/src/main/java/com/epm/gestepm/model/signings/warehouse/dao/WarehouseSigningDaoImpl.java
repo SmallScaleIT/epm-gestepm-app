@@ -51,8 +51,8 @@ public class WarehouseSigningDaoImpl implements WarehouseSigningDao {
 
         final SQLQueryFetchMany<WarehouseSigning> sqlQuery = new SQLQueryFetchMany<WarehouseSigning>()
                 .useRowMapper(new WarehouseSigningRowMapper())
-                .useQuery(QRY_LIST_OF_WSH)
-                .useFilter(FILTER_WSH_BY_PARAMS)
+                .useQuery(QRY_LIST_OF_WHS)
+                .useFilter(FILTER_WHS_BY_PARAMS)
                 .withParams(filter.collectAttributes());
 
         this.setOrder(filter.getOrder(), filter.getOrderBy(), sqlQuery);
@@ -70,9 +70,9 @@ public class WarehouseSigningDaoImpl implements WarehouseSigningDao {
 
         final SQLQueryFetchPage<WarehouseSigning> sqlQuery = new SQLQueryFetchPage<WarehouseSigning>()
                 .useRowMapper(new WarehouseSigningRowMapper())
-                .useQuery(QRY_PAGE_OF_WSH)
-                .useCountQuery(QRY_COUNT_OF_WSH)
-                .useFilter(FILTER_WSH_BY_PARAMS)
+                .useQuery(QRY_PAGE_OF_WHS)
+                .useCountQuery(QRY_COUNT_OF_WHS)
+                .useFilter(FILTER_WHS_BY_PARAMS)
                 .offset(offset)
                 .limit(limit)
                 .withParams(filter.collectAttributes());
@@ -92,8 +92,8 @@ public class WarehouseSigningDaoImpl implements WarehouseSigningDao {
 
         final SQLQueryFetchOne<WarehouseSigning> sqlQuery = new SQLQueryFetchOne<WarehouseSigning>()
                 .useRowMapper(new WarehouseSigningRowMapper())
-                .useQuery(QRY_LIST_OF_WSH)
-                .useFilter(FILTER_WSH_BY_ID)
+                .useQuery(QRY_LIST_OF_WHS)
+                .useFilter(FILTER_WHS_BY_ID)
                 .withParams(finder.collectAttributes());
 
         return datasource.fetch(sqlQuery);
@@ -109,8 +109,8 @@ public class WarehouseSigningDaoImpl implements WarehouseSigningDao {
 
         SQLQueryFetchOne<WarehouseSigningUpdate> sqlQuery = new SQLQueryFetchOne<WarehouseSigningUpdate>()
                 .useRowMapper(new WarehouseSigningUpdateRowMapper())
-                .useQuery(QRY_LIST_OF_WSH)
-                .useFilter(FILTER_WSH_BY_ID)
+                .useQuery(QRY_LIST_OF_WHS)
+                .useFilter(FILTER_WHS_BY_ID)
                 .withParams(finder.collectAttributes());
 
         return datasource.fetch(sqlQuery);
@@ -127,7 +127,7 @@ public class WarehouseSigningDaoImpl implements WarehouseSigningDao {
         WarehouseSigningByIdFinder finder = new WarehouseSigningByIdFinder();
 
         SQLInsert<BigInteger> insert = new SQLInsert<BigInteger>()
-                .useQuery(QRY_CREATE_WSH)
+                .useQuery(QRY_CREATE_WHS)
                 .withParams(create.collectAttributes())
                 .onGeneratedKey(id -> finder.setId(id.intValue()));
 
@@ -148,7 +148,7 @@ public class WarehouseSigningDaoImpl implements WarehouseSigningDao {
         finder.setId(update.getId());
 
         SQLQuery sqlUpdate = new SQLQuery()
-                .useQuery(QRY_UPDATE_WSH)
+                .useQuery(QRY_UPDATE_WHS)
                 .withParams(update.collectAttributes());
 
         datasource.execute(sqlUpdate);
@@ -165,7 +165,7 @@ public class WarehouseSigningDaoImpl implements WarehouseSigningDao {
     public void delete(WarehouseSigningDelete delete) {
 
         SQLQuery sqlDelete = new SQLQuery()
-                .useQuery(QRY_DELETE_WSH)
+                .useQuery(QRY_DELETE_WHS)
                 .withParams(delete.collectAttributes());
 
         datasource.execute(sqlDelete);

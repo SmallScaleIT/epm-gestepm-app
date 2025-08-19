@@ -40,7 +40,7 @@ public class WarehouseSigningRowMapper extends CommonRowMapper implements RowMap
 
         final List<Integer> workshopSigningIds = new ArrayList<>();
 
-        if (hasColumn(rs, COL_WHS_WORKSHOP_SIGNING_IDS)) {
+        if (hasValue(rs, COL_WHS_WORKSHOP_SIGNING_IDS)) {
             Arrays.stream(rs.getString(COL_WHS_WORKSHOP_SIGNING_IDS).split(","))
                     .map(Integer::parseInt)
                     .forEach(workshopSigningIds::add);
