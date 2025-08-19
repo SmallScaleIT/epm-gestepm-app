@@ -26,10 +26,10 @@ public class WarehouseSigningFilter extends Orderable implements CollectableAttr
     public AttributeMap collectAttributes() {
 
         AttributeMap attrs = new AttributeMap();
-        attrs.putList(ATTR_WS_IDS, this.ids);
-        attrs.putList(ATTR_WS_USER_ID, this.userIds);
-        attrs.putList(ATTR_WS_PROJECT_ID, this.projectIds);
-        attrs.put(ATTR_WS_CURRENT, this.current);
+        attrs.putList(ATTR_WHS_IDS, this.ids);
+        attrs.putList(ATTR_WHS_USER_ID, this.userIds);
+        attrs.putList(ATTR_WHS_PROJECT_ID, this.projectIds);
+        attrs.put(ATTR_WHS_CURRENT, this.current);
 
         return attrs;
     }

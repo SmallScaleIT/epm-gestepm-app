@@ -18,7 +18,7 @@ public class WorkshopSigningDelete implements CollectableAttributes {
     public AttributeMap collectAttributes() {
 
         AttributeMap attrs = new AttributeMap();
-        attrs.put(ATTR_WSH_ID, this.id);
+        attrs.put(ATTR_WSS_ID, this.id);
 
         return attrs;
     }

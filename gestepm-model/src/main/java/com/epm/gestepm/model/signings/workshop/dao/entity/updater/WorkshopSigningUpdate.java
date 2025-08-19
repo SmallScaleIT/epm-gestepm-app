@@ -26,9 +26,9 @@ public class WorkshopSigningUpdate implements AuditUpdate, CollectableAttributes
 
         AttributeMap attrs = new AttributeMap();
 
-        attrs.put(ATTR_WSH_ID, this.id);
-        attrs.putTimestamp(ATTR_WSH_STARTED_AT, this.startedAt);
-        attrs.putTimestamp(ATTR_WSH_CLOSED_AT, this.closedAt);
+        attrs.put(ATTR_WSS_ID, this.id);
+        attrs.putTimestamp(ATTR_WSS_STARTED_AT, this.startedAt);
+        attrs.putTimestamp(ATTR_WSS_CLOSED_AT, this.closedAt);
 
         return attrs;
     }

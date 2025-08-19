@@ -29,10 +29,10 @@ public class WorkshopSigningCreate implements AuditCreate, CollectableAttributes
     public AttributeMap collectAttributes() {
 
         AttributeMap attrs = new AttributeMap();
-        attrs.put(ATTR_WSH_WAREHOUSE_ID, this.warehouseId);
-        attrs.put(ATTR_WSH_USER_ID, this.userId);
-        attrs.put(ATTR_WSH_PROJECT_ID, this.projectId);
-        attrs.putTimestamp(ATTR_WSH_STARTED_AT, this.startedAt);
+        attrs.put(ATTR_WSS_WAREHOUSE_ID, this.warehouseId);
+        attrs.put(ATTR_WSS_USER_ID, this.userId);
+        attrs.put(ATTR_WSS_PROJECT_ID, this.projectId);
+        attrs.putTimestamp(ATTR_WSS_STARTED_AT, this.startedAt);
 
         return attrs;
     }

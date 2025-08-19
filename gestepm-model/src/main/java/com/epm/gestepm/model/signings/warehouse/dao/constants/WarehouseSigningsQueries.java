@@ -1,19 +1,19 @@
 package com.epm.gestepm.model.signings.warehouse.dao.constants;
 
 public abstract class WarehouseSigningsQueries {
-    public static final String QRY_PAGE_OF_WS = "qry-page-of-ws";
+    public static final String QRY_PAGE_OF_WSH = "qry-page-of-wsh";
 
-    public static final String QRY_LIST_OF_WS = "qry-list-of-ws";
+    public static final String QRY_LIST_OF_WSH = "qry-list-of-wsh";
 
-    public static final String QRY_COUNT_OF_WS = "qry-count-of-ws";
+    public static final String QRY_COUNT_OF_WSH = "qry-count-of-wsh";
 
-    public static final String QRY_CREATE_WS = "qry-create-ws";
+    public static final String QRY_CREATE_WSH = "qry-create-wsh";
 
-    public static final String QRY_UPDATE_WS = "qry-update-ws";
+    public static final String QRY_UPDATE_WSH = "qry-update-wsh";
 
-    public static final String QRY_DELETE_WS = "qry-delete-ws";
+    public static final String QRY_DELETE_WSH = "qry-delete-wsh";
 
-    public static final String FILTER_WS_BY_PARAMS = "filter-ws-by-params";
+    public static final String FILTER_WSH_BY_PARAMS = "filter-wsh-by-params";
 
-    public static final String FILTER_WS_BY_ID = "filter-ws-by-id";
+    public static final String FILTER_WSH_BY_ID = "filter-wsh-by-id";
 }

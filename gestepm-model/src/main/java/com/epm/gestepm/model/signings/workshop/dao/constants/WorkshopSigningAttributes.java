@@ -1,19 +1,19 @@
 package com.epm.gestepm.model.signings.workshop.dao.constants;
 
 public abstract class WorkshopSigningAttributes {
-    public static final String ATTR_WSH_ID = "attr_wsh_id";
+    public static final String ATTR_WSS_ID = "attr_wss_id";
 
-    public static final String ATTR_WSH_IDS = "attr_wsh_ids";
+    public static final String ATTR_WSS_IDS = "attr_wss_ids";
 
-    public static final String ATTR_WSH_USER_ID = "attr_wsh_user_id";
+    public static final String ATTR_WSS_USER_ID = "attr_wss_user_id";
 
-    public static final String ATTR_WSH_PROJECT_ID = "attr_wsh_project_id";
+    public static final String ATTR_WSS_PROJECT_ID = "attr_wss_project_id";
 
-    public static final String ATTR_WSH_WAREHOUSE_ID = "attr_wsh_warehouse_id";
+    public static final String ATTR_WSS_WAREHOUSE_ID = "attr_wss_warehouse_id";
 
-    public static final String ATTR_WSH_STARTED_AT = "attr_wsh_started_at";
+    public static final String ATTR_WSS_STARTED_AT = "attr_wss_started_at";
 
-    public static final String ATTR_WSH_CLOSED_AT = "attr_wsh_closed_at";
+    public static final String ATTR_WSS_CLOSED_AT = "attr_wss_closed_at";
 
-    public static final String ATTR_WSH_CURRENT = "attr_wsh_current";
+    public static final String ATTR_WSS_CURRENT = "attr_wss_current";
 }

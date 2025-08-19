@@ -1,37 +1,37 @@
 sql:
 
-  qry-list-of-wsh: |
+  qry-list-of-wss: |
 
     SELECT
-      wsh.workshop_signing_id,
-      wsh.warehouse_signing_id,
-      wsh.user_id,
-      wsh.project_id,
+      wss.workshop_signing_id,
+      wss.warehouse_signing_id,
+      wss.user_id,
+      wss.project_id,
       pr.name AS project_name,
-      wsh.started_at,
-      wsh.closed_at
-    FROM ${sch-gestepm}.workshop_signing wsh
-    LEFT JOIN ${sch-gestepm}.project pr ON wsh.project_id = pr.project_id
+      wss.started_at,
+      wss.closed_at
+    FROM ${sch-gestepm}.workshop_signing wss
+    LEFT JOIN ${sch-gestepm}.project pr ON wss.project_id = pr.project_id
 
     #whereToken #filter
-    GROUP BY wsh.workshop_signing_id
+    GROUP BY wss.workshop_signing_id
     #orderByToken
 
-  qry-page-of-wsh: |
+  qry-page-of-wss: |
 
-    ${sql.qry-list-of-wsh}
+    ${sql.qry-list-of-wss}
     ${sql.paginated-query}
 
-  qry-count-of-wsh: |
+  qry-count-of-wss: |
 
     SELECT COUNT(DISTINCT workshop_signing_id) AS "count"
     FROM (
-      SELECT wsh.workshop_signing_id
-      FROM ${sch-gestepm}.workshop_signing wsh      
+      SELECT wss.workshop_signing_id
+      FROM ${sch-gestepm}.workshop_signing wss      
       #whereToken #filter
     ) final
 
-  qry-create-wsh: |
+  qry-create-wss: |
 
     INSERT INTO ${sch-gestepm}.workshop_signing (
       user_id,
@@ -40,58 +40,58 @@ sql:
       started_at
     )
     VALUES (
-      :attr_wsh_user_id,
-      :attr_wsh_project_id,
-      :attr_wsh_warehouse_id,
-      :attr_wsh_started_at
+      :attr_wss_user_id,
+      :attr_wss_project_id,
+      :attr_wss_warehouse_id,
+      :attr_wss_started_at
     )
 
-  qry-update-wsh: |
+  qry-update-wss: |
 
     UPDATE
       ${sch-gestepm}.workshop_signing
     SET
-      started_at = :attr_wsh_started_at,
-      closed_at = :attr_wsh_closed_at
+      started_at = :attr_wss_started_at,
+      closed_at = :attr_wss_closed_at
     WHERE
-      workshop_signing_id = :attr_wsh_id
+      workshop_signing_id = :attr_wss_id
 
-  qry-delete-wsh: |
+  qry-delete-wss: |
 
-    DELETE FROM ${sch-gestepm}.workshop_signing WHERE workshop_signing_id = :attr_wsh_id
+    DELETE FROM ${sch-gestepm}.workshop_signing WHERE workshop_signing_id = :attr_wss_id
 
-  filter-wsh-by-params: |
-
-    -- [AND
-      -- ${sql.predicate-for-wsh-ids}
-      -- ${sql.predicate-for-wsh-u-id}
-      -- ${sql.predicate-for-wsh-p-id}
-      -- ${sql.predicate-for-wsh-current}
-    -- AND]
-
-  filter-wsh-by-id: |
+  filter-wss-by-params: |
 
     -- [AND
-      -- ${sql.predicate-for-wsh-id}
+      -- ${sql.predicate-for-wss-ids}
+      -- ${sql.predicate-for-wss-u-id}
+      -- ${sql.predicate-for-wss-p-id}
+      -- ${sql.predicate-for-wss-current}
     -- AND]
 
-  predicate-for-wsh-id: |
+  filter-wss-by-id: |
 
-    wsh.workshop_signing_id = :attr_wsh_id
+    -- [AND
+      -- ${sql.predicate-for-wss-id}
+    -- AND]
 
-  predicate-for-wsh-ids: |
+  predicate-for-wss-id: |
 
-    wsh.workshop_signing_id IN (:attr_wsh_ids)
+    wss.workshop_signing_id = :attr_wss_id
 
-  predicate-for-wsh-u-id: |
+  predicate-for-wss-ids: |
 
-    wsh.user_id IN (:attr_wsh_user_id)
+    wss.workshop_signing_id IN (:attr_wss_ids)
 
-  predicate-for-wsh-p-id: |
+  predicate-for-wss-u-id: |
 
-    wsh.project_id IN (:attr_wsh_project_id)
+    wss.user_id IN (:attr_wss_user_id)
 
-  predicate-for-wsh-current: |
+  predicate-for-wss-p-id: |
+
+    wss.project_id IN (:attr_wss_project_id)
+
+  predicate-for-wss-current: |
     
-    ((:attr_wsh_current IS TRUE AND wsh.closed_at IS NULL) OR (:attr_wsh_current IS FALSE AND wsh.closed_at IS NOT NULL))
+    ((:attr_wss_current IS TRUE AND wss.closed_at IS NULL) OR (:attr_wss_current IS FALSE AND wss.closed_at IS NOT NULL))
 

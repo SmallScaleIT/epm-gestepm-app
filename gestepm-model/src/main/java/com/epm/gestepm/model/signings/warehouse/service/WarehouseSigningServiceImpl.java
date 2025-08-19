@@ -44,7 +44,7 @@ public class WarehouseSigningServiceImpl implements WarehouseSigningService {
     private final WarehouseSigningDao repository;
 
     @Override
-    @RequirePermits(value = PRMT_READ_WS, action = "List warehouse signings")
+    @RequirePermits(value = PRMT_READ_WHS, action = "List warehouse signings")
     @LogExecution(operation = OP_READ,
             debugOut = true,
             msgIn = "Listing warehouse signings",
@@ -52,13 +52,13 @@ public class WarehouseSigningServiceImpl implements WarehouseSigningService {
             errorMsg = "Failed to list warehouse signings")
     public List<WarehouseSigningDto> list(WarehouseSigningFilterDto filterDto) {
 
-        WarehouseSigningFilter filter = getMapper(MapWSToWarehouseSigningFilter.class).from(filterDto);
+        final WarehouseSigningFilter filter = getMapper(MapWSToWarehouseSigningFilter.class).from(filterDto);
 
         return getMapper(MapWSToWarehouseSigningDto.class).from(repository.list(filter));
     }
 
     @Override
-    @RequirePermits(value = PRMT_READ_WS, action = "Page warehouse signings")
+    @RequirePermits(value = PRMT_READ_WHS, action = "Page warehouse signings")
     @LogExecution(operation = OP_READ,
             debugOut = true,
             msgIn = "Paginating warehouse signings",
@@ -66,13 +66,13 @@ public class WarehouseSigningServiceImpl implements WarehouseSigningService {
             errorMsg = "Failed to paginate warehouse signings")
     public Page<WarehouseSigningDto> list(WarehouseSigningFilterDto filterDto, Long offset, Long limit) {
 
-        WarehouseSigningFilter filter = getMapper(MapWSToWarehouseSigningFilter.class).from(filterDto);
+        final WarehouseSigningFilter filter = getMapper(MapWSToWarehouseSigningFilter.class).from(filterDto);
 
         return getMapper(MapWSToWarehouseSigningDto.class).from(repository.list(filter, offset, limit));
     }
 
     @Override
-    @RequirePermits(value = PRMT_READ_WS, action = "Find warehouse signing by ID")
+    @RequirePermits(value = PRMT_READ_WHS, action = "Find warehouse signing by ID")
     @LogExecution(operation = OP_READ,
             debugOut = true,
             msgIn = "Finding warehouse signing by ID, result can be empty",
@@ -80,7 +80,7 @@ public class WarehouseSigningServiceImpl implements WarehouseSigningService {
             errorMsg = "Failed to find warehouse signing by ID")
     public Optional<WarehouseSigningDto> find(WarehouseSigningByIdFinderDto finderDto) {
 
-        WarehouseSigningByIdFinder finder = getMapper(MapWSToWarehouseSigningByIdFinder.class)
+        final WarehouseSigningByIdFinder finder = getMapper(MapWSToWarehouseSigningByIdFinder.class)
                 .from(finderDto);
 
         return repository.find(finder)
@@ -88,7 +88,7 @@ public class WarehouseSigningServiceImpl implements WarehouseSigningService {
     }
 
     @Override
-    @RequirePermits(value = PRMT_READ_WS, action = "Find warehouse signing by ID")
+    @RequirePermits(value = PRMT_READ_WHS, action = "Find warehouse signing by ID")
     @LogExecution(operation = OP_READ,
             debugOut = true,
             msgIn = "Finding warehouse signing by ID, result is expected or will fail",
@@ -99,7 +99,7 @@ public class WarehouseSigningServiceImpl implements WarehouseSigningService {
     }
 
     @Override
-    @RequirePermits(value = PRMT_EDIT_WS, action = "Create new warehouse signing")
+    @RequirePermits(value = PRMT_EDIT_WHS, action = "Create new warehouse signing")
     @LogExecution(operation = OP_CREATE,
             debugOut = true,
             msgIn = "Creating new warehouse signing",
@@ -107,7 +107,7 @@ public class WarehouseSigningServiceImpl implements WarehouseSigningService {
             errorMsg = "Failed to create new warehouse signing")
     public WarehouseSigningDto create(WarehouseSigningCreateDto createDto) {
 
-        WarehouseSigningCreate create = getMapper(MapWSToWarehouseSigningCreate.class).from(createDto);
+        final WarehouseSigningCreate create = getMapper(MapWSToWarehouseSigningCreate.class).from(createDto);
         create.setStartedAt(LocalDateTime.now());
 
         return getMapper(MapWSToWarehouseSigningDto.class)
@@ -115,7 +115,7 @@ public class WarehouseSigningServiceImpl implements WarehouseSigningService {
     }
 
     @Override
-    @RequirePermits(value = PRMT_EDIT_WS, action = "Update warehouse signing")
+    @RequirePermits(value = PRMT_EDIT_WHS, action = "Update warehouse signing")
     @LogExecution(operation = OP_UPDATE,
             debugOut = true,
             msgIn = "Updating warehouse signing",
@@ -123,14 +123,14 @@ public class WarehouseSigningServiceImpl implements WarehouseSigningService {
             errorMsg = "Failed to update warehouse signing")
     public WarehouseSigningDto update(WarehouseSigningUpdateDto updateDto) {
 
-        WarehouseSigningByIdFinder finderDto = new WarehouseSigningByIdFinder();
-        finderDto.setId(updateDto.getId());
+        final WarehouseSigningByIdFinder finder = new WarehouseSigningByIdFinder();
+        finder.setId(updateDto.getId());
 
         //Get the Warehouse Signing from repository
-        WarehouseSigningUpdate warehouseSigning = repository.findUpdateSigning(finderDto)
+        final WarehouseSigningUpdate warehouseSigning = repository.findUpdateSigning(finder)
                 .orElseThrow(() -> new WarehouseSigningNotFoundException(updateDto.getId()));
 
-        boolean firstClosed = warehouseSigning.getClosedAt() == null;
+        final boolean firstClosed = warehouseSigning.getClosedAt() == null;
 
         //Update non null values from request dto
         getMapper(MapWSToWarehouseSigningUpdate.class)
@@ -145,19 +145,19 @@ public class WarehouseSigningServiceImpl implements WarehouseSigningService {
     }
 
     @Override
-    @RequirePermits(value = PRMT_EDIT_WS, action = "Delete warehouse signing")
+    @RequirePermits(value = PRMT_EDIT_WHS, action = "Delete warehouse signing")
     @LogExecution(operation = OP_DELETE,
             debugOut = true,
             msgIn = "Deleting warehouse signing",
             msgOut = "Warehouse signing deleted OK",
             errorMsg = "Failed to delete warehouse signing")
     public void delete(WarehouseSigningDeleteDto deleteDto) {
-        WarehouseSigningByIdFinderDto finder = new WarehouseSigningByIdFinderDto();
+        final WarehouseSigningByIdFinderDto finder = new WarehouseSigningByIdFinderDto();
         finder.setId(deleteDto.getId());
 
         findOrNotFound(finder);
 
-        WarehouseSigningDelete delete = getMapper(MapWSToWarehouseSigningDelete.class)
+        final WarehouseSigningDelete delete = getMapper(MapWSToWarehouseSigningDelete.class)
                 .from(deleteDto);
 
         repository.delete(delete);

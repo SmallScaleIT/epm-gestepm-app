@@ -8,15 +8,22 @@ import com.epm.gestepm.modelapi.deprecated.user.service.UserServiceOld;
 import com.epm.gestepm.modelapi.project.dto.ProjectDto;
 import com.epm.gestepm.modelapi.project.dto.finder.ProjectByIdFinderDto;
 import com.epm.gestepm.modelapi.project.service.ProjectService;
+import com.epm.gestepm.modelapi.signings.workshop.dto.finder.WorkshopSigningByIdFinderDto;
+import com.epm.gestepm.modelapi.signings.workshop.service.WorkshopSigningService;
 import com.epm.gestepm.rest.project.mappers.MapPRToProjectResponse;
 import com.epm.gestepm.rest.signings.teleworking.request.TeleworkingSigningFindRestRequest;
+import com.epm.gestepm.rest.signings.workshop.mapper.MapWSSToWorkshopSigningResponse;
 import com.epm.gestepm.restapi.openapi.model.Project;
 import com.epm.gestepm.restapi.openapi.model.User;
 import com.epm.gestepm.restapi.openapi.model.WarehouseSigning;
+import com.epm.gestepm.restapi.openapi.model.WorkshopSigning;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import javax.validation.Valid;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.epm.gestepm.lib.logging.constants.LogLayerMarkers.DELEGATOR;
 import static com.epm.gestepm.lib.logging.constants.LogOperations.OP_PROCESS;
@@ -26,20 +33,26 @@ import static org.mapstruct.factory.Mappers.getMapper;
 @EnableExecutionLog(layerMarker = DELEGATOR)
 public class WarehouseSigningResponseDecorator extends BaseResponseDataDecorator<WarehouseSigning> {
 
-    public static final String WS_U_EXPAND = "user";
+    public static final String WHS_U_EXPAND = "user";
 
-    public static final String WS_P_EXPAND = "project";
+    public static final String WHS_P_EXPAND = "project";
+
+    public static final String WHS_WSS_EXPAND = "workshop";
 
     private final UserServiceOld userServiceOld;
 
     private final ProjectService projectService;
 
+    private final WorkshopSigningService workshopService;
+
     protected WarehouseSigningResponseDecorator(ApplicationContext applicationContext
             , UserServiceOld userServiceOld
-            , ProjectService projectService) {
+            , ProjectService projectService
+            , WorkshopSigningService workshopService) {
         super(applicationContext);
         this.userServiceOld = userServiceOld;
         this.projectService = projectService;
+        this.workshopService = workshopService;
     }
 
     @Override
@@ -54,7 +67,7 @@ public class WarehouseSigningResponseDecorator extends BaseResponseDataDecorator
             selfReq.commonValuesFrom(request);
         }
 
-        if (request.hasExpand(WS_U_EXPAND))
+        if (request.hasExpand(WHS_U_EXPAND))
         {
             User user = data.getUser();
             Integer userId = user.getId();
@@ -65,7 +78,7 @@ public class WarehouseSigningResponseDecorator extends BaseResponseDataDecorator
             data.setUser(response);
         }
 
-        if (request.hasExpand(WS_P_EXPAND))
+        if (request.hasExpand(WHS_P_EXPAND))
         {
             Project project = data.getProject();
             Integer projectId = project.getId();
@@ -74,6 +87,18 @@ public class WarehouseSigningResponseDecorator extends BaseResponseDataDecorator
             Project response = getMapper(MapPRToProjectResponse.class).from(projectDto);
 
             data.setProject(response);
+        }
+
+        if (request.hasExpand(WHS_WSS_EXPAND))
+        {
+            final List<WorkshopSigning> workshops = data.getWorkshops();
+
+            final List<WorkshopSigning> response = workshops.stream()
+                    .map(workshop -> workshopService.findOrNotFound(new WorkshopSigningByIdFinderDto(workshop.getId())))
+                    .map(workshop -> getMapper(MapWSSToWorkshopSigningResponse.class).from(workshop))
+                    .collect(Collectors.toList());
+
+            data.setWorkshops(response);
         }
     }
 }

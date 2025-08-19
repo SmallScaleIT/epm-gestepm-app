@@ -1,36 +1,38 @@
 sql:
 
-  qry-list-of-ws: |
+  qry-list-of-whs: |
 
     SELECT
-      ws.warehouse_signing_id,
-      ws.user_id,
-      ws.project_id,
+      whs.warehouse_signing_id,
+      whs.user_id,
+      whs.project_id,
       pr.name AS project_name,
-      ws.started_at,
-      ws.closed_at
-    FROM ${sch-gestepm}.warehouse_signing ws
-    LEFT JOIN ${sch-gestepm}.project pr ON ws.project_id = pr.project_id
+      whs.started_at,
+      whs.closed_at,
+      GROUP_CONCAT(wss.workshop_signing_id) workshop_signing_ids
+    FROM ${sch-gestepm}.warehouse_signing whs
+    LEFT JOIN ${sch-gestepm}.workshop_signing wss ON wss.warehouse_signing_id = whs.warehouse_signing_id
+    LEFT JOIN ${sch-gestepm}.project pr ON whs.project_id = pr.project_id
 
     #whereToken #filter
-    GROUP BY ws.warehouse_signing_id
+    GROUP BY whs.warehouse_signing_id
     #orderByToken
 
-  qry-page-of-ws: |
+  qry-page-of-whs: |
 
-    ${sql.qry-list-of-ws}
+    ${sql.qry-list-of-whs}
     ${sql.paginated-query}
 
-  qry-count-of-ws: |
+  qry-count-of-whs: |
 
     SELECT COUNT(DISTINCT warehouse_signing_id) AS "count"
     FROM (
-      SELECT ws.warehouse_signing_id
-      FROM ${sch-gestepm}.warehouse_signing ws      
+      SELECT whs.warehouse_signing_id
+      FROM ${sch-gestepm}.warehouse_signing whs      
       #whereToken #filter
     ) final
 
-  qry-create-ws: |
+  qry-create-whs: |
 
     INSERT INTO ${sch-gestepm}.warehouse_signing (
       user_id,
@@ -38,57 +40,57 @@ sql:
       started_at
     )
     VALUES (
-      :attr_ws_user_id,
-      :attr_ws_project_id,
-      :attr_ws_started_at
+      :attr_whs_user_id,
+      :attr_whs_project_id,
+      :attr_whs_started_at
     )
 
-  qry-update-ws: |
+  qry-update-whs: |
 
     UPDATE
       ${sch-gestepm}.warehouse_signing
     SET
-      started_at = :attr_ws_started_at,
-      closed_at = :attr_ws_closed_at
+      started_at = :attr_whs_started_at,
+      closed_at = :attr_whs_closed_at
     WHERE
-      warehouse_signing_id = :attr_ws_id
+      warehouse_signing_id = :attr_whs_id
 
-  qry-delete-ws: |
+  qry-delete-whs: |
 
-    DELETE FROM ${sch-gestepm}.warehouse_signing WHERE warehouse_signing_id = :attr_ws_id
+    DELETE FROM ${sch-gestepm}.warehouse_signing WHERE warehouse_signing_id = :attr_whs_id
 
-  filter-ws-by-params: |
-
-    -- [AND
-      -- ${sql.predicate-for-ws-ids}
-      -- ${sql.predicate-for-ws-u-id}
-      -- ${sql.predicate-for-ws-p-id}
-      -- ${sql.predicate-for-ws-current}
-    -- AND]
-
-  filter-ws-by-id: |
+  filter-whs-by-params: |
 
     -- [AND
-      -- ${sql.predicate-for-ws-id}
+      -- ${sql.predicate-for-whs-ids}
+      -- ${sql.predicate-for-whs-u-id}
+      -- ${sql.predicate-for-whs-p-id}
+      -- ${sql.predicate-for-whs-current}
     -- AND]
 
-  predicate-for-ws-id: |
+  filter-whs-by-id: |
 
-    ws.warehouse_signing_id = :attr_ws_id
+    -- [AND
+      -- ${sql.predicate-for-whs-id}
+    -- AND]
 
-  predicate-for-ws-ids: |
+  predicate-for-whs-id: |
 
-    ws.warehouse_signing_id IN (:attr_ws_ids)
+    whs.warehouse_signing_id = :attr_whs_id
 
-  predicate-for-ws-u-id: |
+  predicate-for-whs-ids: |
 
-    ws.user_id IN (:attr_ws_user_id)
+    whs.warehouse_signing_id IN (:attr_whs_ids)
 
-  predicate-for-ws-p-id: |
+  predicate-for-whs-u-id: |
 
-    ws.project_id IN (:attr_ws_project_id)
+    whs.user_id IN (:attr_whs_user_id)
 
-  predicate-for-ws-current: |
+  predicate-for-whs-p-id: |
+
+    whs.project_id IN (:attr_whs_project_id)
+
+  predicate-for-whs-current: |
     
-    ((:attr_ws_current IS TRUE AND ws.closed_at IS NULL) OR (:attr_ws_current IS FALSE AND ws.closed_at IS NOT NULL))
+    ((:attr_whs_current IS TRUE AND whs.closed_at IS NULL) OR (:attr_whs_current IS FALSE AND whs.closed_at IS NOT NULL))
 

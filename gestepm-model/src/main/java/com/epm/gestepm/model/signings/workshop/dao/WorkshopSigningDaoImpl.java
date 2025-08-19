@@ -51,8 +51,8 @@ public class WorkshopSigningDaoImpl implements WorkshopSigningDao {
 
         SQLQueryFetchMany<WorkshopSigning> sqlQuery = new SQLQueryFetchMany<WorkshopSigning>()
                 .useRowMapper(new WorkshopSigningRowMapper())
-                .useQuery(QRY_LIST_OF_WSH)
-                .useFilter(FILTER_WSH_BY_PARAMS)
+                .useQuery(QRY_LIST_OF_WSS)
+                .useFilter(FILTER_WSS_BY_PARAMS)
                 .withParams(signingFilter.collectAttributes());
 
         this.setOrder(signingFilter.getOrder(), signingFilter.getOrderBy(), sqlQuery);
@@ -70,9 +70,9 @@ public class WorkshopSigningDaoImpl implements WorkshopSigningDao {
 
         SQLQueryFetchPage<WorkshopSigning> sqlQuery = new SQLQueryFetchPage<WorkshopSigning>()
                 .useRowMapper(new WorkshopSigningRowMapper())
-                .useQuery(QRY_PAGE_OF_WSH)
-                .useCountQuery(QRY_COUNT_OF_WSH)
-                .useFilter(FILTER_WSH_BY_PARAMS)
+                .useQuery(QRY_PAGE_OF_WSS)
+                .useCountQuery(QRY_COUNT_OF_WSS)
+                .useFilter(FILTER_WSS_BY_PARAMS)
                 .offset(offset)
                 .limit(limit)
                 .withParams(signingFilter.collectAttributes());
@@ -92,8 +92,8 @@ public class WorkshopSigningDaoImpl implements WorkshopSigningDao {
 
         SQLQueryFetchOne<WorkshopSigning> sqlQuery = new SQLQueryFetchOne<WorkshopSigning>()
                 .useRowMapper(new WorkshopSigningRowMapper())
-                .useQuery(QRY_LIST_OF_WSH)
-                .useFilter(FILTER_WSH_BY_ID)
+                .useQuery(QRY_LIST_OF_WSS)
+                .useFilter(FILTER_WSS_BY_ID)
                 .withParams(finder.collectAttributes());
 
         return datasource.fetch(sqlQuery);
@@ -108,8 +108,8 @@ public class WorkshopSigningDaoImpl implements WorkshopSigningDao {
     public Optional<WorkshopSigningUpdate> findUpdateSigning(WorkshopSigningByIdFinder finder) {
         SQLQueryFetchOne<WorkshopSigningUpdate> sqlQuery = new SQLQueryFetchOne<WorkshopSigningUpdate>()
                 .useRowMapper(new WorkshopSigningUpdateRowMapper())
-                .useQuery(QRY_LIST_OF_WSH)
-                .useFilter(FILTER_WSH_BY_ID)
+                .useQuery(QRY_LIST_OF_WSS)
+                .useFilter(FILTER_WSS_BY_ID)
                 .withParams(finder.collectAttributes());
 
         return datasource.fetch(sqlQuery);
@@ -126,7 +126,7 @@ public class WorkshopSigningDaoImpl implements WorkshopSigningDao {
         WorkshopSigningByIdFinder finder = new WorkshopSigningByIdFinder();
 
         SQLInsert<BigInteger> sqlInsert = new SQLInsert<BigInteger>()
-                .useQuery(QRY_CREATE_WSH)
+                .useQuery(QRY_CREATE_WSS)
                 .withParams(create.collectAttributes())
                 .onGeneratedKey(id -> finder.setId(id.intValue()));
 
@@ -147,7 +147,7 @@ public class WorkshopSigningDaoImpl implements WorkshopSigningDao {
         finder.setId(update.getId());
 
         SQLQuery updateSQL = new SQLQuery()
-                .useQuery(QRY_UPDATE_WSH)
+                .useQuery(QRY_UPDATE_WSS)
                 .withParams(update.collectAttributes());
 
         datasource.execute(updateSQL);
@@ -164,7 +164,7 @@ public class WorkshopSigningDaoImpl implements WorkshopSigningDao {
     public void delete(WorkshopSigningDelete delete) {
 
         SQLQuery deleteSQL = new SQLQuery()
-                .useQuery(QRY_DELETE_WSH)
+                .useQuery(QRY_DELETE_WSS)
                 .withParams(delete.collectAttributes());
 
         datasource.execute(deleteSQL);

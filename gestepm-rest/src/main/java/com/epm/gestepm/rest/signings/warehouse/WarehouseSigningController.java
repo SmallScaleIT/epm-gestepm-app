@@ -58,7 +58,7 @@ public class WarehouseSigningController extends BaseController implements Wareho
     }
 
     @Override
-    @RequirePermits(value = PRMT_READ_WS, action = "Get warehouse signing list")
+    @RequirePermits(value = PRMT_READ_WHS, action = "Get warehouse signing list")
     @LogExecution(operation = OP_READ)
     public ResponseEntity<ListWarehouseSigningsV1200Response> listWarehouseSigningsV1(List<String> meta
             , Boolean links, Set<String> expand, Long offset, Long limit, String order, String orderBy
@@ -83,7 +83,7 @@ public class WarehouseSigningController extends BaseController implements Wareho
     }
 
     @Override
-    @RequirePermits(value = PRMT_READ_WS, action = "Find warehouse signing")
+    @RequirePermits(value = PRMT_READ_WHS, action = "Find warehouse signing")
     @LogExecution(operation = OP_READ)
     public ResponseEntity<CreateWarehouseSigningV1200Response> findWarehouseSigningByIdV1(final Integer id, final List<String> meta
             , final Boolean links, final Set<String> expand) {
@@ -106,7 +106,7 @@ public class WarehouseSigningController extends BaseController implements Wareho
     }
 
     @Override
-    @RequirePermits(value = PRMT_EDIT_WS, action = "Create warehouse signing")
+    @RequirePermits(value = PRMT_EDIT_WHS, action = "Create warehouse signing")
     @LogExecution(operation = OP_CREATE)
     public ResponseEntity<CreateWarehouseSigningV1200Response> createWarehouseSigningV1(final CreateWarehouseSigningV1Request reqCreateWarehouseSigning) {
 
@@ -128,7 +128,7 @@ public class WarehouseSigningController extends BaseController implements Wareho
     }
 
     @Override
-    @RequirePermits(value = PRMT_EDIT_WS, action = "Update warehouse signing")
+    @RequirePermits(value = PRMT_EDIT_WHS, action = "Update warehouse signing")
     @LogExecution(operation = OP_UPDATE)
     public ResponseEntity<CreateWarehouseSigningV1200Response> updateWarehouseSigningV1(final Integer id, final UpdateWarehouseSigningV1Request reqUpdateWarehouseSigning) {
 
@@ -151,7 +151,7 @@ public class WarehouseSigningController extends BaseController implements Wareho
     }
 
     @Override
-    @RequirePermits(value = PRMT_EDIT_WS, action = "Delete warehouse signing")
+    @RequirePermits(value = PRMT_EDIT_WHS, action = "Delete warehouse signing")
     @LogExecution(operation = OP_DELETE)
     public ResponseEntity<ResSuccess> deleteWarehouseSigningV1(final Integer id) {
 

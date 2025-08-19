@@ -25,9 +25,9 @@ public class WarehouseSigningUpdate implements AuditUpdate, CollectableAttribute
 
         AttributeMap attrs = new AttributeMap();
 
-        attrs.put(ATTR_WS_ID, this.id);
-        attrs.putTimestamp(ATTR_WS_STARTED_AT, this.startedAt);
-        attrs.putTimestamp(ATTR_WS_CLOSED_AT, this.closedAt);
+        attrs.put(ATTR_WHS_ID, this.id);
+        attrs.putTimestamp(ATTR_WHS_STARTED_AT, this.startedAt);
+        attrs.putTimestamp(ATTR_WHS_CLOSED_AT, this.closedAt);
 
         return attrs;
     }

@@ -25,9 +25,9 @@ public class WarehouseSigningCreate implements AuditCreate, CollectableAttribute
     public AttributeMap collectAttributes() {
 
         AttributeMap attrs = new AttributeMap();
-        attrs.put(ATTR_WS_USER_ID, this.userId);
-        attrs.put(ATTR_WS_PROJECT_ID, this.projectId);
-        attrs.putTimestamp(ATTR_WS_STARTED_AT, this.startedAt);
+        attrs.put(ATTR_WHS_USER_ID, this.userId);
+        attrs.put(ATTR_WHS_PROJECT_ID, this.projectId);
+        attrs.putTimestamp(ATTR_WHS_STARTED_AT, this.startedAt);
 
         return attrs;
     }

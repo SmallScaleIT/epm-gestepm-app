@@ -3747,6 +3747,12 @@ components:
           x-stoplight:
             id: 8yvfv3exkqv1h
           format: date-time
+        workshops:
+          type: array
+          x-stoplight:
+            id: okddke28m718l
+          items:
+            $ref: '#/components/schemas/WorkshopSigning'
     WorkshopSigning:
       title: WorkshopSigning
       x-stoplight:

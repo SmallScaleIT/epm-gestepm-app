@@ -21,7 +21,6 @@ import com.epm.gestepm.model.signings.warehouse.dao.mappers.WarehouseSigningUpda
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
-import javax.validation.Valid;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
@@ -52,8 +51,8 @@ public class WarehouseSigningDaoImpl implements WarehouseSigningDao {
 
         final SQLQueryFetchMany<WarehouseSigning> sqlQuery = new SQLQueryFetchMany<WarehouseSigning>()
                 .useRowMapper(new WarehouseSigningRowMapper())
-                .useQuery(QRY_LIST_OF_WS)
-                .useFilter(FILTER_WS_BY_PARAMS)
+                .useQuery(QRY_LIST_OF_WSH)
+                .useFilter(FILTER_WSH_BY_PARAMS)
                 .withParams(filter.collectAttributes());
 
         this.setOrder(filter.getOrder(), filter.getOrderBy(), sqlQuery);
@@ -71,9 +70,9 @@ public class WarehouseSigningDaoImpl implements WarehouseSigningDao {
 
         final SQLQueryFetchPage<WarehouseSigning> sqlQuery = new SQLQueryFetchPage<WarehouseSigning>()
                 .useRowMapper(new WarehouseSigningRowMapper())
-                .useQuery(QRY_PAGE_OF_WS)
-                .useCountQuery(QRY_COUNT_OF_WS)
-                .useFilter(FILTER_WS_BY_PARAMS)
+                .useQuery(QRY_PAGE_OF_WSH)
+                .useCountQuery(QRY_COUNT_OF_WSH)
+                .useFilter(FILTER_WSH_BY_PARAMS)
                 .offset(offset)
                 .limit(limit)
                 .withParams(filter.collectAttributes());
@@ -93,8 +92,8 @@ public class WarehouseSigningDaoImpl implements WarehouseSigningDao {
 
         final SQLQueryFetchOne<WarehouseSigning> sqlQuery = new SQLQueryFetchOne<WarehouseSigning>()
                 .useRowMapper(new WarehouseSigningRowMapper())
-                .useQuery(QRY_LIST_OF_WS)
-                .useFilter(FILTER_WS_BY_ID)
+                .useQuery(QRY_LIST_OF_WSH)
+                .useFilter(FILTER_WSH_BY_ID)
                 .withParams(finder.collectAttributes());
 
         return datasource.fetch(sqlQuery);
@@ -110,8 +109,8 @@ public class WarehouseSigningDaoImpl implements WarehouseSigningDao {
 
         SQLQueryFetchOne<WarehouseSigningUpdate> sqlQuery = new SQLQueryFetchOne<WarehouseSigningUpdate>()
                 .useRowMapper(new WarehouseSigningUpdateRowMapper())
-                .useQuery(QRY_LIST_OF_WS)
-                .useFilter(FILTER_WS_BY_ID)
+                .useQuery(QRY_LIST_OF_WSH)
+                .useFilter(FILTER_WSH_BY_ID)
                 .withParams(finder.collectAttributes());
 
         return datasource.fetch(sqlQuery);
@@ -128,7 +127,7 @@ public class WarehouseSigningDaoImpl implements WarehouseSigningDao {
         WarehouseSigningByIdFinder finder = new WarehouseSigningByIdFinder();
 
         SQLInsert<BigInteger> insert = new SQLInsert<BigInteger>()
-                .useQuery(QRY_CREATE_WS)
+                .useQuery(QRY_CREATE_WSH)
                 .withParams(create.collectAttributes())
                 .onGeneratedKey(id -> finder.setId(id.intValue()));
 
@@ -149,7 +148,7 @@ public class WarehouseSigningDaoImpl implements WarehouseSigningDao {
         finder.setId(update.getId());
 
         SQLQuery sqlUpdate = new SQLQuery()
-                .useQuery(QRY_UPDATE_WS)
+                .useQuery(QRY_UPDATE_WSH)
                 .withParams(update.collectAttributes());
 
         datasource.execute(sqlUpdate);
@@ -166,7 +165,7 @@ public class WarehouseSigningDaoImpl implements WarehouseSigningDao {
     public void delete(WarehouseSigningDelete delete) {
 
         SQLQuery sqlDelete = new SQLQuery()
-                .useQuery(QRY_DELETE_WS)
+                .useQuery(QRY_DELETE_WSH)
                 .withParams(delete.collectAttributes());
 
         datasource.execute(sqlDelete);
@@ -175,7 +174,7 @@ public class WarehouseSigningDaoImpl implements WarehouseSigningDao {
     private void setOrder(final SQLOrderByType order, final String orderBy, final SQLQueryFetchMany<WarehouseSigning> sqlQuery) {
         final String orderByStatement = StringUtils.isNoneBlank(orderBy) && !orderBy.equals("id")
                 ? this.getOrderColumn(orderBy)
-                : COL_WS_ID;
+                : COL_WHS_ID;
         final SQLOrderByType orderStatement = order != null
                 ? order
                 : SQLOrderByType.DESC;
@@ -184,11 +183,11 @@ public class WarehouseSigningDaoImpl implements WarehouseSigningDao {
 
     private String getOrderColumn(final String orderBy) {
         if ("startedAt".equals(orderBy)) {
-            return COL_WS_STARTED_AT;
+            return COL_WHS_STARTED_AT;
         } else if ("closedAt".equals(orderBy)) {
-            return COL_WS_CLOSED_AT;
+            return COL_WHS_CLOSED_AT;
         } else if ("project.name".equals(orderBy)) {
-            return COL_WS_PROJECT_NAME;
+            return COL_WHS_PROJECT_NAME;
         }
         return orderBy;
     }

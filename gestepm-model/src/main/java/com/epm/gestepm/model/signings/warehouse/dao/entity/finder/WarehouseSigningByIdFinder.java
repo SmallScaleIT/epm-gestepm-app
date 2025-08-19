@@ -15,7 +15,7 @@ public class WarehouseSigningByIdFinder implements CollectableAttributes {
     public AttributeMap collectAttributes() {
 
         AttributeMap attrs = new AttributeMap();
-        attrs.put(ATTR_WS_ID, this.id);
+        attrs.put(ATTR_WHS_ID, this.id);
 
         return attrs;
     }

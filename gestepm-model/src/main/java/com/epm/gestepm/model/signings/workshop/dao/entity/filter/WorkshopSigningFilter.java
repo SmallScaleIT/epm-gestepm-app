@@ -29,11 +29,11 @@ public class WorkshopSigningFilter extends Orderable implements CollectableAttri
 
         AttributeMap attrs = new AttributeMap();
 
-        attrs.putList(ATTR_WSH_IDS, this.ids);
-        attrs.putList(ATTR_WSH_WAREHOUSE_ID, this.warehouseIds);
-        attrs.putList(ATTR_WSH_PROJECT_ID, this.projectIds);
-        attrs.putList(ATTR_WSH_USER_ID, this.userIds);
-        attrs.put(ATTR_WSH_CURRENT, this.current);
+        attrs.putList(ATTR_WSS_IDS, this.ids);
+        attrs.putList(ATTR_WSS_WAREHOUSE_ID, this.warehouseIds);
+        attrs.putList(ATTR_WSS_PROJECT_ID, this.projectIds);
+        attrs.putList(ATTR_WSS_USER_ID, this.userIds);
+        attrs.put(ATTR_WSS_CURRENT, this.current);
 
         return attrs;
     }

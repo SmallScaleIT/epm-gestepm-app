@@ -43,7 +43,7 @@ public class WorkshopSigningServiceImpl implements WorkshopSigningService {
     private final WorkshopSigningDao repository;
 
     @Override
-    @RequirePermits(value = PRMT_READ_WSH, action = "List workshop signings")
+    @RequirePermits(value = PRMT_READ_WSS, action = "List workshop signings")
     @LogExecution(operation = OP_READ,
             debugOut = true,
             msgIn = "Listing workshop signings",
@@ -59,7 +59,7 @@ public class WorkshopSigningServiceImpl implements WorkshopSigningService {
     }
 
     @Override
-    @RequirePermits(value = PRMT_READ_WSH, action = "Page workshop signings")
+    @RequirePermits(value = PRMT_READ_WSS, action = "Page workshop signings")
     @LogExecution(operation = OP_READ,
             debugOut = true,
             msgIn = "Paginating workshop signings",
@@ -75,7 +75,7 @@ public class WorkshopSigningServiceImpl implements WorkshopSigningService {
     }
 
     @Override
-    @RequirePermits(value = PRMT_READ_WSH, action = "Find workshop signing by ID")
+    @RequirePermits(value = PRMT_READ_WSS, action = "Find workshop signing by ID")
     @LogExecution(operation = OP_READ,
             debugOut = true,
             msgIn = "Finding workshop signing by ID, result can be empty",
@@ -91,7 +91,7 @@ public class WorkshopSigningServiceImpl implements WorkshopSigningService {
     }
 
     @Override
-    @RequirePermits(value = PRMT_READ_WSH, action = "Find workshop signing by ID")
+    @RequirePermits(value = PRMT_READ_WSS, action = "Find workshop signing by ID")
     @LogExecution(operation = OP_READ,
             debugOut = true,
             msgIn = "Finding workshop signing by ID, result can be empty",
@@ -103,7 +103,7 @@ public class WorkshopSigningServiceImpl implements WorkshopSigningService {
     }
 
     @Override
-    @RequirePermits(value = PRMT_EDIT_WSH, action = "Create new workshop signing")
+    @RequirePermits(value = PRMT_EDIT_WSS, action = "Create new workshop signing")
     @LogExecution(operation = OP_CREATE,
             debugOut = true,
             msgIn = "Creating new workshop signing",
@@ -120,7 +120,7 @@ public class WorkshopSigningServiceImpl implements WorkshopSigningService {
     }
 
     @Override
-    @RequirePermits(value = PRMT_EDIT_WSH, action = "Update workshop signing")
+    @RequirePermits(value = PRMT_EDIT_WSS, action = "Update workshop signing")
     @LogExecution(operation = OP_UPDATE,
             debugOut = true,
             msgIn = "Updating workshop signing",
@@ -150,7 +150,7 @@ public class WorkshopSigningServiceImpl implements WorkshopSigningService {
     }
 
     @Override
-    @RequirePermits(value = PRMT_EDIT_WSH, action = "Delete workshop signing")
+    @RequirePermits(value = PRMT_EDIT_WSS, action = "Delete workshop signing")
     @LogExecution(operation = OP_DELETE,
             debugOut = true,
             msgIn = "Deleting workshop signing",

@@ -1,9 +1,11 @@
 package com.epm.gestepm.modelapi.signings.warehouse.dto;
 
 import lombok.Data;
+import lombok.Singular;
 
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class WarehouseSigningDto {
@@ -21,4 +23,7 @@ public class WarehouseSigningDto {
     private LocalDateTime startedAt;
 
     private LocalDateTime closedAt;
+
+    @Singular
+    private List<Integer> workshopIds;
 }
