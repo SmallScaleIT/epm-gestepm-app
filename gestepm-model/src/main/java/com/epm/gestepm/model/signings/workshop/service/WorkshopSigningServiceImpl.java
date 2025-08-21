@@ -23,7 +23,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -49,12 +48,12 @@ public class WorkshopSigningServiceImpl implements WorkshopSigningService {
             msgIn = "Listing workshop signings",
             msgOut = "Listing workshop signings OK",
             errorMsg = "Failed to list workshop signings")
-    public List<@Valid WorkShopSigningDto> list(WorkshopSigningFilterDto filterDto) {
+    public List<WorkShopSigningDto> list(WorkshopSigningFilterDto filterDto) {
 
-        WorkshopSigningFilter filter = getMapper(MapWSHToWorkshopSigningFilter.class)
+        WorkshopSigningFilter filter = getMapper(MapWSSToWorkshopSigningFilter.class)
                 .from(filterDto);
 
-        return getMapper(MapWSHToWorkshopSigningDto.class)
+        return getMapper(MapWSSToWorkshopSigningDto.class)
                 .from(repository.list(filter));
     }
 
@@ -65,12 +64,12 @@ public class WorkshopSigningServiceImpl implements WorkshopSigningService {
             msgIn = "Paginating workshop signings",
             msgOut = "Paginating workshop signings OK",
             errorMsg = "Failed to paginate workshop signings")
-    public Page<@Valid WorkShopSigningDto> page(WorkshopSigningFilterDto filterDto, Long offset, Long limit) {
+    public Page<WorkShopSigningDto> page(WorkshopSigningFilterDto filterDto, Long offset, Long limit) {
 
-        WorkshopSigningFilter filter = getMapper(MapWSHToWorkshopSigningFilter.class)
+        WorkshopSigningFilter filter = getMapper(MapWSSToWorkshopSigningFilter.class)
                 .from(filterDto);
 
-        return getMapper(MapWSHToWorkshopSigningDto.class)
+        return getMapper(MapWSSToWorkshopSigningDto.class)
                 .from(repository.list(filter, offset, limit));
     }
 
@@ -81,13 +80,13 @@ public class WorkshopSigningServiceImpl implements WorkshopSigningService {
             msgIn = "Finding workshop signing by ID, result can be empty",
             msgOut = "Found workshop signing by ID",
             errorMsg = "Failed to find workshop signing by ID")
-    public Optional<@Valid WorkShopSigningDto> find(WorkshopSigningByIdFinderDto finderDto) {
+    public Optional<WorkShopSigningDto> find(WorkshopSigningByIdFinderDto finderDto) {
 
-        WorkshopSigningByIdFinder finder = getMapper(MapWSHToWorkshopSigningByIdFinder.class)
+        WorkshopSigningByIdFinder finder = getMapper(MapWSSToWorkshopSigningByIdFinder.class)
                 .from(finderDto);
 
         return repository.find(finder)
-                .map(getMapper(MapWSHToWorkshopSigningDto.class)::from);
+                .map(getMapper(MapWSSToWorkshopSigningDto.class)::from);
     }
 
     @Override
@@ -111,11 +110,11 @@ public class WorkshopSigningServiceImpl implements WorkshopSigningService {
             errorMsg = "Failed to create new workshop signing")
     public WorkShopSigningDto create(WorkshopSigningCreateDto createDto) {
 
-        WorkshopSigningCreate create = getMapper(MapWSHToWorkshopSigningCreate.class)
+        WorkshopSigningCreate create = getMapper(MapWSSToWorkshopSigningCreate.class)
                 .from(createDto);
         create.setStartedAt(LocalDateTime.now());
 
-        return getMapper(MapWSHToWorkshopSigningDto.class)
+        return getMapper(MapWSSToWorkshopSigningDto.class)
                 .from(repository.create(create));
     }
 
@@ -139,13 +138,13 @@ public class WorkshopSigningServiceImpl implements WorkshopSigningService {
         boolean firsTimeUpdate = signing.getClosedAt() == null;
 
         //Update entity with non null values
-        getMapper(MapWSHToWorkshopSigningUpdate.class)
+        getMapper(MapWSSToWorkshopSigningUpdate.class)
                 .from(updateDto, signing);
 
         if (firsTimeUpdate)
             signing.setClosedAt(LocalDateTime.now());
 
-        return getMapper(MapWSHToWorkshopSigningDto.class)
+        return getMapper(MapWSSToWorkshopSigningDto.class)
                 .from(repository.update(signing));
     }
 
@@ -163,7 +162,7 @@ public class WorkshopSigningServiceImpl implements WorkshopSigningService {
 
         findOrNotFound(finderDto);
 
-        WorkshopSigningDelete delete = getMapper(MapWSHToWorkshopSigningDelete.class)
+        WorkshopSigningDelete delete = getMapper(MapWSSToWorkshopSigningDelete.class)
                 .from(deleteDto);
 
         repository.delete(delete);

@@ -5,7 +5,7 @@ import com.epm.gestepm.modelapi.signings.warehouse.dto.finder.WarehouseSigningBy
 import org.mapstruct.Mapper;
 
 @Mapper
-public interface MapWSToWarehouseSigningByIdFinder {
+public interface MapWHSToWarehouseSigningByIdFinder {
 
     WarehouseSigningByIdFinder from(WarehouseSigningByIdFinderDto finderDto);
 }

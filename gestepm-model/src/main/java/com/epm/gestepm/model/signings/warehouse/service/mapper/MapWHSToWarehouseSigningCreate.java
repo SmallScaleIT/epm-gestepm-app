@@ -5,7 +5,7 @@ import com.epm.gestepm.modelapi.signings.warehouse.dto.creator.WarehouseSigningC
 import org.mapstruct.Mapper;
 
 @Mapper
-public interface MapWSToWarehouseSigningCreate {
+public interface MapWHSToWarehouseSigningCreate {
 
     WarehouseSigningCreate from(WarehouseSigningCreateDto createDto);
 }

@@ -5,6 +5,6 @@ import com.epm.gestepm.modelapi.signings.warehouse.dto.deleter.WarehouseSigningD
 import org.mapstruct.Mapper;
 
 @Mapper
-public interface MapWSToWarehouseSigningDelete {
+public interface MapWHSToWarehouseSigningDelete {
     WarehouseSigningDelete from(WarehouseSigningDeleteDto deleteDto);
 }

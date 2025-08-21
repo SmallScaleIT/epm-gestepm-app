@@ -5,6 +5,6 @@ import com.epm.gestepm.modelapi.signings.workshop.dto.filter.WorkshopSigningFilt
 import org.mapstruct.Mapper;
 
 @Mapper
-public interface MapWSHToWorkshopSigningFilter {
+public interface MapWSSToWorkshopSigningFilter {
     WorkshopSigningFilter from(WorkshopSigningFilterDto dto);
 }

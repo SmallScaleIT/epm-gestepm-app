@@ -8,7 +8,7 @@ import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
 @Mapper
-public interface MapWSHToWorkshopSigningUpdate {
+public interface MapWSSToWorkshopSigningUpdate {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void from(WorkshopSigningUpdateDto dto, @MappingTarget WorkshopSigningUpdate signing);
 }

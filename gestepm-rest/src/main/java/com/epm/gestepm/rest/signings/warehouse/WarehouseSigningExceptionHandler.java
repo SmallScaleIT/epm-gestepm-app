@@ -14,9 +14,9 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 @RestControllerAdvice
 public class WarehouseSigningExceptionHandler extends BaseRestExceptionHandler {
 
-    public static final int WS_ERROR_CODE = 1300;
+    public static final int WHS_ERROR_CODE = 1300;
 
-    public static final String WS_NOT_FOUND = "warehouse-signing-not-found";
+    public static final String WHS_NOT_FOUND = "warehouse-signing-not-found";
 
     public WarehouseSigningExceptionHandler(ExecutionRequestProvider executionRequestProvider, I18nErrorMessageSource i18nErrorMessageSource) {
         super(executionRequestProvider, i18nErrorMessageSource);
@@ -28,6 +28,6 @@ public class WarehouseSigningExceptionHandler extends BaseRestExceptionHandler {
 
         final Integer id = ex.getId();
 
-        return toAPIError(WS_ERROR_CODE, WS_NOT_FOUND, WS_NOT_FOUND, id);
+        return toAPIError(WHS_ERROR_CODE, WHS_NOT_FOUND, WHS_NOT_FOUND, id);
     }
 }

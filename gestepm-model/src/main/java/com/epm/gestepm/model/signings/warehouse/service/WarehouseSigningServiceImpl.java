@@ -52,9 +52,9 @@ public class WarehouseSigningServiceImpl implements WarehouseSigningService {
             errorMsg = "Failed to list warehouse signings")
     public List<WarehouseSigningDto> list(WarehouseSigningFilterDto filterDto) {
 
-        final WarehouseSigningFilter filter = getMapper(MapWSToWarehouseSigningFilter.class).from(filterDto);
+        final WarehouseSigningFilter filter = getMapper(MapWHSToWarehouseSigningFilter.class).from(filterDto);
 
-        return getMapper(MapWSToWarehouseSigningDto.class).from(repository.list(filter));
+        return getMapper(MapWHSToWarehouseSigningDto.class).from(repository.list(filter));
     }
 
     @Override
@@ -66,9 +66,9 @@ public class WarehouseSigningServiceImpl implements WarehouseSigningService {
             errorMsg = "Failed to paginate warehouse signings")
     public Page<WarehouseSigningDto> list(WarehouseSigningFilterDto filterDto, Long offset, Long limit) {
 
-        final WarehouseSigningFilter filter = getMapper(MapWSToWarehouseSigningFilter.class).from(filterDto);
+        final WarehouseSigningFilter filter = getMapper(MapWHSToWarehouseSigningFilter.class).from(filterDto);
 
-        return getMapper(MapWSToWarehouseSigningDto.class).from(repository.list(filter, offset, limit));
+        return getMapper(MapWHSToWarehouseSigningDto.class).from(repository.list(filter, offset, limit));
     }
 
     @Override
@@ -80,11 +80,11 @@ public class WarehouseSigningServiceImpl implements WarehouseSigningService {
             errorMsg = "Failed to find warehouse signing by ID")
     public Optional<WarehouseSigningDto> find(WarehouseSigningByIdFinderDto finderDto) {
 
-        final WarehouseSigningByIdFinder finder = getMapper(MapWSToWarehouseSigningByIdFinder.class)
+        final WarehouseSigningByIdFinder finder = getMapper(MapWHSToWarehouseSigningByIdFinder.class)
                 .from(finderDto);
 
         return repository.find(finder)
-                .map(getMapper(MapWSToWarehouseSigningDto.class)::from);
+                .map(getMapper(MapWHSToWarehouseSigningDto.class)::from);
     }
 
     @Override
@@ -107,10 +107,10 @@ public class WarehouseSigningServiceImpl implements WarehouseSigningService {
             errorMsg = "Failed to create new warehouse signing")
     public WarehouseSigningDto create(WarehouseSigningCreateDto createDto) {
 
-        final WarehouseSigningCreate create = getMapper(MapWSToWarehouseSigningCreate.class).from(createDto);
+        final WarehouseSigningCreate create = getMapper(MapWHSToWarehouseSigningCreate.class).from(createDto);
         create.setStartedAt(LocalDateTime.now());
 
-        return getMapper(MapWSToWarehouseSigningDto.class)
+        return getMapper(MapWHSToWarehouseSigningDto.class)
                 .from(repository.create(create));
     }
 
@@ -133,14 +133,14 @@ public class WarehouseSigningServiceImpl implements WarehouseSigningService {
         final boolean firstClosed = warehouseSigning.getClosedAt() == null;
 
         //Update non null values from request dto
-        getMapper(MapWSToWarehouseSigningUpdate.class)
+        getMapper(MapWHSToWarehouseSigningUpdate.class)
                 .from(updateDto, warehouseSigning);
 
         //If first time for update then close signing today
         if (firstClosed)
             warehouseSigning.setClosedAt(LocalDateTime.now());
 
-        return getMapper(MapWSToWarehouseSigningDto.class)
+        return getMapper(MapWHSToWarehouseSigningDto.class)
                 .from(repository.update(warehouseSigning));
     }
 
@@ -157,7 +157,7 @@ public class WarehouseSigningServiceImpl implements WarehouseSigningService {
 
         findOrNotFound(finder);
 
-        final WarehouseSigningDelete delete = getMapper(MapWSToWarehouseSigningDelete.class)
+        final WarehouseSigningDelete delete = getMapper(MapWHSToWarehouseSigningDelete.class)
                 .from(deleteDto);
 
         repository.delete(delete);

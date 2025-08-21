@@ -5,7 +5,7 @@ import com.epm.gestepm.modelapi.signings.workshop.dto.creator.WorkshopSigningCre
 import org.mapstruct.Mapper;
 
 @Mapper
-public interface MapWSHToWorkshopSigningCreate {
+public interface MapWSSToWorkshopSigningCreate {
 
     WorkshopSigningCreate from(WorkshopSigningCreateDto dto);
 }

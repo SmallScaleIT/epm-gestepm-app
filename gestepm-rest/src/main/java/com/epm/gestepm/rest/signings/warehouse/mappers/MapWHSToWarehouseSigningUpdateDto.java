@@ -5,7 +5,7 @@ import com.epm.gestepm.restapi.openapi.model.UpdateWarehouseSigningV1Request;
 import org.mapstruct.Mapper;
 
 @Mapper
-public interface MapWSToWarehouseSigningUpdateDto {
+public interface MapWHSToWarehouseSigningUpdateDto {
 
     WarehouseSigningUpdateDto from(UpdateWarehouseSigningV1Request request);
 }

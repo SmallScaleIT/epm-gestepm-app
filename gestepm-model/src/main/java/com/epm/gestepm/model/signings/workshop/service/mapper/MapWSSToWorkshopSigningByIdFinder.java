@@ -5,6 +5,6 @@ import com.epm.gestepm.modelapi.signings.workshop.dto.finder.WorkshopSigningById
 import org.mapstruct.Mapper;
 
 @Mapper
-public interface MapWSHToWorkshopSigningByIdFinder {
+public interface MapWSSToWorkshopSigningByIdFinder {
     WorkshopSigningByIdFinder from(WorkshopSigningByIdFinderDto dto);
 }

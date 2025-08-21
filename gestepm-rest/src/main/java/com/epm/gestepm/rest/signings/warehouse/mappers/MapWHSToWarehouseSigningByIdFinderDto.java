@@ -5,6 +5,6 @@ import com.epm.gestepm.rest.signings.warehouse.request.WarehouseSigningFindRestR
 import org.mapstruct.Mapper;
 
 @Mapper
-public interface MapWSToWarehouseSigningByIdFinderDto {
+public interface MapWHSToWarehouseSigningByIdFinderDto {
     WarehouseSigningByIdFinderDto from(WarehouseSigningFindRestRequest request);
 }

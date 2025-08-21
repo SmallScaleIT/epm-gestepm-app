@@ -5,7 +5,7 @@ import com.epm.gestepm.restapi.openapi.model.CreateWarehouseSigningV1Request;
 import org.mapstruct.Mapper;
 
 @Mapper
-public interface MapWSToWarehouseSigningCreateDto {
+public interface MapWHSToWarehouseSigningCreateDto {
 
     WarehouseSigningCreateDto from(CreateWarehouseSigningV1Request request);
 }

@@ -5,7 +5,7 @@ import com.epm.gestepm.rest.signings.warehouse.request.WarehouseSigningListRestR
 import org.mapstruct.Mapper;
 
 @Mapper
-public interface MapWSToWarehouseSigningFilterDto {
+public interface MapWHSToWarehouseSigningFilterDto {
 
     WarehouseSigningFilterDto from(WarehouseSigningListRestRequest request);
 }

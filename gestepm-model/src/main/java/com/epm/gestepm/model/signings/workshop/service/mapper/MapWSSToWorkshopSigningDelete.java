@@ -5,6 +5,6 @@ import com.epm.gestepm.modelapi.signings.workshop.dto.deleter.WorkshopSigningDel
 import org.mapstruct.Mapper;
 
 @Mapper
-public interface MapWSHToWorkshopSigningDelete {
+public interface MapWSSToWorkshopSigningDelete {
     WorkshopSigningDelete from(WorkshopSigningDeleteDto dto);
 }

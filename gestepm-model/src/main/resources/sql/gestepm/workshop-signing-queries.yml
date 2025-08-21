@@ -66,6 +66,7 @@ sql:
       -- ${sql.predicate-for-wss-ids}
       -- ${sql.predicate-for-wss-u-id}
       -- ${sql.predicate-for-wss-p-id}
+      -- ${sql.predicate-for-wss-whs-id}
       -- ${sql.predicate-for-wss-current}
     -- AND]
 
@@ -90,6 +91,10 @@ sql:
   predicate-for-wss-p-id: |
 
     wss.project_id IN (:attr_wss_project_id)
+
+  predicate-for-wss-whs-id: |
+    
+    wss.warehouse_signing_id IN (:attr_wss_warehouse_id)
 
   predicate-for-wss-current: |
     

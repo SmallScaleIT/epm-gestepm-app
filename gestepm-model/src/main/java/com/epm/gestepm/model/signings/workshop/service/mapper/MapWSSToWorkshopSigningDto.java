@@ -8,7 +8,7 @@ import org.mapstruct.Mapper;
 import java.util.List;
 
 @Mapper
-public interface MapWSHToWorkshopSigningDto {
+public interface MapWSSToWorkshopSigningDto {
     WorkShopSigningDto from(WorkshopSigning model);
 
     List<WorkShopSigningDto> from(List<WorkshopSigning> dtoList);

@@ -12,15 +12,13 @@ import com.epm.gestepm.modelapi.signings.workshop.dto.finder.WorkshopSigningById
 import com.epm.gestepm.modelapi.signings.workshop.service.WorkshopSigningService;
 import com.epm.gestepm.rest.project.mappers.MapPRToProjectResponse;
 import com.epm.gestepm.rest.signings.teleworking.request.TeleworkingSigningFindRestRequest;
-import com.epm.gestepm.rest.signings.workshop.mapper.MapWSSToWorkshopSigningResponse;
+import com.epm.gestepm.rest.signings.workshop.mappers.MapWSSToWorkshopSigningResponse;
 import com.epm.gestepm.restapi.openapi.model.Project;
 import com.epm.gestepm.restapi.openapi.model.User;
 import com.epm.gestepm.restapi.openapi.model.WarehouseSigning;
 import com.epm.gestepm.restapi.openapi.model.WorkshopSigning;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
-
-import javax.validation.Valid;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -91,14 +89,14 @@ public class WarehouseSigningResponseDecorator extends BaseResponseDataDecorator
 
         if (request.hasExpand(WHS_WSS_EXPAND))
         {
-            final List<WorkshopSigning> workshops = data.getWorkshops();
+            final List<WorkshopSigning> workshops = data.getWorkshopSignings();
 
             final List<WorkshopSigning> response = workshops.stream()
                     .map(workshop -> workshopService.findOrNotFound(new WorkshopSigningByIdFinderDto(workshop.getId())))
                     .map(workshop -> getMapper(MapWSSToWorkshopSigningResponse.class).from(workshop))
                     .collect(Collectors.toList());
 
-            data.setWorkshops(response);
+            data.setWorkshopSignings(response);
         }
     }
 }

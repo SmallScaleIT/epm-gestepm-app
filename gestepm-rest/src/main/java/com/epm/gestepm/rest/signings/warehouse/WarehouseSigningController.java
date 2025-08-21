@@ -71,11 +71,11 @@ public class WarehouseSigningController extends BaseController implements Wareho
         this.setPagination(req, limit, offset);
         this.setOrder(req, order, orderBy);
 
-        final WarehouseSigningFilterDto filterDto = getMapper(MapWSToWarehouseSigningFilterDto.class).from(req);
+        final WarehouseSigningFilterDto filterDto = getMapper(MapWHSToWarehouseSigningFilterDto.class).from(req);
         final Page<WarehouseSigningDto> page = this.warehouseService.list(filterDto, offset, limit);
 
         final APIMetadata metadata = this.getMetadata(req, page, new ListWarehouseSigningV1Operation());
-        final List<WarehouseSigning> data = getMapper(MapWSToWarehouseSigningResponse.class).from(page);
+        final List<WarehouseSigning> data = getMapper(MapWHSToWarehouseSigningResponse.class).from(page);
 
         this.decorate(req, data, WarehouseSigningResponseDecorator.class);
 
@@ -92,13 +92,13 @@ public class WarehouseSigningController extends BaseController implements Wareho
 
         this.setCommon(req, meta, links, expand);
 
-        final WarehouseSigningByIdFinderDto finderDto = getMapper(MapWSToWarehouseSigningByIdFinderDto.class)
+        final WarehouseSigningByIdFinderDto finderDto = getMapper(MapWHSToWarehouseSigningByIdFinderDto.class)
                 .from(req);
 
         final WarehouseSigningDto dto = this.warehouseService.findOrNotFound(finderDto);
 
         final APIMetadata metadata = this.getMetadata(req, new FindWarehouseSigningV1Operation());
-        final WarehouseSigning data = getMapper(MapWSToWarehouseSigningResponse.class).from(dto);
+        final WarehouseSigning data = getMapper(MapWHSToWarehouseSigningResponse.class).from(dto);
 
         this.decorate(req, data, WarehouseSigningResponseDecorator.class);
 
@@ -110,14 +110,14 @@ public class WarehouseSigningController extends BaseController implements Wareho
     @LogExecution(operation = OP_CREATE)
     public ResponseEntity<CreateWarehouseSigningV1200Response> createWarehouseSigningV1(final CreateWarehouseSigningV1Request reqCreateWarehouseSigning) {
 
-        final WarehouseSigningCreateDto createDto = getMapper(MapWSToWarehouseSigningCreateDto.class)
+        final WarehouseSigningCreateDto createDto = getMapper(MapWHSToWarehouseSigningCreateDto.class)
                 .from(reqCreateWarehouseSigning);
 
         final WarehouseSigningDto warehouseSigningDto = warehouseService.create(createDto);
 
         final APIMetadata metadata = this.getDefaultMetadata();
 
-        final WarehouseSigning data = getMapper(MapWSToWarehouseSigningResponse.class)
+        final WarehouseSigning data = getMapper(MapWHSToWarehouseSigningResponse.class)
                 .from(warehouseSigningDto);
 
         final CreateWarehouseSigningV1200Response response = new CreateWarehouseSigningV1200Response();
@@ -132,7 +132,7 @@ public class WarehouseSigningController extends BaseController implements Wareho
     @LogExecution(operation = OP_UPDATE)
     public ResponseEntity<CreateWarehouseSigningV1200Response> updateWarehouseSigningV1(final Integer id, final UpdateWarehouseSigningV1Request reqUpdateWarehouseSigning) {
 
-        final WarehouseSigningUpdateDto updateDto = getMapper(MapWSToWarehouseSigningUpdateDto.class)
+        final WarehouseSigningUpdateDto updateDto = getMapper(MapWHSToWarehouseSigningUpdateDto.class)
                 .from(reqUpdateWarehouseSigning);
 
         updateDto.setId(id);
@@ -140,7 +140,7 @@ public class WarehouseSigningController extends BaseController implements Wareho
         final WarehouseSigningDto warehouseSigning = this.warehouseService.update(updateDto);
 
         final APIMetadata metadata = this.getDefaultMetadata();
-        final WarehouseSigning data = getMapper(MapWSToWarehouseSigningResponse.class)
+        final WarehouseSigning data = getMapper(MapWHSToWarehouseSigningResponse.class)
                 .from(warehouseSigning);
 
         final CreateWarehouseSigningV1200Response response = new CreateWarehouseSigningV1200Response();
