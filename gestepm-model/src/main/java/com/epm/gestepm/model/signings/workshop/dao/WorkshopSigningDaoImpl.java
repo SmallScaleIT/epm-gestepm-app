@@ -173,7 +173,7 @@ public class WorkshopSigningDaoImpl implements WorkshopSigningDao {
     private void setOrder(final SQLOrderByType order, final String orderBy, final SQLQueryFetchMany<WorkshopSigning> sqlQuery) {
         final String orderByStatement = StringUtils.isNoneBlank(orderBy) && !orderBy.equals("id")
                 ? this.getOrderColumn(orderBy)
-                : COL_WSH_ID;
+                : COL_WSS_ID;
         final SQLOrderByType orderStatement = order != null
                 ? order
                 : SQLOrderByType.DESC;
@@ -182,13 +182,13 @@ public class WorkshopSigningDaoImpl implements WorkshopSigningDao {
 
     private String getOrderColumn(final String orderBy) {
         if ("startedAt".equals(orderBy)) {
-            return COL_WSH_STARTED_AT;
+            return COL_WSS_STARTED_AT;
         } else if ("closedAt".equals(orderBy)) {
-            return COL_WSH_CLOSED_AT;
+            return COL_WSS_CLOSED_AT;
         } else if ("project.name".equals(orderBy)) {
-            return COL_WSH_PROJECT_NAME;
+            return COL_WSS_PROJECT_NAME;
         } else if ("warehouse_signing_id".equals(orderBy)) {
-            return COL_WSH_WAREHOUSE_ID;
+            return COL_WSS_WAREHOUSE_ID;
         }
         return orderBy;
     }

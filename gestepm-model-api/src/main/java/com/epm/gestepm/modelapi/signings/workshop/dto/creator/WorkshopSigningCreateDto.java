@@ -15,4 +15,6 @@ public class WorkshopSigningCreateDto {
 
     @NotNull
     private Integer userId;
+
+    private String description;
 }

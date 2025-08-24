@@ -11,7 +11,14 @@ public class WorkshopSigningUpdateDto {
     @NotNull
     private Integer id;
 
+    @NotNull
+    private Integer warehouseId;
+
     private LocalDateTime startedAt;
 
     private LocalDateTime closedAt;
+
+    private String description;
+
+    private Boolean finalize;
 }

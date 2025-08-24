@@ -24,4 +24,6 @@ public class WorkshopSigning {
     private LocalDateTime startedAt;
 
     private LocalDateTime closedAt;
+
+    private String description;
 }

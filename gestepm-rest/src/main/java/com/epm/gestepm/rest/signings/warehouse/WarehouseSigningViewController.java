@@ -66,6 +66,7 @@ public class WarehouseSigningViewController {
 
         final ProjectDto project = projectService.findOrNotFound(new ProjectByIdFinderDto(warehouseSigning.getProjectId()));
         model.addAttribute("projectName", project.getName());
+        model.addAttribute("projectId", project.getId());
 
         this.loadPermissions(user, project.getId(), model);
 

@@ -3786,6 +3786,10 @@ components:
           x-stoplight:
             id: yf3vqpzj6hd8r
           format: date-time
+        description:
+          type: string
+          x-stoplight:
+            id: l9y2l16v139oz
   securitySchemes:
     bearerAuth:
       type: http
@@ -5287,6 +5291,10 @@ components:
                 type: integer
                 x-stoplight:
                   id: 0h7rh7ma0d6lx
+              description:
+                type: string
+                x-stoplight:
+                  id: t6b0ag6jhvqg6
       description: ''
     UpdateWorkshopSigning:
       content:
@@ -5304,6 +5312,14 @@ components:
                 x-stoplight:
                   id: h5l48jokq9eg9
                 format: date-time
+              description:
+                type: string
+                x-stoplight:
+                  id: alk7wcv72seh6
+              finalize:
+                type: boolean
+                x-stoplight:
+                  id: bm6elje2hl1mo
   parameters:
     Share-Id:
       name: shareId

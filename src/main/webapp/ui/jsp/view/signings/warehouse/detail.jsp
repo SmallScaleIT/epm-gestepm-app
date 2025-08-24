@@ -60,7 +60,7 @@
                             </label>
                         </div>
                     </div>
-                    <div class="col-sm-12 col-md-4">
+                    <div class="col-sm-12 col-md-4 d-none" id = "endDateBox">
                         <div class="form-group mb-1">
                             <label class="col-form-label w-100"><spring:message code="end.date"/>
                                 <input type="datetime-local" name="closedAt" class="form-control mt-1" value="${warehouseSigning.closedAt}" disabled />
@@ -71,7 +71,7 @@
 
                 <div class="row actionable d-none">
                     <div class="col text-right">
-                        <button id="finishBtn" type="button" class="btn btn-danger btn-sm"><spring:message code="finish"/></button></button>
+                        <button id="finishBtn" type="button" class="btn btn-danger btn-sm"><spring:message code="finish"/></button>
                     </div>
                 </div>
             </form>
@@ -176,17 +176,18 @@
         warehouseSigning = await getWarehouse(id);
 
         const closeAtEditor = document.querySelector('[name="closedAt"]');
+        const closeDateBox = document.getElementById('endDateBox');
 
         if (closeAtEditor)
         {
             if (warehouseSigning.closedAt !== null && warehouseSigning.closedAt !== undefined)
             {
-                $(closeAtEditor).removeClass('d-none');
+                closeDateBox.classList.remove('d-none');
                 closeAtEditor.value = warehouseSigning.closedAt;
             }
             else
             {
-                $(closeAtEditor).addClass('d-none');
+                closeDateBox.classList.add('d-none');
                 closeAtEditor.value = null;
             }
         }
@@ -201,11 +202,12 @@
 
             axios.patch('/v1/signings/warehouse/' + id, {})
             .then(response => {
-                setWarehouseEndDate(response.data.data.id);
-                showNotify(messages.signings.warehouse.update.success);
+                window.location.reload();
             })
             .catch(error => showNotify(error.response.data.detail, 'danger'))
-            .finally(() => hideLoading());
+            .finally(() => {
+                hideLoading();
+            });
         });
     }
 
@@ -250,8 +252,8 @@
             , permission: 'edit_warehouse-signing'
         }];
 
-        if (warehouseSigning.closedAt === null)
-            actions.push({action: 'delete', permission: 'edit_warehouse_signing'});
+        if (!warehouseSigning.closedAt)
+            actions.push({action: 'delete', permission: 'edit_warehouse_signings'});
 
         let expand = [];
 
@@ -275,10 +277,7 @@
 
         const projectEditor = document.querySelector('[name="projectId"]');
 
-        const projectId = null;
-
-        if (projectEditor)
-            projectId = projectEditor.value;
+        const projectId = ${projectId};
 
         showLoading();
 
@@ -298,7 +297,7 @@
     }
 
     function remove(id) {
-        const alertMessage = messages.signings.warehouse.delete.alert.replace('{0}', inspectionId);
+        const alertMessage = messages.signings.warehouse.delete.alert.replace('{0}', id);
 
         if (!confirm(alertMessage))
             return ;
@@ -344,7 +343,7 @@
     function setReturnButtonUrl() {
         let lastPageUrl = '/signings/warehouse';
 
-        if (document.referrer) {
+        /*if (document.referrer) {
             const lastPagePath = new URL(document.referrer).pathname;
 
             if (/^\/signings\/warehouse\/\d+\/workshop-signings\/\d+$/.test(lastPagePath)) {
@@ -354,7 +353,7 @@
                 lastPageUrl = lastPagePath + (queryParams ? '?' + queryParams : '');
                 sessionStorage.setItem('warehouseSigningFilter', lastPageUrl);
             }
-        }
+        }*/
 
         returnBtnJQ.attr('href', lastPageUrl);
     }

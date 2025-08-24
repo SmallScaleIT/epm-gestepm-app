@@ -16,10 +16,14 @@ public class WorkshopSigningUpdate implements AuditUpdate, CollectableAttributes
     @NotNull
     private Integer id;
 
+    @NotNull
+    private Integer warehouseId;
+
     private LocalDateTime startedAt;
 
-    @NotNull
     private LocalDateTime closedAt;
+
+    private String description;
 
     @Override
     public AttributeMap collectAttributes() {
@@ -29,6 +33,8 @@ public class WorkshopSigningUpdate implements AuditUpdate, CollectableAttributes
         attrs.put(ATTR_WSS_ID, this.id);
         attrs.putTimestamp(ATTR_WSS_STARTED_AT, this.startedAt);
         attrs.putTimestamp(ATTR_WSS_CLOSED_AT, this.closedAt);
+        attrs.put(ATTR_WSS_DESCRIPTION, this.description);
+        attrs.put(ATTR_WSS_WAREHOUSE_ID, this.warehouseId);
 
         return attrs;
     }

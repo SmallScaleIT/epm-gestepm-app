@@ -24,4 +24,6 @@ public class WorkShopSigningDto {
     private LocalDateTime startedAt;
 
     private LocalDateTime closedAt;
+
+    private String description;
 }

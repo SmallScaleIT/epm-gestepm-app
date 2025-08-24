@@ -143,6 +143,7 @@ public class WorkshopSigningController extends BaseController implements Respons
                 .from(updateWorkshopSigningV1Request);
 
         updateDto.setId(workshopSigningId);
+        updateDto.setWarehouseId(warehouseSigningId);
 
         final WorkShopSigningDto dto = service.update(updateDto);
 

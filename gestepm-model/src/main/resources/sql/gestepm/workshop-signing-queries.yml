@@ -9,7 +9,8 @@ sql:
       wss.project_id,
       pr.name AS project_name,
       wss.started_at,
-      wss.closed_at
+      wss.closed_at,
+      wss.description
     FROM ${sch-gestepm}.workshop_signing wss
     LEFT JOIN ${sch-gestepm}.project pr ON wss.project_id = pr.project_id
 
@@ -37,13 +38,15 @@ sql:
       user_id,
       project_id,
       warehouse_signing_id,
-      started_at
+      started_at,
+      description
     )
     VALUES (
       :attr_wss_user_id,
       :attr_wss_project_id,
       :attr_wss_warehouse_id,
-      :attr_wss_started_at
+      :attr_wss_started_at,
+      :attr_wss_description
     )
 
   qry-update-wss: |
@@ -52,7 +55,9 @@ sql:
       ${sch-gestepm}.workshop_signing
     SET
       started_at = :attr_wss_started_at,
-      closed_at = :attr_wss_closed_at
+      closed_at = :attr_wss_closed_at,
+      warehouse_signing_id = :attr_wss_warehouse_id,
+      description = :attr_wss_description
     WHERE
       workshop_signing_id = :attr_wss_id
 

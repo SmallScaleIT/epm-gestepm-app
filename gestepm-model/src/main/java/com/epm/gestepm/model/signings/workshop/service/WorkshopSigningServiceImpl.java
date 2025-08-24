@@ -20,6 +20,7 @@ import com.epm.gestepm.modelapi.signings.workshop.dto.deleter.WorkshopSigningDel
 import com.epm.gestepm.modelapi.signings.workshop.dto.filter.WorkshopSigningFilterDto;
 import com.epm.gestepm.modelapi.signings.workshop.dto.finder.WorkshopSigningByIdFinderDto;
 import com.epm.gestepm.modelapi.signings.workshop.dto.updater.WorkshopSigningUpdateDto;
+import com.epm.gestepm.modelapi.signings.workshop.exception.WorkshopSigningFinalized;
 import com.epm.gestepm.modelapi.signings.workshop.exception.WorkshopSigningNotFoundException;
 import com.epm.gestepm.modelapi.signings.workshop.service.WorkshopSigningService;
 import lombok.AllArgsConstructor;
@@ -142,14 +143,17 @@ public class WorkshopSigningServiceImpl implements WorkshopSigningService {
         WorkshopSigningUpdate signing = repository.findUpdateSigning(finder)
                 .orElseThrow(() -> new WorkshopSigningNotFoundException(finder.getId()));
 
-        //Evaluate if first update
-        boolean firsTimeUpdate = signing.getClosedAt() == null;
+        if (signing.getClosedAt() != null)
+            throw new WorkshopSigningFinalized(signing.getId());
 
         //Update entity with non null values
         getMapper(MapWSSToWorkshopSigningUpdate.class)
                 .from(updateDto, signing);
 
-        if (firsTimeUpdate)
+        boolean finalize = Optional.ofNullable(updateDto.getFinalize())
+                .orElse(false);
+
+        if (finalize)
             signing.setClosedAt(LocalDateTime.now());
 
         return getMapper(MapWSSToWorkshopSigningDto.class)

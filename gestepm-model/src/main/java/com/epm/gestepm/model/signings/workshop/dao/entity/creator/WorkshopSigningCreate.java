@@ -25,6 +25,8 @@ public class WorkshopSigningCreate implements AuditCreate, CollectableAttributes
     @NotNull
     private LocalDateTime startedAt;
 
+    private String description;
+
     @Override
     public AttributeMap collectAttributes() {
 
@@ -33,6 +35,7 @@ public class WorkshopSigningCreate implements AuditCreate, CollectableAttributes
         attrs.put(ATTR_WSS_USER_ID, this.userId);
         attrs.put(ATTR_WSS_PROJECT_ID, this.projectId);
         attrs.putTimestamp(ATTR_WSS_STARTED_AT, this.startedAt);
+        attrs.put(ATTR_WSS_DESCRIPTION, this.description);
 
         return attrs;
     }
