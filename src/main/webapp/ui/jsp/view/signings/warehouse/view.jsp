@@ -37,11 +37,6 @@
             <div class="breadcrumbs-inner">
                 <form id="form">
                     <div id="form-page-header" class="page-header pl-3">
-                        <div class="row start-date-info-row">
-                            <div class="col" style="margin-top: -3px">
-                                <span class="start-date-info"></span>
-                            </div>
-                        </div>
                         <div class="row w-100">
                             <div class="col-sm-12 col-md-9 pr-0">
                                 <select id="projectDropdown" class="form-control input" name="projectId" required>
@@ -74,7 +69,7 @@
             <div class="card">
                 <div class="card-body">
                     <div class="title mb-0">
-                        <spring:message code="signing.teleworking"/>
+                        <spring:message code="signing.warehouse"/>
                     </div>
 
                     <div class="table-responsive">
@@ -102,7 +97,6 @@
     let userId = ${user.id};
 
     $(document).ready(async function () {
-        await getCurrentWarehouse();
         initializeDataTables();
         initializeSelects();
     });

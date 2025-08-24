@@ -47,6 +47,14 @@
         <put-attribute name="body" value="/ui/jsp/view/signings/teleworking/detail.jsp" />
     </definition>
 
+    <definition name="warehouse-signings" extends="fullFrameLayout">
+        <put-attribute name="body" value="/ui/jsp/view/signings/warehouse/view.jsp" />
+    </definition>
+
+    <definition name="warehouse-signing-detail" extends="fullFrameLayout">
+        <put-attribute name="body" value="/ui/jsp/view/signings/warehouse/detail.jsp" />
+    </definition>
+
     <definition name="manual-signing" extends="fullFrameLayout">
         <put-attribute name="body" value="/ui/jsp/view/signing/manual.jsp" />
     </definition>

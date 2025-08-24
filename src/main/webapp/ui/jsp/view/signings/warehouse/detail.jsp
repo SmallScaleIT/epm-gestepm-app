@@ -59,19 +59,20 @@
                         </label>
                     </div>
                 </div>
-
-                <div class="col-sm-12 col-md-4">
-                    <div class="form-group mb-1">
-                        <label>
-                            <input type="datetime-local" name="closedAt" class="form-control mt-1" value="${warehouseSigning.closedAt}" disabled />
-                        </label class="col-form-label w-100"><spring:message code="end.date"/>
+                <c:if test="${warehouseSigning.closedAt != null}">
+                    <div class="col-sm-12 col-md-4">
+                        <div class="form-group mb-1">
+                            <label class="col-form-label w-100"><spring:message code="end.date"/>
+                                <input type="datetime-local" name="closedAt" class="form-control mt-1" value="${warehouseSigning.closedAt}" disabled />
+                            </label>
+                        </div>
                     </div>
-                </div>
+                </c:if>
             </div>
 
             <div class="row actionable d-none">
                 <div class="col text-right">
-                    <button id="editBtn" type="button" class="btn btn-standard btn-sm movile-full"><spring:message code="save"/></button>
+                    <button id="editBtn" type="button" class="btn btn-sm" data-dismiss="modal"><spring:message code="close"/></button>
                 </div>
             </div>
         </form>
@@ -95,8 +96,12 @@
 
         editForm.querySelector('.actionable').classList.remove('d-none');
 
-        editForm.querySelector('[name="startedAt"]').disabled = false;
-        editForm.querySelector('[name="closedAt"]').disabled = false;
+        editForm.querySelector('[name="startedAt"]').disabled = true;
+
+        const closeAtEditor = editForm.querySelector('[name="closedAt"]');
+
+        if (closeAtEditor)
+            closeAtEditor.disabled = true;
     }
 
     function save() {
@@ -107,10 +112,12 @@
         editBtnJQ.click(async () => {
             if (!isValidForm('#editForm'))
             {
+                console.log('Invalido');
                 editFormJQ.addClass('was-validated');
                 return ;
             }
 
+            console.log('Loading');
             showLoading();
             editFormJQ.removeClass('was-validated');
 
@@ -132,7 +139,7 @@
             };
 
             axios.patch('/v1' + window.location.pathname, params).then(() => {
-                showNotify(messages.signings.teleworking.update.success);
+                showNotify(messages.signings.warehouse.update.success);
             })
             .catch(error => showNotify(error.response.data.detail, 'danger'))
             .finally(() => hideLoading());

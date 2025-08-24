@@ -156,6 +156,17 @@
                 "success": "Se ha actualizado el fichaje de teletrabajo con éxito."
             }
         },
+        "warehouse": {
+            "name": "Nave",
+            "startDate": "Fecha de inicio: {0}",
+            "update": {
+                "success": "Se ha actualizado el fichaje de nave con éxito."
+            },
+            "delete": {
+                "alert": "¿Está seguro que quiere borrar el fichaje tipo nave {0}?",
+                "success": "Fichaje tipo nave nº {0} eliminado con éxito."
+            }
+        },
         "personal": {
             "name": "Fichaje de horario personal"
         }

@@ -156,6 +156,17 @@
                 "success": "La fiche de bureau / télétravail a été mise à jour avec succès."
             }
         },
+        "warehouse": {
+            "name": "Navire",
+            "startDate": "Date de début : {0}",
+            "update": {
+                "success": "La fiche du navire a été mise à jour avec succès."
+            },
+            "delete": {
+                "alert": "Êtes-vous sûr de vouloir supprimer l'enregistrement de type navire {0} ?",
+                "success": "Fichier type navire n° {0} supprimé avec succès."
+            }
+        },
         "personal": {
             "name": "Pointage horaire personnel"
         }

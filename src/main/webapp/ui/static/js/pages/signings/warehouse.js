@@ -10,12 +10,16 @@ function initializeDataTables() {
             action: 'view'
             , url: '/signings/warehouse/{id}'
             , permission: 'edit_warehouse_signings'
+        },
+        {
+            action: 'delete',
+            permission: 'edit_warehouse_signings'
         }
     ];
 
     const expand = ['project'];
 
-    const filters = [{'userIds': userId, 'current': false}];
+    const filters = [{'userIds': userId}];
 
     const columnDefs = [
         {
@@ -43,29 +47,52 @@ function initializeSelects() {
 
     selects.forEach(select => {
         const select2 = createBasicSelect2($(select));
-
-        if (currentWarehouse)
-        {
-            select2.append(new Option(currentWarehouse.project.name, currentWarehouse.project.id, true, true));
-        }
     });
 }
 
-async function getCurrentWarehouse() {
-    await axios.get(endpoint, {
-        params: {
-            userIds: userId
-            , current: true
-            , offset: 0
-            , limit: 1
-            , _expand: 'project'
-        }
-    }).then((response) => {
-        currentWarehouse = response.data.data[0];
-        updateForm();
-    }).catch(error => showNotify(error.response.data.detail, 'danger'));
+function submitWarehouse() {
+
+    const form = document.getElementById('form');
+
+    const formJQ = $(form);
+
+    if (!isValidForm('#form'))
+        formJQ.addClass('was-validated');
+    else
+    {
+        showLoading();
+
+        formJQ.removeClass('was-validated');
+
+        const projectId = form.querySelector('[name="projectId"]').value;
+
+        axios.post(endpoint, {'projectId': projectId, 'userId': userId})
+        .then(response => {
+            const warehouse = response.data.data;
+            window.location.replace('/signings/warehouse/' + warehouse.id);
+        })
+        .catch(error => showNotify(error.response.data.detail, 'danger'))
+        .finally(() => hideLoading());
+    }
+
+    hideLoading();
 }
 
-function updateForm() {
+function remove(id) {
+    if (!confirm(messages.signings.warehouse.delete.alert.replace('{0}', id)))
+        return ;
 
+    showLoading();
+
+    axios.delete('/v1/signings/warehouse/' + id)
+    .then(() => {
+        dTable.ajax.reload(function () {
+            dTable.page(dTable.page()).draw(false);
+        }, false);
+        showNotify(messages.signings.warehouse.delete.success.replace('{0}', id));
+    })
+    .catch(error => showNotify(error.response.data.detail, 'danger'))
+    .finally(() => hideLoading());
+
+    hideLoading();
 }

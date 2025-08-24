@@ -2,11 +2,15 @@ package com.epm.gestepm.model.signings.warehouse.dao.entity.finder;
 
 import com.epm.gestepm.lib.entity.AttributeMap;
 import com.epm.gestepm.lib.entity.CollectableAttributes;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import static com.epm.gestepm.model.signings.warehouse.dao.constants.WarehouseSigningAttributes.*;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class WarehouseSigningByIdFinder implements CollectableAttributes {
 
     private Integer id;

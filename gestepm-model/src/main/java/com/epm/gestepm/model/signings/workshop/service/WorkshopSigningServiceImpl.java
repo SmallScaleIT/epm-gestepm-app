@@ -4,6 +4,8 @@ import com.epm.gestepm.lib.logging.annotation.EnableExecutionLog;
 import com.epm.gestepm.lib.logging.annotation.LogExecution;
 import com.epm.gestepm.lib.security.annotation.RequirePermits;
 import com.epm.gestepm.lib.types.Page;
+import com.epm.gestepm.model.signings.warehouse.dao.WarehouseSigningDao;
+import com.epm.gestepm.model.signings.warehouse.dao.entity.finder.WarehouseSigningByIdFinder;
 import com.epm.gestepm.model.signings.workshop.dao.WorkshopSigningDao;
 import com.epm.gestepm.model.signings.workshop.dao.entity.creator.WorkshopSigningCreate;
 import com.epm.gestepm.model.signings.workshop.dao.entity.deleter.WorkshopSigningDelete;
@@ -11,6 +13,7 @@ import com.epm.gestepm.model.signings.workshop.dao.entity.filter.WorkshopSigning
 import com.epm.gestepm.model.signings.workshop.dao.entity.finder.WorkshopSigningByIdFinder;
 import com.epm.gestepm.model.signings.workshop.dao.entity.updater.WorkshopSigningUpdate;
 import com.epm.gestepm.model.signings.workshop.service.mapper.*;
+import com.epm.gestepm.modelapi.signings.warehouse.exception.WarehouseSigningNotFoundException;
 import com.epm.gestepm.modelapi.signings.workshop.dto.WorkShopSigningDto;
 import com.epm.gestepm.modelapi.signings.workshop.dto.creator.WorkshopSigningCreateDto;
 import com.epm.gestepm.modelapi.signings.workshop.dto.deleter.WorkshopSigningDeleteDto;
@@ -40,6 +43,8 @@ import static com.epm.gestepm.modelapi.signings.workshop.security.WorkshopSignin
 public class WorkshopSigningServiceImpl implements WorkshopSigningService {
 
     private final WorkshopSigningDao repository;
+
+    private final WarehouseSigningDao warehouseRepository;
 
     @Override
     @RequirePermits(value = PRMT_READ_WSS, action = "List workshop signings")
@@ -113,6 +118,9 @@ public class WorkshopSigningServiceImpl implements WorkshopSigningService {
         WorkshopSigningCreate create = getMapper(MapWSSToWorkshopSigningCreate.class)
                 .from(createDto);
         create.setStartedAt(LocalDateTime.now());
+
+        warehouseRepository.find(new WarehouseSigningByIdFinder(create.getWarehouseId()))
+                .orElseThrow(() -> new WarehouseSigningNotFoundException(create.getWarehouseId()));
 
         return getMapper(MapWSSToWorkshopSigningDto.class)
                 .from(repository.create(create));

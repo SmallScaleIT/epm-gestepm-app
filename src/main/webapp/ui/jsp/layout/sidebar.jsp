@@ -52,7 +52,7 @@
 					<ul class="sub-menu children dropdown-menu">
 						<li><i class="fa fa-home"></i><a href="/signings/teleworking"><spring:message code="sidebar.signing.teleworking" /></a></li>
 						<li><i class="fas fa-pencil-alt"></i><a href="/signing/manual"><spring:message code="sidebar.signing.manual" /></a></li>
-						<li><i class="fas"></i><a href="/signings/warehouse"><spring:message code="sidebar.signing.warehouse" /></a></li>
+						<li><i class="fas fa-warehouse"></i><a href="/signings/warehouse"><spring:message code="sidebar.signing.warehouse" /></a></li>
 						<sec:authorize access="hasAuthority('ROLE_JEFE_PROYECTO')">
 							<li><i class="fas fa-edit"></i><a href="/signing/modified-list"><spring:message code="sidebar.signing.modified.list" /></a></li>
 						</sec:authorize>
