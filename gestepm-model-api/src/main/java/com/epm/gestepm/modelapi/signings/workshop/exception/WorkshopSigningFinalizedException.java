@@ -5,6 +5,6 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class WorkshopSigningFinalized extends RuntimeException {
+public class WorkshopSigningFinalizedException extends RuntimeException {
     private Integer id;
 }

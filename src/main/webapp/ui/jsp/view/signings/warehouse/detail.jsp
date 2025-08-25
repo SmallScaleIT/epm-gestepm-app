@@ -307,7 +307,7 @@
         axios.delete('/v1/signings/warehouse/' + warehouseSigning.id + "/workshop-signings/" + id)
         .then(() => {
             dTable.ajax.reload();
-            const successMessage = messages.signings.warehouse.delete.success.replace('{0}', inspectionId);
+            const successMessage = messages.signings.warehouse.delete.success.replace('{0}', id);
             showNotify(successMessage);
         })
         .catch(error => showNotify(error.response.data.detail, 'danger'))
