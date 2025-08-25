@@ -36,7 +36,7 @@
         <div class="breadcrumbs">
             <div class="breadcrumbs-inner">
                 <form id="form">
-                    <div id="form-page-header" class="page-header pl-3">
+                    <div id="form-page-header" class="page-header pl-3 d-md-flex align-items-center">
                         <div class="row w-100">
                             <div class="col-sm-12 col-md-9 pr-0">
                                 <select id="projectDropdown" class="form-control input" name="projectId" required>
