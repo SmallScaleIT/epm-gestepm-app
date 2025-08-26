@@ -315,5 +315,8 @@
         "approved": "Aprobado",
         "paid": "Aprobado por administración",
         "rejected": "Cancelado"
+    },
+    "projectId": {
+        "mandatory": "El proyecto es obligatorio, seleccione uno."
     }
 }

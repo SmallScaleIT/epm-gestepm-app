@@ -276,8 +276,10 @@
 
         let projectId = ${projectId};
 
-        if (projectEditor)
+        if (projectEditor && projectEditor.value)
+        {
             projectId = projectEditor.value;
+        }
 
         showLoading();
 
