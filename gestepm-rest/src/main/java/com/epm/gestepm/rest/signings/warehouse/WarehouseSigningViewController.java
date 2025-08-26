@@ -70,12 +70,18 @@ public class WarehouseSigningViewController {
 
         this.loadPermissions(user, project.getId(), model);
 
+        model.addAttribute("importPath", "warehouse-detail");
+        model.addAttribute("loadingPath", "warehouses");
+        model.addAttribute("type", "detail");
+
         return "warehouse-signing-detail";
     }
 
     private void loadProjects(final Model model) {
         final ProjectFilterDto projectFilterDto = new ProjectFilterDto();
         projectFilterDto.setTypes(List.of(NORMAL, STATION));
+        projectFilterDto.setOrder("ASC");
+        projectFilterDto.setOrderBy("name");
 
         final List<ProjectDto> projects = this.projectService.list(projectFilterDto);
         model.addAttribute("projects", projects);

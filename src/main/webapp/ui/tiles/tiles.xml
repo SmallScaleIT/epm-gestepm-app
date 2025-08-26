@@ -51,7 +51,7 @@
         <put-attribute name="body" value="/ui/jsp/view/signings/warehouse/view.jsp" />
     </definition>
 
-    <definition name="warehouse-signing-detail" extends="fullFrameLayout">
+    <definition name="warehouse-signing-detail" extends="mainFrameLayout">
         <put-attribute name="body" value="/ui/jsp/view/signings/warehouse/detail.jsp" />
     </definition>
 

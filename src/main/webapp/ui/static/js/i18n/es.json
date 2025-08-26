@@ -55,20 +55,6 @@
             "success": "Día de vacaciones {0} eliminado con éxito del proyecto."
         }
     },
-    "workshops": {
-        "name": "Taller",
-        "title": "Taller número {0}",
-        "create": {
-            "success": "Taller con id {0} creado con éxito."
-        },
-        "update": {
-            "success": "Taller con id {0} actualizado con éxito."
-        },
-        "delete": {
-            "alert": "¿Está seguro que quiere borrar el taller {0}?",
-            "success": "Taller nº {0} eliminado con éxito."
-        }
-    },
     "inspections": {
         "name": "Revisión",
         "title": "Revisión número {0}",
@@ -171,14 +157,25 @@
             }
         },
         "warehouse": {
-            "name": "Nave",
-            "startDate": "Fecha de inicio: {0}",
             "update": {
                 "success": "Se ha actualizado el fichaje de nave con éxito."
             },
             "delete": {
                 "alert": "¿Está seguro que quiere borrar el fichaje tipo nave {0}?",
                 "success": "Fichaje tipo nave nº {0} eliminado con éxito."
+            }
+        },
+        "workshop": {
+            "title": "Taller número {0}",
+            "create": {
+                "success": "Taller con id {0} creado con éxito."
+            },
+            "update": {
+                "success": "Taller con id {0} actualizado con éxito."
+            },
+            "delete": {
+                "alert": "¿Está seguro que quiere borrar el taller {0}?",
+                "success": "Taller nº {0} eliminado con éxito."
             }
         },
         "personal": {

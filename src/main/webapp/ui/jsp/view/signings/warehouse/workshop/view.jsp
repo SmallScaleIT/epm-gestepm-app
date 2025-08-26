@@ -51,7 +51,7 @@
         const pageTitle = document.querySelector('#title');
         const backButton = document.querySelector('#backButton');
 
-        pageTitle.textContent = messages.workshops.title.replace('{0}', workshop.id);
+        pageTitle.textContent = messages.signings.workshop.title.replace('{0}', workshop.id);
         backButton.href = '/signings/warehouse/' + workshop.warehouse.id;
     }
 

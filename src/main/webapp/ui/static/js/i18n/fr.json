@@ -55,20 +55,6 @@
             "success" : "Le congé {0} a été supprimé avec succès du projet."
         }
     },
-    "workshops": {
-        "name": "Atelier",
-        "title": "Atelier numéro {0}",
-        "create": {
-            "success": "Atelier avec l'ID {0} créé avec succès."
-        },
-        "update": {
-            "success": "Atelier avec l'ID {0} mis à jour avec succès."
-        },
-        "delete": {
-            "alert": "Êtes-vous sûr de vouloir supprimer l'atelier {0} ?",
-            "success": "Atelier n° {0} supprimé avec succès."
-        }
-    },
     "inspections": {
         "name": "Révision",
         "title": "Révision numéro {0}",
@@ -171,14 +157,25 @@
             }
         },
         "warehouse": {
-            "name": "Navire",
-            "startDate": "Date de début : {0}",
             "update": {
                 "success": "La fiche du navire a été mise à jour avec succès."
             },
             "delete": {
                 "alert": "Êtes-vous sûr de vouloir supprimer l'enregistrement de type navire {0} ?",
                 "success": "Fichier type navire n° {0} supprimé avec succès."
+            }
+        },
+        "workshops": {
+            "title": "Atelier numéro {0}",
+            "create": {
+                "success": "Atelier avec l'ID {0} créé avec succès."
+            },
+            "update": {
+                "success": "Atelier avec l'ID {0} mis à jour avec succès."
+            },
+            "delete": {
+                "alert": "Êtes-vous sûr de vouloir supprimer l'atelier {0} ?",
+                "success": "Atelier n° {0} supprimé avec succès."
             }
         },
         "personal": {

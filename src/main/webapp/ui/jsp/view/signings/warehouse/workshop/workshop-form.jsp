@@ -1,4 +1,4 @@
-<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <style>
@@ -95,7 +95,7 @@
         <div class="col-sm-12 col-md-4">
             <div class="form-group mb-1">
                 <label class="col-form-label w-100"><spring:message code="project"/>
-                    <input type="text" class="form-control mt-1" value="${projectName}" disabled />
+                    <input type="text" class="form-control mt-1" value="${projectName}" disabled/>
                 </label>
             </div>
         </div>
@@ -103,9 +103,11 @@
     <div class="row">
         <div class="col-12">
             <div class="form-group mb-1">
-                <spring:message code="signings.workshop.create.desc.placeholder" var="placeholder" />
-                <label class="col-form-label w-100"><spring:message code="signings.workshop.create.desc" />
-                    <textarea class="form-control mt-1" placeholder="${placeholder}" name="description" rows="4" style="resize: none" value="${workshopSigning.description}" required>${workshopSigning.description}</textarea>
+                <spring:message code="select.placeholder" var="placeholder"/>
+                <label class="col-form-label w-100"><spring:message code="description"/>
+                    <textarea class="form-control mt-1" placeholder="${placeholder}" name="description" rows="4"
+                              style="resize: none" value="${workshopSigning.description}"
+                              required>${workshopSigning.description}</textarea>
                 </label>
             </div>
         </div>
@@ -114,22 +116,24 @@
         <div class="col-sm-12 col-md-6">
             <div class="form-group mb-1">
                 <label class="col-form-label w-100"><spring:message code="start.date"/>
-                    <input type="datetime-local" name="startedAt" class="form-control mt-1" value="${workshopSigning.startedAt}" disabled />
+                    <input type="datetime-local" name="startedAt" class="form-control mt-1"
+                           value="${workshopSigning.startedAt}" disabled/>
                 </label>
             </div>
         </div>
         <div class="col-sm-12 col-md-6" id="endDateBox">
             <div class="form-group mb-1">
                 <label class="col-form-label w-100"><spring:message code="end.date"/>
-                    <input type="datetime-local" name="closedAt" class="form-control mt-1" value="${workshopSigning.closedAt}" disabled />
+                    <input type="datetime-local" name="closedAt" class="form-control mt-1"
+                           value="${workshopSigning.closedAt}" disabled/>
                 </label>
             </div>
         </div>
     </div>
     <div class="row">
         <div class="col text-right">
-            <button id="editBtn" type="button" class="btn btn-standard btn-sm movile-full">
-                <spring:message code="save" />
+            <button id="editBtn" type="button" class="btn btn-danger btn-sm movile-full">
+                <spring:message code="finish"/>
             </button>
         </div>
     </div>
@@ -149,16 +153,16 @@
             'description': description
             , 'finalize': finalize
         })
-        .then((response) => {
-            const workshop = response.data.data;
+            .then((response) => {
+                const workshop = response.data.data;
 
-            if (finalize)
-                window.location.replace('/signings/warehouse/' + workshop.warehouse.id);
-            else
-                update(workshop);
-        })
-        .catch(error => showNotify(error.response.data.detail, 'danger'))
-        .finally(() => hideLoading());
+                if (finalize)
+                    window.location.replace('/signings/warehouse/' + workshop.warehouse.id);
+                else
+                    update(workshop);
+            })
+            .catch(error => showNotify(error.response.data.detail, 'danger'))
+            .finally(() => hideLoading());
     }
 
     function save() {
@@ -186,8 +190,7 @@
     async function initialize() {
         const closedAtField = document.querySelector('[name="closedAt"]');
 
-        if (closedAtField && closedAtField.value)
-        {
+        if (closedAtField && closedAtField.value) {
             const editBtn = document.getElementById('editBtn');
 
             editBtn.classList.add('d-none');

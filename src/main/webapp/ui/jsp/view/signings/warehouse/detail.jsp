@@ -48,7 +48,7 @@
                     <div class="col-sm-12 col-md-4">
                         <div class="form-group mb-1">
                             <label class="col-form-label w-100"><spring:message code="project"/>
-                                <input type="text" class="form-control mt-1" value="${projectName}" disabled />
+                                <input type="text" class="form-control mt-1" value="${projectName}" disabled/>
                             </label>
                         </div>
                     </div>
@@ -56,14 +56,16 @@
                     <div class="col-sm-12 col-md-4">
                         <div class="form-group mb-1">
                             <label class="col-form-label w-100"><spring:message code="start.date"/>
-                                <input type="datetime-local" name="startedAt" class="form-control mt-1" value="${warehouseSigning.startedAt}" disabled />
+                                <input type="datetime-local" name="startedAt" class="form-control mt-1"
+                                       value="${warehouseSigning.startedAt}" disabled/>
                             </label>
                         </div>
                     </div>
-                    <div class="col-sm-12 col-md-4" id = "endDateBox">
+                    <div class="col-sm-12 col-md-4" id="endDateBox">
                         <div class="form-group mb-1">
                             <label class="col-form-label w-100"><spring:message code="end.date"/>
-                                <input type="datetime-local" name="closedAt" class="form-control mt-1" value="${warehouseSigning.closedAt}" disabled />
+                                <input type="datetime-local" name="closedAt" class="form-control mt-1"
+                                       value="${warehouseSigning.closedAt}" disabled/>
                             </label>
                         </div>
                     </div>
@@ -71,7 +73,8 @@
 
                 <div class="row actionable">
                     <div class="col text-right">
-                        <button id="finishBtn" type="button" class="btn btn-danger btn-sm"><spring:message code="finish"/></button>
+                        <button id="finishBtn" type="button" class="btn btn-danger btn-sm"><spring:message
+                                code="finish"/></button>
                     </div>
                 </div>
             </form>
@@ -97,14 +100,14 @@
             <div class="table-responsive">
                 <table id="dTable" class="table table-striped table-borderer dataTable w-100">
                     <thead>
-                        <tr>
-                            <th><spring:message code="id"/></th>
-                            <th><spring:message code="start.date"/></th>
-                            <th><spring:message code="end.date"/></th>
-                            <th><spring:message code="description"/></th>
-                            <th><spring:message code="project"/></th>
-                            <th><spring:message code="actions"/></th>
-                        </tr>
+                    <tr>
+                        <th><spring:message code="id"/></th>
+                        <th><spring:message code="project"/></th>
+                        <th><spring:message code="start.date"/></th>
+                        <th><spring:message code="end.date"/></th>
+                        <th><spring:message code="description"/></th>
+                        <th><spring:message code="actions"/></th>
+                    </tr>
                     </thead>
                 </table>
             </div>
@@ -128,13 +131,13 @@
                             <div class="form-group">
                                 <label class="col-form-label w-100">
                                     <spring:message code="project"/>
-                                    <select name = "projectId" class="form-control" required>
+                                    <select name="projectId" class="form-control" required>
                                         <option value="" disabled selected="selected">
-                                            <spring:message code="signings.workshop.create.desc.placeholder"/>
+                                            <spring:message code="select.placeholder"/>
                                         </option>
                                         <c:forEach items="${projects}" var="project">
                                             <option value="${project.id}">
-                                                ${project.name}
+                                                    ${project.name}
                                             </option>
                                         </c:forEach>
                                     </select>
@@ -164,207 +167,5 @@
 </div>
 
 <script>
-    let locale = '${locale}';
-    let returnBtn = document.getElementById('returnBtn');
-    let returnBtnJQ = $(returnBtn);
-
-    let warehouseSigning;
-
-    let hasRole;
-    let canClose;
-
     let userId = ${user.id};
-
-    async function init() {
-        const editForm = document.getElementById('editForm');
-        const editFormJQ = $(editForm);
-
-        const warehouseId = getWarehouseId();
-
-        warehouseSigning = await getWarehouse(warehouseId);
-    }
-
-    function setEndDate() {
-        const endDateEditor = document.querySelector('[name="closedAt"]');
-
-        if (endDateEditor && warehouseSigning && warehouseSigning.closedAt)
-            endDateEditor.value = warehouseSigning.closedAt;
-    }
-
-    function close(id) {
-        const finishBtn = document.getElementById('finishBtn');
-        const finishBtnJQ = $(finishBtn);
-
-        finishBtnJQ.click(async () => {
-            showLoading();
-
-            axios.patch('/v1/signings/warehouse/' + id, {})
-            .then(async response => {
-                const warehouseId = response.data.data.id;
-                warehouseSigning = await getWarehouse(warehouseId);
-                setEndDate();
-                setMode();
-                dTable.ajax.reload();
-                const successMessage = messages.signings.warehouse.update.success.replace('{0}', id);
-                showNotify(successMessage);
-            })
-            .catch(error => showNotify(error.response.data.detail, 'danger'))
-            .finally(() => {
-                hideLoading();
-            });
-        });
-    }
-
-    function setWorkingMode() {
-        const createWorkshopBtn = document.getElementById('createWorkshopBtn');
-
-        if (createWorkshopBtn)
-            createWorkshopBtn.classList.remove('d-none');
-
-        disableForm('#editForm');
-    }
-
-    function setCompletedMode() {
-        const createWorkshopBtn = document.getElementById('createWorkshopBtn');
-        const finishBtn = document.querySelector('.actionable');
-
-        if (finishBtn)
-            finishBtn.classList.add('d-none');
-
-        if (createWorkshopBtn)
-            createWorkshopBtn.classList.add('d-none');
-
-        disableForm('#editForm');
-    }
-
-    function loadDataTables() {
-        let columns = ['id', 'startedAt', 'closedAt', 'description', 'project.name', 'id'];
-
-        let endpoint = '/v1/signings/warehouse/' + warehouseSigning.id + "/workshop-signings";
-
-        let actions = [{
-            action: 'edit'
-            , type: 'redirect'
-            , url: '/signings/warehouse/' + warehouseSigning.id + '/workshop-signings/{id}'
-            , permission: 'edit_warehouse-signing'
-        }];
-
-        if (!warehouseSigning.closedAt)
-            actions.push({action: 'delete', permission: 'edit_warehouse_signings'});
-
-        let expand = ['project'];
-
-        let columnDefs = [
-            {
-                targets: [1, 2],
-                render: function (data) {
-                    return data ? parseDate(data, 'DD-MM-YYYY HH:mm') : '-';
-                }
-            }
-        ];
-
-        customDataTable = new CustomDataTable(columns, endpoint, null, actions, expand, null, columnDefs);
-        dTable = createDataTable('#dTable', customDataTable, locale);
-        customDataTable.setCurrentTable(dTable);
-    }
-
-    function createWorkshop() {
-        const createForm = document.getElementById('createForm');
-        const createFormJQ = $(createForm);
-
-        const projectEditor = document.querySelector('[name="projectId"]');
-
-        let projectId = ${projectId};
-
-        if (projectEditor && projectEditor.value)
-        {
-            projectId = projectEditor.value;
-        }
-
-        showLoading();
-
-        axios.post('/v1/signings/warehouse/' + warehouseSigning.id + "/workshop-signings", {
-            'projectId': projectId
-            ,'userId': ${user.id}
-        })
-        .then((response) => {
-            const workshop = response.data.data;
-            window.location.replace(window.location.pathname + '/workshop-signings/' + workshop.id);
-        })
-        .catch(error => showNotify(error.response.data.detail, 'danger'))
-        .finally(() => {
-            hideLoading();
-            $('#createModal').modal('hide');
-        });
-    }
-
-    function remove(id) {
-        const alertMessage = messages.signings.warehouse.delete.alert.replace('{0}', id);
-
-        if (!confirm(alertMessage))
-            return ;
-
-        showLoading();
-
-        axios.delete('/v1/signings/warehouse/' + warehouseSigning.id + "/workshop-signings/" + id)
-        .then(() => {
-            dTable.ajax.reload();
-            const successMessage = messages.signings.warehouse.delete.success.replace('{0}', id);
-            showNotify(successMessage);
-        })
-        .catch(error => showNotify(error.response.data.detail, 'danger'))
-        .finally(() => hideLoading());
-    }
-
-    async function getWarehouse(id) {
-        const response = await axios.get('/v1/signings/warehouse/' + id, {
-            locale: locale
-            , _expand: "user,project"
-        });
-
-        return response.data.data;
-    }
-
-    function getWarehouseId() {
-        const currentUrl = window.location.href;
-        const elements = currentUrl.split('/');
-
-        if (elements.length === 0)
-            return "0";
-
-        return elements[elements.length - 1];
-    }
-
-    function setMode() {
-        if (warehouseSigning.closedAt !== null && warehouseSigning.closedAt !== undefined)
-            setCompletedMode();
-        else
-            setWorkingMode();
-    }
-
-    function setReturnButtonUrl() {
-        let lastPageUrl = '/signings/warehouse';
-
-        /*if (document.referrer) {
-            const lastPagePath = new URL(document.referrer).pathname;
-
-            if (/^\/signings\/warehouse\/\d+\/workshop-signings\/\d+$/.test(lastPagePath)) {
-                lastPageUrl = sessionStorage.getItem('warehouseSigningFilter');
-            } else {
-                const queryParams = document.referrer.split('?')[1];
-                lastPageUrl = lastPagePath + (queryParams ? '?' + queryParams : '');
-                sessionStorage.setItem('warehouseSigningFilter', lastPageUrl);
-            }
-        }*/
-
-        returnBtnJQ.attr('href', lastPageUrl);
-    }
-
-    $(document).ready(async () => {
-        await init();
-        close(warehouseSigning.id);
-        setMode();
-        loadDataTables();
-        setReturnButtonUrl();
-    });
 </script>

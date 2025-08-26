@@ -1,7 +1,5 @@
 const endpoint = '/v1/signings/warehouse';
 
-let currentWarehouse = null;
-
 function initializeDataTables() {
     const columns = ['id', 'project.name', 'startedAt', 'closedAt', 'id'];
 
@@ -46,7 +44,7 @@ function initializeSelects() {
     const selects = form.querySelectorAll('select');
 
     selects.forEach(select => {
-        const select2 = createBasicSelect2($(select));
+        createBasicSelect2($(select));
     });
 }
 
