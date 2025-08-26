@@ -5,6 +5,9 @@ import com.epm.gestepm.lib.logging.annotation.LogExecution;
 import com.epm.gestepm.modelapi.common.utils.ModelUtil;
 import com.epm.gestepm.modelapi.common.utils.classes.Constants;
 import com.epm.gestepm.modelapi.deprecated.user.dto.User;
+import com.epm.gestepm.modelapi.project.dto.ProjectDto;
+import com.epm.gestepm.modelapi.project.dto.finder.ProjectByIdFinderDto;
+import com.epm.gestepm.modelapi.project.service.ProjectService;
 import com.epm.gestepm.modelapi.signings.workshop.dto.WorkShopSigningDto;
 import com.epm.gestepm.modelapi.signings.workshop.dto.finder.WorkshopSigningByIdFinderDto;
 import com.epm.gestepm.modelapi.signings.workshop.service.WorkshopSigningService;
@@ -29,6 +32,7 @@ import static com.epm.gestepm.lib.logging.constants.LogOperations.OP_VIEW;
 public class WorkshopSigningViewController {
 
     private final WorkshopSigningService service;
+    private final ProjectService projectService;
 
     @ModelAttribute
     public User loadCommonModelView(final Locale locale, final Model model) {
@@ -46,6 +50,11 @@ public class WorkshopSigningViewController {
         final WorkShopSigningDto workShopSigning = service.findOrNotFound(new WorkshopSigningByIdFinderDto(id));
 
         model.addAttribute("workshopSigning", workShopSigning);
+
+        final ProjectDto project = projectService.findOrNotFound(new ProjectByIdFinderDto(workShopSigning.getProjectId()));
+        model.addAttribute("projectName", project.getName());
+        model.addAttribute("projectId", project.getId());
+
         this.loadPermissions(user, workShopSigning.getProjectId(), model);
 
         return "workshop-signing-detail";

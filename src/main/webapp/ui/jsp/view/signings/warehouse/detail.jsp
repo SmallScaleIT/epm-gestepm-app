@@ -60,7 +60,7 @@
                             </label>
                         </div>
                     </div>
-                    <div class="col-sm-12 col-md-4 d-none" id = "endDateBox">
+                    <div class="col-sm-12 col-md-4" id = "endDateBox">
                         <div class="form-group mb-1">
                             <label class="col-form-label w-100"><spring:message code="end.date"/>
                                 <input type="datetime-local" name="closedAt" class="form-control mt-1" value="${warehouseSigning.closedAt}" disabled />
@@ -69,7 +69,7 @@
                     </div>
                 </div>
 
-                <div class="row actionable d-none">
+                <div class="row actionable">
                     <div class="col text-right">
                         <button id="finishBtn" type="button" class="btn btn-danger btn-sm"><spring:message code="finish"/></button>
                     </div>
@@ -101,6 +101,8 @@
                             <th><spring:message code="id"/></th>
                             <th><spring:message code="start.date"/></th>
                             <th><spring:message code="end.date"/></th>
+                            <th><spring:message code="description"/></th>
+                            <th><spring:message code="project"/></th>
                             <th><spring:message code="actions"/></th>
                         </tr>
                     </thead>
@@ -115,7 +117,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <div class="modal-title">
-                    <h5><spring:message code="warehousesigning"/></h5>
+                    <h5><spring:message code="workshop.add"/></h5>
                 </div>
             </div>
 
@@ -124,8 +126,18 @@
                     <div class="row">
                         <div class="col">
                             <div class="form-group">
-                                <label class="col-form-label w-100"><spring:message code="userId"/>
-                                    <input type="text" class="form-control mt-1" value="${user.name}" disabled />
+                                <label class="col-form-label w-100">
+                                    <spring:message code="project"/>
+                                    <select name = "projectId" class="form-control" required>
+                                        <option value="" disabled selected="selected">
+                                            <spring:message code="signings.workshop.create.desc.placeholder"/>
+                                        </option>
+                                        <c:forEach items="${projects}" var="project">
+                                            <option value="${project.id}">
+                                                ${project.name}
+                                            </option>
+                                        </c:forEach>
+                                    </select>
                                 </label>
                             </div>
                         </div>
@@ -169,28 +181,14 @@
 
         const warehouseId = getWarehouseId();
 
-        await setWarehouseEndDate(warehouseId);
+        warehouseSigning = await getWarehouse(warehouseId);
     }
 
-    async function setWarehouseEndDate(id) {
-        warehouseSigning = await getWarehouse(id);
+    function setEndDate() {
+        const endDateEditor = document.querySelector('[name="closedAt"]');
 
-        const closeAtEditor = document.querySelector('[name="closedAt"]');
-        const closeDateBox = document.getElementById('endDateBox');
-
-        if (closeAtEditor)
-        {
-            if (warehouseSigning.closedAt !== null && warehouseSigning.closedAt !== undefined)
-            {
-                closeDateBox.classList.remove('d-none');
-                closeAtEditor.value = warehouseSigning.closedAt;
-            }
-            else
-            {
-                closeDateBox.classList.add('d-none');
-                closeAtEditor.value = null;
-            }
-        }
+        if (endDateEditor && warehouseSigning && warehouseSigning.closedAt)
+            endDateEditor.value = warehouseSigning.closedAt;
     }
 
     function close(id) {
@@ -201,8 +199,14 @@
             showLoading();
 
             axios.patch('/v1/signings/warehouse/' + id, {})
-            .then(response => {
-                window.location.reload();
+            .then(async response => {
+                const warehouseId = response.data.data.id;
+                warehouseSigning = await getWarehouse(warehouseId);
+                setEndDate();
+                setMode();
+                dTable.ajax.reload();
+                const successMessage = messages.signings.warehouse.update.success.replace('{0}', id);
+                showNotify(successMessage);
             })
             .catch(error => showNotify(error.response.data.detail, 'danger'))
             .finally(() => {
@@ -213,13 +217,6 @@
 
     function setWorkingMode() {
         const createWorkshopBtn = document.getElementById('createWorkshopBtn');
-                const finishBtn = document.querySelector('.actionable');
-
-
-        if (finishBtn && warehouseSigning.workshopSignings.length > 0)
-            finishBtn.classList.remove('d-none');
-        else if (finishBtn && warehouseSigning.workshopSignings.length == 0)
-            finishBtn.classList.add('d-none');
 
         if (createWorkshopBtn)
             createWorkshopBtn.classList.remove('d-none');
@@ -241,7 +238,7 @@
     }
 
     function loadDataTables() {
-        let columns = ['id', 'startedAt', 'closedAt', 'id'];
+        let columns = ['id', 'startedAt', 'closedAt', 'description', 'project.name', 'id'];
 
         let endpoint = '/v1/signings/warehouse/' + warehouseSigning.id + "/workshop-signings";
 
@@ -255,7 +252,7 @@
         if (!warehouseSigning.closedAt)
             actions.push({action: 'delete', permission: 'edit_warehouse_signings'});
 
-        let expand = [];
+        let expand = ['project'];
 
         let columnDefs = [
             {
@@ -277,7 +274,10 @@
 
         const projectEditor = document.querySelector('[name="projectId"]');
 
-        const projectId = ${projectId};
+        let projectId = ${projectId};
+
+        if (projectEditor)
+            projectId = projectEditor.value;
 
         showLoading();
 

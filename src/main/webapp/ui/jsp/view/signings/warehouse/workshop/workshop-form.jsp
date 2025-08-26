@@ -92,7 +92,16 @@
 
 <form id="editForm" class="needs-validation">
     <div class="row">
-        <div class="col-md-6 col-sm-12">
+        <div class="col-sm-12 col-md-4">
+            <div class="form-group mb-1">
+                <label class="col-form-label w-100"><spring:message code="project"/>
+                    <input type="text" class="form-control mt-1" value="${projectName}" disabled />
+                </label>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
             <div class="form-group mb-1">
                 <spring:message code="signings.workshop.create.desc.placeholder" var="placeholder" />
                 <label class="col-form-label w-100"><spring:message code="signings.workshop.create.desc" />
@@ -109,7 +118,7 @@
                 </label>
             </div>
         </div>
-        <div class="col-sm-12 col-md-6 d-none" id="endDateBox">
+        <div class="col-sm-12 col-md-6" id="endDateBox">
             <div class="form-group mb-1">
                 <label class="col-form-label w-100"><spring:message code="end.date"/>
                     <input type="datetime-local" name="closedAt" class="form-control mt-1" value="${workshopSigning.closedAt}" disabled />
@@ -162,21 +171,23 @@
     function update(workshop) {
         const descriptionField = document.querySelector('[name="description"]');
         const startAtField = document.querySelector('[name="startedAt"]');
+        const closedAtField = document.querySelector('[name="closedAt"]');
 
         if (descriptionField && workshop.description)
             descriptionField.value = workshop.description;
 
         if (startAtField && workshop.startAt)
             startAtField.value = workshop.startAt;
+
+        if (closedAtField && workshop.closedAt)
+            closedAtField.value = workshop.closedAt;
     }
 
     async function initialize() {
         const closedAtField = document.querySelector('[name="closedAt"]');
-        const endDateBox = document.getElementById('endDateBox');
 
         if (closedAtField && closedAtField.value)
         {
-            endDateBox.classList.remove('d-none');
             const editBtn = document.getElementById('editBtn');
 
             editBtn.classList.add('d-none');
