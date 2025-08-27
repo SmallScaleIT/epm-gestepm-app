@@ -50,7 +50,10 @@ public class TimeControlExportServiceImpl implements TimeControlExportService {
             TimeControlTypeEnumDto.PROGRAMMED_SHARES, "ips",
             TimeControlTypeEnumDto.INSPECTIONS, "is",
             TimeControlTypeEnumDto.PERSONAL_SIGNINGS, "ps",
-            TimeControlTypeEnumDto.WORK_SHARES, "ws"
+            TimeControlTypeEnumDto.WORK_SHARES, "ws",
+            TimeControlTypeEnumDto.WAREHOUSE_SIGNING, "whs",
+            TimeControlTypeEnumDto.OFFICE_SIGNING, "os",
+            TimeControlTypeEnumDto.TELEWORKING_SIGNING, "ts"
     );
 
     private final LocaleProvider localeProvider;

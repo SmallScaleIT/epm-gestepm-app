@@ -3524,6 +3524,7 @@ components:
             - PROGRAMMED_SHARES
             - TELEWORKING_SIGNING
             - WORK_SHARES
+            - WAREHOUSE_SIGNING
         description:
           type: string
           x-stoplight:
