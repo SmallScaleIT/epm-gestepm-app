@@ -66,6 +66,7 @@ sql:
       -- ${sql.predicate-for-whs-u-id}
       -- ${sql.predicate-for-whs-p-id}
       -- ${sql.predicate-for-whs-current}
+      -- ${sql.predicate-for-whs-date}
     -- AND]
 
   filter-whs-by-id: |
@@ -93,4 +94,8 @@ sql:
   predicate-for-whs-current: |
     
     ((:attr_whs_current IS TRUE AND whs.closed_at IS NULL) OR (:attr_whs_current IS FALSE AND whs.closed_at IS NOT NULL))
+
+  predicate-for-whs-date: |
+    
+    whs.started_at >= :attr_whs_started_at AND whs.closed_at <= :attr_whs_closed_at
 

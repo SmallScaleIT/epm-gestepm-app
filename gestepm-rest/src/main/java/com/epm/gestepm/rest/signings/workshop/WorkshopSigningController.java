@@ -33,7 +33,10 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static com.epm.gestepm.lib.logging.constants.LogLayerMarkers.REST;
@@ -112,10 +115,24 @@ public class WorkshopSigningController extends BaseController implements Respons
     }
 
     @Override
-    public ResponseEntity<ListWorkshopSigningsV1200Response> listWorkshopSigningsV1(Integer warehouseSigningId, List<String> meta, Boolean links, Set<String> expand, Long offset, Long limit, String order, String orderBy, List<Integer> ids, List<Integer> userIds, List<Integer> projectIds, Boolean current) {
+    public ResponseEntity<ListWorkshopSigningsV1200Response> listWorkshopSigningsV1(Integer warehouseSigningId
+            , List<String> meta, Boolean links, Set<String> expand
+            , Long offset, Long limit, String order, String orderBy
+            , List<Integer> ids, List<Integer> userIds, List<Integer> projectIds
+            , Boolean current, String startDate, String endDate) {
+
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
+
+        LocalDateTime localStartDate = Optional.ofNullable(startDate)
+                .map(strDate -> LocalDateTime.parse(strDate, formatter))
+                .orElse(null);
+
+        LocalDateTime localEndDate = Optional.ofNullable(endDate)
+                .map(strDate -> LocalDateTime.parse(strDate, formatter))
+                .orElse(null);
 
         final WorkshopSigningListRestRequest req = new WorkshopSigningListRestRequest(ids, warehouseSigningId
-                , projectIds, userIds,current);
+                , projectIds, userIds,current, localStartDate, localEndDate);
 
         this.setCommon(req, meta, links, expand);
         this.setDefaults(req);

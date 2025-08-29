@@ -6,6 +6,7 @@ import com.epm.gestepm.lib.entity.Orderable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.epm.gestepm.model.signings.workshop.dao.constants.WorkshopSigningAttributes.*;
@@ -24,6 +25,10 @@ public class WorkshopSigningFilter extends Orderable implements CollectableAttri
 
     private Boolean current;
 
+    private LocalDateTime startDate;
+
+    private LocalDateTime endDate;
+
     @Override
     public AttributeMap collectAttributes() {
 
@@ -34,6 +39,8 @@ public class WorkshopSigningFilter extends Orderable implements CollectableAttri
         attrs.putList(ATTR_WSS_PROJECT_ID, this.projectIds);
         attrs.putList(ATTR_WSS_USER_ID, this.userIds);
         attrs.put(ATTR_WSS_CURRENT, this.current);
+        attrs.putTimestamp(ATTR_WSS_STARTED_AT, this.startDate);
+        attrs.putTimestamp(ATTR_WSS_CLOSED_AT, this.endDate);
 
         return attrs;
     }

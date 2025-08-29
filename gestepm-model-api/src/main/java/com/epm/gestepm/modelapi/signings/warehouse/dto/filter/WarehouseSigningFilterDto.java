@@ -6,6 +6,7 @@ import com.epm.gestepm.lib.dto.OrderableDto;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -20,6 +21,10 @@ public class WarehouseSigningFilterDto extends OrderableDto implements UsableAsC
 
     private Boolean current;
 
+    private LocalDateTime startDate;
+
+    private LocalDateTime endDate;
+
     @Override
     public String asCacheKey() {
 
@@ -29,6 +34,8 @@ public class WarehouseSigningFilterDto extends OrderableDto implements UsableAsC
         builder.addElement("projectIds", this.projectIds);
         builder.addElement("userIds", this.userIds);
         builder.addElement("current", this.current);
+        builder.addElement("startDate", this.startDate);
+        builder.addElement("endDate", this.endDate);
         builder.addElement("orderable", super.toString());
 
         return builder.toString();

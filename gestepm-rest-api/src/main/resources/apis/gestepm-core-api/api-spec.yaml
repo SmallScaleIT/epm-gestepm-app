@@ -2360,6 +2360,16 @@ paths:
           in: query
           name: current
           description: Filter by current warehouse signings.
+        - schema:
+            type: string
+          in: query
+          name: startDate
+          description: Filter by start date
+        - schema:
+            type: string
+          in: query
+          name: endDtae
+          description: Filter by end date
       x-stoplight:
         id: vez1e3c4qatf7
     post:
@@ -2491,6 +2501,16 @@ paths:
           in: query
           name: current
           description: Filter by current workshop signings.
+        - schema:
+            type: string
+          in: query
+          name: startDate
+          description: Filter by start date
+        - schema:
+            type: string
+          in: query
+          name: endDate
+          description: Filter by end date
       tags:
         - workshop-signing-v1
       description: list-workshop-signings-v1
@@ -2811,6 +2831,46 @@ paths:
       tags:
         - user-v1
       description: delete-user-v1
+      x-stoplight:
+        id: emrsbo8xorq6f
+  '/v1/signings/workshop/{userId}/export':
+    parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: User identificator.
+    get:
+      summary: V1 - Export workshop-signing
+      responses:
+        '200':
+          $ref: '#/components/responses/WorkshopSigningExport'
+        '404':
+          description: workshop-signin-not-found
+          content:
+            application/json:
+              schema:
+                $ref: ../../base-api-spec.yaml#/components/schemas/ResError
+      operationId: export-workshop-signing-v1
+      x-stoplight:
+        id: 5bse5nqr6ojxy
+      description: export-workshop-signing-v1
+      parameters:
+        - schema:
+            type: string
+            format: date-time
+          in: query
+          required: true
+          name: startDate
+        - schema:
+            type: string
+            format: date-time
+          in: query
+          required: true
+          name: endDate
+      tags:
+        - workshop-signing-v1
 components:
   schemas:
     ConstructionShare:
@@ -4244,6 +4304,13 @@ components:
                 type: array
                 items:
                   $ref: '#/components/schemas/ProjectMaterial'
+    WorkshopSigningExport:
+      description: ''
+      content:
+        application/octet-stream:
+          schema:
+            type: string
+            format: binary
   requestBodies:
     CreateNoProgrammedShare:
       content:

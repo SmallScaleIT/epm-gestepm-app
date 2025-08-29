@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -21,4 +22,8 @@ public class WorkshopSigningListRestRequest extends RestRequest {
     private List<Integer> userIds;
 
     private Boolean current;
+
+    private LocalDateTime startDate;
+
+    private LocalDateTime endDate;
 }
