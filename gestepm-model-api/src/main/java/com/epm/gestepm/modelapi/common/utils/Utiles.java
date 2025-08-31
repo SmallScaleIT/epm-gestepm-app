@@ -18,6 +18,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalField;
+import java.time.temporal.TemporalUnit;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
@@ -190,6 +193,16 @@ public class Utiles {
 		return isNegative ? "-" + formatted : formatted;
 	}
 
+	public static long getHours(LocalDateTime lc1, LocalDateTime lc2) {
+		return getTemporal(lc1, lc2, ChronoUnit.HOURS);
+	}
+
+	public static long getTemporal(LocalDateTime lc1, LocalDateTime lc2, TemporalUnit temporal) {
+		if (lc1 == null || lc2 == null || temporal == null)
+			return 0;
+
+		return temporal.between(lc1, lc2);
+	}
 
 	public static final int SECONDS_PER_MINUTE = 60;
 	public static final int MINUTES_PER_HOUR = 60;

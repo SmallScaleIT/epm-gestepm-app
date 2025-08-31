@@ -10,4 +10,6 @@ public class WorkshopSigningExportFilterDto {
     private LocalDateTime startDate;
 
     private LocalDateTime endDate;
+
+    private Integer userId;
 }
