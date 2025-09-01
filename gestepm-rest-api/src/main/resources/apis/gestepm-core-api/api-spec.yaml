@@ -2833,14 +2833,8 @@ paths:
       description: delete-user-v1
       x-stoplight:
         id: emrsbo8xorq6f
-  '/v1/signings/workshop/{userId}/export':
-    parameters:
-      - name: userId
-        in: path
-        required: true
-        schema:
-          type: integer
-        description: User identificator.
+  /v1/signings/workshop/export:
+    parameters: []
     get:
       summary: V1 - Export workshop-signing
       responses:
@@ -2869,6 +2863,14 @@ paths:
           in: query
           required: true
           name: endDate
+        - schema:
+            type: integer
+          in: query
+          name: userId
+        - schema:
+            type: integer
+          in: query
+          name: projectId
       tags:
         - workshop-signing-v1
 components:

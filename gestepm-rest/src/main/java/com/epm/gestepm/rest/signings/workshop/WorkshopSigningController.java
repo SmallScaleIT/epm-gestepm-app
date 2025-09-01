@@ -13,9 +13,11 @@ import com.epm.gestepm.lib.types.Page;
 import com.epm.gestepm.modelapi.signings.workshop.dto.WorkShopSigningDto;
 import com.epm.gestepm.modelapi.signings.workshop.dto.creator.WorkshopSigningCreateDto;
 import com.epm.gestepm.modelapi.signings.workshop.dto.deleter.WorkshopSigningDeleteDto;
+import com.epm.gestepm.modelapi.signings.workshop.dto.filter.WorkshopSigningExportFilterDto;
 import com.epm.gestepm.modelapi.signings.workshop.dto.filter.WorkshopSigningFilterDto;
 import com.epm.gestepm.modelapi.signings.workshop.dto.finder.WorkshopSigningByIdFinderDto;
 import com.epm.gestepm.modelapi.signings.workshop.dto.updater.WorkshopSigningUpdateDto;
+import com.epm.gestepm.modelapi.signings.workshop.service.WorkshopExportService;
 import com.epm.gestepm.modelapi.signings.workshop.service.WorkshopSigningService;
 import com.epm.gestepm.rest.common.MetadataMapper;
 import com.epm.gestepm.rest.common.ResSuccessMapper;
@@ -30,6 +32,11 @@ import com.epm.gestepm.rest.signings.workshop.response.ResponsesForWorkshopSigni
 import com.epm.gestepm.restapi.openapi.api.WorkshopSigningV1Api;
 import com.epm.gestepm.restapi.openapi.model.*;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -49,16 +56,20 @@ public class WorkshopSigningController extends BaseController implements Respons
 
     private final WorkshopSigningService service;
 
+    private final WorkshopExportService exportService;
+
     protected WorkshopSigningController(LocaleProvider localeProvider
             , ExecutionRequestProvider executionRequestProvider
             , ExecutionTimeProvider executionTimeProvider, RestContextProvider restContextProvider
             , ApplicationContext applicationContext, AppLocaleService appLocaleService
             , ResponseSuccessfulHelper responseSuccessfulHelper
-            , WorkshopSigningService service) {
+            , WorkshopSigningService service
+            , WorkshopExportService exportService) {
         super(localeProvider, executionRequestProvider, executionTimeProvider, restContextProvider
                 , applicationContext, appLocaleService, responseSuccessfulHelper);
 
         this.service = service;
+        this.exportService = exportService;
     }
 
     @Override
@@ -132,7 +143,7 @@ public class WorkshopSigningController extends BaseController implements Respons
                 .orElse(null);
 
         final WorkshopSigningListRestRequest req = new WorkshopSigningListRestRequest(ids, warehouseSigningId
-                , projectIds, userIds,current, localStartDate, localEndDate);
+                , projectIds, userIds, current, localStartDate, localEndDate);
 
         this.setCommon(req, meta, links, expand);
         this.setDefaults(req);
@@ -173,5 +184,28 @@ public class WorkshopSigningController extends BaseController implements Respons
         response.setData(data);
 
         return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<Resource> exportWorkshopSigningV1(LocalDateTime startDate, LocalDateTime endDate, Integer userId, Integer projectId) {
+
+        final WorkshopSigningExportFilterDto workshopFilter = new WorkshopSigningExportFilterDto();
+        workshopFilter.setStartDate(startDate);
+        workshopFilter.setEndDate(endDate);
+        workshopFilter.setUserId(userId);
+        workshopFilter.setProjectId(projectId);
+
+        final byte[] excel = exportService.generate(workshopFilter);
+        final Resource resource = new ByteArrayResource(excel);
+        final String fileName = exportService.buildFileName(workshopFilter);
+
+        final HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName);
+        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentLength(excel.length)
+                .body(resource);
     }
 }
