@@ -33,9 +33,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import static com.epm.gestepm.lib.logging.constants.LogLayerMarkers.REST;
@@ -66,20 +64,10 @@ public class WarehouseSigningController extends BaseController implements Wareho
     public ResponseEntity<ListWarehouseSigningsV1200Response> listWarehouseSigningsV1(List<String> meta
             , Boolean links, Set<String> expand, Long offset, Long limit, String order, String orderBy
             , List<Integer> ids, List<Integer> userIds, List<Integer> projectIds, Boolean current
-            , String startDate, String endDate) {
-
-        DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
-
-        LocalDateTime localStartDate = Optional.ofNullable(startDate)
-                .map(strDate -> LocalDateTime.parse(strDate, formatter))
-                .orElse(null);
-
-        LocalDateTime localEndDate = Optional.ofNullable(endDate)
-                .map(strDate -> LocalDateTime.parse(strDate, formatter))
-                .orElse(null);
+            , LocalDateTime startDate, LocalDateTime endDate) {
 
         final WarehouseSigningListRestRequest req = new WarehouseSigningListRestRequest(ids, userIds
-                , projectIds, current, localStartDate, localEndDate);
+                , projectIds, current, startDate, endDate);
 
         this.setCommon(req, meta, links, expand);
         this.setDefaults(req);

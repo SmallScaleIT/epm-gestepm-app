@@ -17,8 +17,7 @@ public class ListWarehouseSigningV1Operation extends APIOperation<WarehouseSigni
         this.generateLinksWith((apiClass, req) -> apiClass.listWarehouseSigningsV1(req.getMeta(),
                 req.getLinks(), req.getExpand(), req.getOffset(), req.getLimit(), req.getOrder()
                 , req.getOrderBy(), req.getIds(), req.getUserIds(), req.getProjectIds(), req.getCurrent()
-                , Optional.ofNullable(req.getStartDate()).map(date -> date.format(formatter)).orElse(null)
-                , Optional.ofNullable(req.getEndDate()).map(date -> date.format(formatter)).orElse(null)));
+                , req.getStartDate(), req.getEndDate()));
     }
 
 }

@@ -2362,11 +2362,13 @@ paths:
           description: Filter by current warehouse signings.
         - schema:
             type: string
+            format: date-time
           in: query
           name: startDate
           description: Filter by start date
         - schema:
             type: string
+            format: date-time
           in: query
           name: endDtae
           description: Filter by end date
@@ -2503,11 +2505,13 @@ paths:
           description: Filter by current workshop signings.
         - schema:
             type: string
+            format: date-time
           in: query
           name: startDate
           description: Filter by start date
         - schema:
             type: string
+            format: date-time
           in: query
           name: endDate
           description: Filter by end date

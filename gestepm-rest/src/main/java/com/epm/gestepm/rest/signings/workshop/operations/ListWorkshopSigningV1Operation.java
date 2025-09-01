@@ -18,8 +18,7 @@ public class ListWorkshopSigningV1Operation extends APIOperation<WorkshopSigning
                 (apiClass, req) -> apiClass.listWorkshopSigningsV1(req.getWarehouseId(), req.getMeta()
                         , req.getLinks(), req.getExpand(), req.getOffset(), req.getLimit(), req.getOrder()
                         , req.getOrderBy(), req.getIds(), req.getUserIds(), req.getProjectIds(), req.getCurrent()
-                        , Optional.ofNullable(req.getStartDate()).map(date -> date.format(formatter)).orElse(null)
-                        , Optional.ofNullable(req.getEndDate()).map(date -> date.format(formatter)).orElse(null)
+                        , req.getStartDate(), req.getEndDate()
                 ));
     }
 }

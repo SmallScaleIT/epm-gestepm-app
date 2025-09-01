@@ -130,20 +130,10 @@ public class WorkshopSigningController extends BaseController implements Respons
             , List<String> meta, Boolean links, Set<String> expand
             , Long offset, Long limit, String order, String orderBy
             , List<Integer> ids, List<Integer> userIds, List<Integer> projectIds
-            , Boolean current, String startDate, String endDate) {
-
-        DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
-
-        LocalDateTime localStartDate = Optional.ofNullable(startDate)
-                .map(strDate -> LocalDateTime.parse(strDate, formatter))
-                .orElse(null);
-
-        LocalDateTime localEndDate = Optional.ofNullable(endDate)
-                .map(strDate -> LocalDateTime.parse(strDate, formatter))
-                .orElse(null);
+            , Boolean current, LocalDateTime startDate, LocalDateTime endDate) {
 
         final WorkshopSigningListRestRequest req = new WorkshopSigningListRestRequest(ids, warehouseSigningId
-                , projectIds, userIds, current, localStartDate, localEndDate);
+                , projectIds, userIds, current, startDate, endDate);
 
         this.setCommon(req, meta, links, expand);
         this.setDefaults(req);

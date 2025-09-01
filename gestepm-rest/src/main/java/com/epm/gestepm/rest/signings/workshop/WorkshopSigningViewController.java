@@ -48,7 +48,7 @@ public class WorkshopSigningViewController {
         return ModelUtil.loadConstants(locale, model, request);
     }
 
-    @GetMapping("/signings/workshop-signings/resume")
+    @GetMapping("/admin/summaries")
     public String viewResume(final Locale locale, final Model model) {
         this.loadCommonModelView(locale, model);
         this.loadProjects(model);
