@@ -75,7 +75,7 @@ public class WorkshopExportServiceImpl implements WorkshopExportService {
 
             final UserDto user = userService.findOrNotFound(userFinder);
 
-            fileName.append(messageSource.getMessage("userId", new Object[0]
+            fileName.append(" ").append(messageSource.getMessage("userId", new Object[0]
                     , LocaleContextHolder.getLocale())).append(" ").append(user.getFullName());
         }
 
@@ -86,12 +86,13 @@ public class WorkshopExportServiceImpl implements WorkshopExportService {
 
             final ProjectDto project = projectService.findOrNotFound(projectFinder);
 
-            fileName.append(messageSource.getMessage("project", new Object[0]
+            fileName.append(" ").append(messageSource.getMessage("project", new Object[0]
                     , LocaleContextHolder.getLocale())).append(" ").append(project.getName());
         }
 
         fileName.append(" ").append(workshopSigningFilterDto.getStartDate().format(format))
-                .append(" - ").append(workshopSigningFilterDto.getEndDate().format(format));
+                .append(" - ").append(workshopSigningFilterDto.getEndDate().format(format))
+                .append(".xlsx");
 
         return fileName.toString();
     }
@@ -135,6 +136,9 @@ public class WorkshopExportServiceImpl implements WorkshopExportService {
         dto.setEndDate(filterDto.getEndDate());
 
         final List<WorkShopSigningDto> workshops = service.list(dto);
+
+        if (workshops.isEmpty())
+            return ;
 
         final List<Integer> projectIds = workshops
                 .stream()

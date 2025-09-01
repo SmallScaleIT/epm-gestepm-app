@@ -187,6 +187,11 @@
     <definition name="admin-holidays" extends="fullFrameLayout">
         <put-attribute name="body" value="/ui/jsp/view/admin/holidays/holidays.jsp" />
     </definition>
+
+    <!-- Signing Resume -->
+    <definition name="signing-resume" extends="fullFrameLayout">
+        <put-attribute name="body" value="/ui/jsp/view/admin/resume/signing-resume.jsp" />
+    </definition>
     
     <!-- Admin Families -->
     <definition name="admin-families" extends="fullFrameLayout">
