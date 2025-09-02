@@ -57,7 +57,7 @@ public class WorkshopSigningViewController {
         model.addAttribute("loadingPath", "admin");
         model.addAttribute("type", "summaries");
 
-        return "summaries";
+        return "admin-summaries";
     }
 
     @GetMapping("/signings/warehouse/{warehouseSigningId}/workshop-signings/{id}")

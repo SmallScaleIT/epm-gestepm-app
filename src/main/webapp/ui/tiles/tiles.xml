@@ -189,8 +189,8 @@
     </definition>
 
     <!-- Signing Summary -->
-    <definition name="summaries" extends="mainFrameLayout">
-        <put-attribute name="body" value="/ui/jsp/view/admin/summaries/summaries.jsp" />
+    <definition name="admin-summaries" extends="mainFrameLayout">
+        <put-attribute name="body" value="/ui/jsp/view/admin/summaries/admin-summaries.jsp" />
     </definition>
     
     <!-- Admin Families -->
