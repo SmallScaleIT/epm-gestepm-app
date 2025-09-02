@@ -49,12 +49,15 @@ public class WorkshopSigningViewController {
     }
 
     @GetMapping("/admin/summaries")
+    @LogExecution(operation = OP_VIEW)
     public String viewResume(final Locale locale, final Model model) {
         this.loadCommonModelView(locale, model);
-        this.loadProjects(model);
-        this.loadUsers(model);
 
-        return "signing-resume";
+        model.addAttribute("importPath", "admin-summaries");
+        model.addAttribute("loadingPath", "admin");
+        model.addAttribute("type", "summaries");
+
+        return "summaries";
     }
 
     @GetMapping("/signings/warehouse/{warehouseSigningId}/workshop-signings/{id}")

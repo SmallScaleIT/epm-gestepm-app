@@ -188,9 +188,9 @@
         <put-attribute name="body" value="/ui/jsp/view/admin/holidays/holidays.jsp" />
     </definition>
 
-    <!-- Signing Resume -->
-    <definition name="signing-resume" extends="fullFrameLayout">
-        <put-attribute name="body" value="/ui/jsp/view/admin/resume/signing-resume.jsp" />
+    <!-- Signing Summary -->
+    <definition name="summaries" extends="mainFrameLayout">
+        <put-attribute name="body" value="/ui/jsp/view/admin/summaries/summaries.jsp" />
     </definition>
     
     <!-- Admin Families -->

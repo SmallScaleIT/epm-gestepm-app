@@ -1,5 +1,22 @@
+const usersEndpoint = "/v1/users";
+const projectsEndpoint = "/v1/projects";
 
-function generateResume() {
+$(document).ready(function() {
+    initializeSelects();
+});
+
+function initializeSelects() {
+    const userCustomName = user => `${user.name} ${user.surnames}`;
+    const projectCustomName = project => `${project.name}`;
+
+    const userIdEditor = document.querySelector('[name="userId"]');
+    const projectEditor = document.querySelector('[name="projectId"]');
+
+    createSelect2($(userIdEditor), usersEndpoint, null, null, userCustomName, 'generateForm');
+    createSelect2($(projectEditor), projectsEndpoint, null, null, projectCustomName, 'generateForm');
+}
+
+function generateSummary() {
     const generateForm = document.getElementById('generateForm');
     const generateFormJQ = $(generateForm);
 

@@ -17,14 +17,14 @@
             <div class="col">
                 <div class="page-header float-left">
                     <div class="page-title">
-                        <h1 class="text-uppercase"><spring:message code="resume.signing.title" /></h1>
+                        <h1 class="text-uppercase"><spring:message code="summary.signing.title" /></h1>
                     </div>
                 </div>
             </div>
             <div class="col">
                 <div class="page-header float-right">
                     <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#generateModal">
-                        <spring:message code="resume.signing.generate" />
+                        <spring:message code="summary.signing.generate" />
                     </button>
                 </div>
             </div>
@@ -39,7 +39,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <div class="modal-title">
-                    <h5><spring:message code="resume.signing.generate" /></h5>
+                    <h5><spring:message code="summary.signing.generate" /></h5>
                 </div>
             </div>
 
@@ -48,34 +48,18 @@
                     <div class="row">
                         <div class="col-md-6 col-sm-12">
                             <div class="form-group">
-                                <label class="col-form-label w-100">
+                                <label class="col-form-label w-100 bootstrap-select">
                                     <spring:message code="project"/>
-                                    <select name="projectId" class="form-control">
-                                        <option value="" disabled selected="selected">
-                                            <spring:message code="select.placeholder"/>
-                                        </option>
-                                        <c:forEach items="${projects}" var="project">
-                                            <option value="${project.id}">
-                                                    ${project.name}
-                                            </option>
-                                        </c:forEach>
+                                    <select name="projectId" class="form-control select2" data-control="select2">
                                     </select>
                                 </label>
                             </div>
                         </div>
                         <div class="col-md-6 col-sm-12">
                             <div class="form-group">
-                                <label class="col-form-label w-100">
+                                <label class="col-form-label w-100 bootstrap-select">
                                     <spring:message code="userId"/>
-                                    <select name="userId" class="form-control">
-                                        <option value="" disabled selected="selected">
-                                            <spring:message code="select.placeholder"/>
-                                        </option>
-                                        <c:forEach items="${users}" var="user">
-                                            <option value="${user.id}">
-                                                    ${user.fullName}
-                                            </option>
-                                        </c:forEach>
+                                    <select name="userId" class="form-control select2" data-control="select2">
                                     </select>
                                 </label>
                             </div>
@@ -110,8 +94,8 @@
                         </button>
                     </div>
                     <div class="float-right">
-                        <button type="button" class="btn btn-default btn-sm" onclick="generateResume()">
-                            <spring:message code="resume.signing.generate" />
+                        <button type="button" class="btn btn-default btn-sm" onclick="generateSummary()">
+                            <spring:message code="summary.signing.generate" />
                         </button>
                     </div>
                 </div>
