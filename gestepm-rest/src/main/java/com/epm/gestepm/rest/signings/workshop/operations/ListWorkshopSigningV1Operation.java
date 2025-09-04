@@ -4,15 +4,10 @@ import com.epm.gestepm.lib.controller.APIOperation;
 import com.epm.gestepm.rest.signings.workshop.request.WorkshopSigningListRestRequest;
 import com.epm.gestepm.restapi.openapi.api.WorkshopSigningV1Api;
 
-import java.time.format.DateTimeFormatter;
-import java.util.Optional;
-
 public class ListWorkshopSigningV1Operation extends APIOperation<WorkshopSigningV1Api, WorkshopSigningListRestRequest> {
 
     public ListWorkshopSigningV1Operation() {
         super("listWorkshopSigningV1");
-
-        DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
 
         this.generateLinksWith(
                 (apiClass, req) -> apiClass.listWorkshopSigningsV1(req.getWarehouseId(), req.getMeta()
