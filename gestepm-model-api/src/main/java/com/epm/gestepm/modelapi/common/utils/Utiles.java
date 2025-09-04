@@ -204,6 +204,12 @@ public class Utiles {
 		return temporal.between(lc1, lc2);
 	}
 
+	public static double getHoursWithMinutesPart(LocalDateTime lc1, LocalDateTime lc2) {
+		Duration duration = Duration.between(lc1, lc2);
+
+		return duration.toHours() + duration.toMinutesPart() / 60.0;
+	}
+
 	public static final int SECONDS_PER_MINUTE = 60;
 	public static final int MINUTES_PER_HOUR = 60;
 	public static final int HOURS_PER_DAY = 24;

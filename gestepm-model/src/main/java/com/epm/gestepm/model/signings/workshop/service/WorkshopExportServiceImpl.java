@@ -9,6 +9,8 @@ import com.epm.gestepm.modelapi.project.dto.ProjectDto;
 import com.epm.gestepm.modelapi.project.dto.filter.ProjectFilterDto;
 import com.epm.gestepm.modelapi.project.dto.finder.ProjectByIdFinderDto;
 import com.epm.gestepm.modelapi.project.service.ProjectService;
+import com.epm.gestepm.modelapi.signings.warehouse.dto.WarehouseSigningDto;
+import com.epm.gestepm.modelapi.signings.warehouse.dto.filter.WarehouseSigningFilterDto;
 import com.epm.gestepm.modelapi.signings.warehouse.service.WarehouseSigningService;
 import com.epm.gestepm.modelapi.signings.workshop.dto.WorkShopSigningDto;
 import com.epm.gestepm.modelapi.signings.workshop.dto.filter.WorkshopSigningExportFilterDto;
@@ -33,6 +35,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
@@ -61,10 +65,10 @@ public class WorkshopExportServiceImpl implements WorkshopExportService {
     @Override
     public String buildFileName(WorkshopSigningExportFilterDto workshopSigningFilterDto) {
 
-        String baseFileName = messageSource.getMessage("workshop.file.name"
+        final String baseFileName = messageSource.getMessage("workshop.file.name"
                 , new Object[0], LocaleContextHolder.getLocale());
 
-        DateTimeFormatter format = DateTimeFormatter.ISO_DATE_TIME;
+        final DateTimeFormatter format = DateTimeFormatter.ISO_DATE_TIME;
 
         final StringBuilder fileName = new StringBuilder(baseFileName);
 
@@ -151,7 +155,7 @@ public class WorkshopExportServiceImpl implements WorkshopExportService {
 
         final List<ProjectDto> projects = projectService.list(projectFilter)
                 .stream()
-                .sorted(Comparator.comparing(ProjectDto::getId))
+                .sorted(Comparator.comparing(ProjectDto::getName))
                 .collect(Collectors.toList());
 
         final List<Integer> userIds = workshops
@@ -160,7 +164,7 @@ public class WorkshopExportServiceImpl implements WorkshopExportService {
                 .distinct()
                 .collect(Collectors.toList());
 
-        UserFilterDto userFilter = new UserFilterDto();
+        final UserFilterDto userFilter = new UserFilterDto();
         userFilter.setIds(userIds);
 
         final List<UserDto> users = userService.list(userFilter)
@@ -168,82 +172,118 @@ public class WorkshopExportServiceImpl implements WorkshopExportService {
                 .sorted(Comparator.comparing(UserDto::getFullName))
                 .collect(Collectors.toList());
 
+        final List<Integer> warehouseIds = workshops
+                .stream()
+                .map(WorkShopSigningDto::getWarehouseId)
+                .distinct()
+                .collect(Collectors.toList());
+
+        final WarehouseSigningFilterDto warehouseFilter = new WarehouseSigningFilterDto();
+        warehouseFilter.setIds(warehouseIds);
+
+        final List<WarehouseSigningDto> warehouses = warehouseService.list(warehouseFilter);
+
         for (UserDto user: users)
         {
             if (currentRow != 1)
                 ExcelUtils.createRowAsSeparation(sheet, currentRow++, 15);
 
             createUserRow(sheet, user.getId(), currentRow++, projectIds.size() + 2);
-            createHeaderRow(sheet, projects, currentRow++);
 
-            final List<Integer> warehouseIds = workshops
+            final List<WorkShopSigningDto> userWorkshops = workshops
                     .stream()
                     .filter(workshop -> workshop.getUserId().equals(user.getId()))
-                    .map(WorkShopSigningDto::getWarehouseId)
-                    .distinct()
-                    .sorted(Integer::compareTo)
                     .collect(Collectors.toList());
 
-            for (Integer warehouseId: warehouseIds)
-                createWorkshopDetail(sheet, warehouseId, workshops, projects, currentRow++);
+            final List<Integer> userProjectIds = userWorkshops
+                    .stream()
+                    .map(WorkShopSigningDto::getProjectId)
+                    .distinct()
+                    .collect(Collectors.toList());
+
+            final List<ProjectDto> userProjectsD = projects
+                    .stream()
+                    .filter(project -> userProjectIds.contains(project.getId()))
+                    .collect(Collectors.toList());
+
+            final List<Integer> userWarehouseIds = userWorkshops
+                    .stream()
+                    .map(WorkShopSigningDto::getWarehouseId)
+                    .distinct()
+                    .collect(Collectors.toList());
+
+            final List<WarehouseSigningDto> userWarehouses = warehouses
+                    .stream()
+                    .filter(warehouse -> userWarehouseIds.contains(warehouse.getId()))
+                    .collect(Collectors.toList());
+
+            currentRow = createDetailsRow(sheet, workshops, projects, warehouses, currentRow);
         }
 
         IntStream.rangeClosed(1, projectIds.size() + 2)
                 .forEach(sheet::autoSizeColumn);
     }
 
-    protected void createWorkshopDetail(final Sheet sheet, final Integer warehouseId
-            , final List<WorkShopSigningDto> workshops, final List<ProjectDto> projects, int rowNumber) {
+    protected int createDetailsRow(final Sheet sheet, final List<WorkShopSigningDto> workshops
+            , final List<ProjectDto> projects, final List<WarehouseSigningDto> warehouses, int rowNumber) {
 
-        final Row row = sheet.createRow(rowNumber);
-        row.setHeightInPoints(15);
+        final Row row1 = sheet.createRow(rowNumber++);
+        row1.setHeightInPoints(15);
 
-        ExcelUtils.setCell(row, 1, warehouseId, styles.whiteBorderCenterStyle);
+        final Row row2 = sheet.createRow(rowNumber++);
+        row2.setHeightInPoints(15);
 
-        final List<Long> projectHours = projects
+        final double totalHoursWarehouse = warehouses
                 .stream()
-                .map(project -> getHoursByProject(warehouseId, project.getId(), workshops))
-                .collect(Collectors.toList());
-
-        IntStream.range(0, projectHours.size())
-                .forEach(i -> ExcelUtils.setCell(row, i + 2, projectHours.get(i), styles.whiteBorderCenterStyle));
-
-        ExcelUtils.setCell(row, projectHours.size() + 2
-                , projectHours.stream().reduce(0L, Long::sum)
-                , styles.whiteBorderCenterStyle);
-    }
-
-    protected long getHoursByProject(final Integer warehouseId, final Integer projectId
-            , final List<WorkShopSigningDto> workshops) {
-        return workshops
-                .stream()
-                .filter(workshop -> workshop.getWarehouseId().equals(warehouseId) && workshop.getProjectId().equals(projectId))
-                .map(workshop -> Utiles.getHours(workshop.getStartedAt(), workshop.getClosedAt()))
-                .reduce(0L, Long::sum);
-    }
-
-    protected void createHeaderRow(final Sheet sheet, final List<ProjectDto> projects, int rowNumber) {
-
-        final Row row = sheet.createRow(rowNumber);
-        row.setHeightInPoints(15);
+                .map(warehouse -> Utiles.getHoursWithMinutesPart(warehouse.getStartedAt(), warehouse.getClosedAt()))
+                .map(hour -> BigDecimal.valueOf(hour).setScale(2, RoundingMode.HALF_UP).doubleValue())
+                .reduce(0.0, Double::sum);
 
         final String warehouseTitle = messageSource.getMessage("warehouse.export.title", new Object[0]
                 , LocaleContextHolder.getLocale());
 
-        final String projectText = messageSource.getMessage("project.export", new Object[0]
-                , LocaleContextHolder.getLocale());
+        ExcelUtils.setCell(row1, 1, warehouseTitle, styles.workshopExportCellStyle);
+        ExcelUtils.setCell(row2, 1, totalHoursWarehouse, styles.whiteBorderCenterStyle);
 
-        ExcelUtils.setCell(row, 1, warehouseTitle, styles.workshopExportCellStyle);
+        List<Double> projectHours = projects
+                .stream()
+                .map(project -> getHoursByProject(project.getId(), workshops))
+                .map(hour -> BigDecimal.valueOf(hour).setScale(2, RoundingMode.HALF_UP).doubleValue())
+                .collect(Collectors.toList());
+
+        double totalHours = projectHours
+                .stream()
+                .reduce(0.0, Double::sum);
 
         IntStream.range(0, projects.size())
-                .forEach(i -> ExcelUtils.setCell(row, i + 2
-                        , projectText + " " + projects.get(i).getId()
-                        , styles.workshopExportCellStyle));
+            .forEach(i -> {
 
-        ExcelUtils.setCell(row, projects.size() + 2
+                ExcelUtils.setCell(row1, i + 2
+                        , projects.get(i).getName()
+                        , styles.workshopExportCellStyle);
+
+                ExcelUtils.setCell(row2, i + 2, projectHours.get(i)
+                        , styles.whiteBorderCenterStyle);
+            });
+
+        ExcelUtils.setCell(row1, projects.size() + 2
                 , messageSource.getMessage("totalHours.title", new Object[0]
                         , LocaleContextHolder.getLocale())
                 , styles.dataOrgangeCellStyle);
+
+        ExcelUtils.setCell(row2, projectHours.size() + 2
+                , totalHours
+                , styles.whiteBorderCenterStyle);
+
+        return rowNumber;
+    }
+
+    protected double getHoursByProject(Integer projectId, final List<WorkShopSigningDto> workshops) {
+        return workshops
+                .stream()
+                .filter(workshop -> workshop.getProjectId().equals(projectId))
+                .map(workshop -> Utiles.getHoursWithMinutesPart(workshop.getStartedAt(), workshop.getClosedAt()))
+                .reduce(0.0, Double::sum);
     }
 
     protected void createUserRow(final Sheet sheet, final Integer userId, int rowNumber, int colNumber) {
