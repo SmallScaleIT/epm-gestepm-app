@@ -32,6 +32,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -62,9 +63,11 @@ public class WarehouseSigningController extends BaseController implements Wareho
     @LogExecution(operation = OP_READ)
     public ResponseEntity<ListWarehouseSigningsV1200Response> listWarehouseSigningsV1(List<String> meta
             , Boolean links, Set<String> expand, Long offset, Long limit, String order, String orderBy
-            , List<Integer> ids, List<Integer> userIds, List<Integer> projectIds, Boolean current) {
+            , List<Integer> ids, List<Integer> userIds, List<Integer> projectIds, Boolean current
+            , LocalDateTime startDate, LocalDateTime endDate) {
 
-        final WarehouseSigningListRestRequest req = new WarehouseSigningListRestRequest(ids, userIds, projectIds, current);
+        final WarehouseSigningListRestRequest req = new WarehouseSigningListRestRequest(ids, userIds
+                , projectIds, current, startDate, endDate);
 
         this.setCommon(req, meta, links, expand);
         this.setDefaults(req);

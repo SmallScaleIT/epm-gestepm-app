@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 
 import static com.epm.gestepm.model.signings.warehouse.dao.constants.WarehouseSigningAttributes.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -22,6 +23,10 @@ public class WarehouseSigningFilter extends Orderable implements CollectableAttr
 
     private Boolean current;
 
+    private LocalDateTime startDate;
+
+    private LocalDateTime endDate;
+
     @Override
     public AttributeMap collectAttributes() {
 
@@ -30,6 +35,8 @@ public class WarehouseSigningFilter extends Orderable implements CollectableAttr
         attrs.putList(ATTR_WHS_USER_ID, this.userIds);
         attrs.putList(ATTR_WHS_PROJECT_ID, this.projectIds);
         attrs.put(ATTR_WHS_CURRENT, this.current);
+        attrs.putTimestamp(ATTR_WHS_STARTED_AT, this.startDate);
+        attrs.putTimestamp(ATTR_WHS_CLOSED_AT, this.endDate);
 
         return attrs;
     }

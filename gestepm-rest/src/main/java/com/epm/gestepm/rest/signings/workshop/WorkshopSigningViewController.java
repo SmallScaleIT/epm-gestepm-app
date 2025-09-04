@@ -3,7 +3,6 @@ package com.epm.gestepm.rest.signings.workshop;
 import com.epm.gestepm.lib.logging.annotation.EnableExecutionLog;
 import com.epm.gestepm.lib.logging.annotation.LogExecution;
 import com.epm.gestepm.modelapi.common.utils.ModelUtil;
-import com.epm.gestepm.modelapi.common.utils.classes.Constants;
 import com.epm.gestepm.modelapi.deprecated.user.dto.User;
 import com.epm.gestepm.modelapi.project.dto.ProjectDto;
 import com.epm.gestepm.modelapi.project.dto.finder.ProjectByIdFinderDto;
@@ -32,6 +31,7 @@ import static com.epm.gestepm.lib.logging.constants.LogOperations.OP_VIEW;
 public class WorkshopSigningViewController {
 
     private final WorkshopSigningService service;
+
     private final ProjectService projectService;
 
     @ModelAttribute
@@ -40,32 +40,28 @@ public class WorkshopSigningViewController {
         return ModelUtil.loadConstants(locale, model, request);
     }
 
+    @GetMapping("/admin/summaries")
+    @LogExecution(operation = OP_VIEW)
+    public String viewResume(final Locale locale, final Model model) {
+        this.loadCommonModelView(locale, model);
+
+        model.addAttribute("importPath", "admin-summaries");
+        model.addAttribute("loadingPath", "admin");
+        model.addAttribute("type", "summaries");
+
+        return "admin-summaries";
+    }
+
     @GetMapping("/signings/warehouse/{warehouseSigningId}/workshop-signings/{id}")
     @LogExecution(operation = OP_VIEW)
-    public String viewWorkshopSigningDetail(@PathVariable("id") final Integer id
-            , final Locale locale, final Model model) {
-
-        final User user = this.loadCommonModelView(locale, model);
+    public String viewWorkshopSigningDetail(@PathVariable("id") final Integer id, final Model model) {
 
         final WorkShopSigningDto workShopSigning = service.findOrNotFound(new WorkshopSigningByIdFinderDto(id));
-
         model.addAttribute("workshopSigning", workShopSigning);
 
         final ProjectDto project = projectService.findOrNotFound(new ProjectByIdFinderDto(workShopSigning.getProjectId()));
         model.addAttribute("projectName", project.getName());
-        model.addAttribute("projectId", project.getId());
-
-        this.loadPermissions(user, workShopSigning.getProjectId(), model);
 
         return "workshop-signing-detail";
-    }
-
-    private void loadPermissions(final User user, final Integer projectId, final Model model) {
-        boolean isAdmin = Constants.ROLE_ADMIN.equals(user.getRole().getRoleName());
-
-        boolean isProjectTl = Constants.ROLE_PL.equals(user.getRole().getRoleName())
-                && user.getBossProjects().stream().anyMatch(project -> project.getId().equals(projectId.longValue()));
-
-        model.addAttribute("canUpdate", isAdmin || isProjectTl);
     }
 }

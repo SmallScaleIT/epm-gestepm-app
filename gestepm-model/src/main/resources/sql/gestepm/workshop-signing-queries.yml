@@ -73,6 +73,7 @@ sql:
       -- ${sql.predicate-for-wss-p-id}
       -- ${sql.predicate-for-wss-whs-id}
       -- ${sql.predicate-for-wss-current}
+      -- ${sql.predicate-for-wss-date}
     -- AND]
 
   filter-wss-by-id: |
@@ -104,4 +105,8 @@ sql:
   predicate-for-wss-current: |
     
     ((:attr_wss_current IS TRUE AND wss.closed_at IS NULL) OR (:attr_wss_current IS FALSE AND wss.closed_at IS NOT NULL))
+
+  predicate-for-wss-date: |
+    
+    wss.started_at >= :attr_wss_started_at AND wss.closed_at <= :attr_wss_closed_at
 
