@@ -2,15 +2,6 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<style>
-    #filterForm {
-        top: 100% !important;
-        left: auto !important;
-        right: 0;
-        min-width: 20rem;
-    }
-</style>
-
 <div class="breadcrumbs">
     <div class="breadcrumbs-inner">
         <div class="row m-0">
@@ -21,10 +12,19 @@
                     </div>
                 </div>
             </div>
-            <div class="col">
-                <div class="page-header float-right">
+        </div>
+    </div>
+</div>
+
+<div class="clearfix"></div>
+
+<div class="content">
+    <div class="row h-100">
+        <div class="col h-100">
+            <div class="card">
+                <div class="card-body">
                     <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#generateModal">
-                        <spring:message code="summary.signing.generate" />
+                        <spring:message code="summary.workshop.signing" />
                     </button>
                 </div>
             </div>
@@ -32,14 +32,12 @@
     </div>
 </div>
 
-<div class="clearfix"></div>
-
 <div id="generateModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <div class="modal-title">
-                    <h5><spring:message code="summary.signing.generate" /></h5>
+                    <h5><spring:message code="summary.workshop.signing" /></h5>
                 </div>
             </div>
 
@@ -95,7 +93,7 @@
                     </div>
                     <div class="float-right">
                         <button type="button" class="btn btn-default btn-sm" onclick="generateSummary()">
-                            <spring:message code="summary.signing.generate" />
+                            <spring:message code="summary.workshop.signing" />
                         </button>
                     </div>
                 </div>

@@ -50,59 +50,52 @@ import static com.epm.gestepm.lib.logging.constants.LogLayerMarkers.SERVICE;
 @EnableExecutionLog(layerMarker = SERVICE)
 public class WorkshopExportServiceImpl implements WorkshopExportService {
 
-    private final WorkshopSigningService service;
+    private final WorkshopSigningService workshopSigningService;
 
     private final MessageSource messageSource;
 
     private final UserService userService;
 
-    private final WarehouseSigningService warehouseService;
+    private final WarehouseSigningService warehouseSigningService;
 
     private final ProjectService projectService;
 
     private ExcelStyles.Styles styles;
 
     @Override
-    public String buildFileName(WorkshopSigningExportFilterDto workshopSigningFilterDto) {
+    public String buildFileName(final WorkshopSigningExportFilterDto workshopSigningFilterDto) {
 
         final String baseFileName = messageSource.getMessage("workshop.file.name"
                 , new Object[0], LocaleContextHolder.getLocale());
 
-        final DateTimeFormatter format = DateTimeFormatter.ISO_DATE_TIME;
-
         final StringBuilder fileName = new StringBuilder(baseFileName);
 
-        if (workshopSigningFilterDto.getUserId() != null)
-        {
+        if (workshopSigningFilterDto.getUserId() != null) {
             final UserByIdFinderDto userFinder = new UserByIdFinderDto();
             userFinder.setId(workshopSigningFilterDto.getUserId());
 
-            final UserDto user = userService.findOrNotFound(userFinder);
+            final UserDto user = this.userService.findOrNotFound(userFinder);
 
-            fileName.append(" ").append(messageSource.getMessage("userId", new Object[0]
+            fileName.append(" ").append(this.messageSource.getMessage("userId", new Object[0]
                     , LocaleContextHolder.getLocale())).append(" ").append(user.getFullName());
         }
 
-        if (workshopSigningFilterDto.getProjectId() != null)
-        {
-            final ProjectByIdFinderDto projectFinder = new ProjectByIdFinderDto();
-            projectFinder.setId(workshopSigningFilterDto.getProjectId());
+        if (workshopSigningFilterDto.getProjectId() != null) {
+            final ProjectDto project = this.projectService.findOrNotFound(new ProjectByIdFinderDto(workshopSigningFilterDto.getProjectId()));
 
-            final ProjectDto project = projectService.findOrNotFound(projectFinder);
-
-            fileName.append(" ").append(messageSource.getMessage("project", new Object[0]
+            fileName.append(" ").append(this.messageSource.getMessage("project", new Object[0]
                     , LocaleContextHolder.getLocale())).append(" ").append(project.getName());
         }
 
-        fileName.append(" ").append(workshopSigningFilterDto.getStartDate().format(format))
-                .append(" - ").append(workshopSigningFilterDto.getEndDate().format(format))
+        fileName.append(" ").append(Utiles.getDateFormatted(workshopSigningFilterDto.getStartDate()))
+                .append(" - ").append(Utiles.getDateFormatted(workshopSigningFilterDto.getEndDate()))
                 .append(".xlsx");
 
         return fileName.toString();
     }
 
     @Override
-    public byte[] generate(WorkshopSigningExportFilterDto workshopSigningFilterDto) {
+    public byte[] generate(final WorkshopSigningExportFilterDto workshopSigningFilterDto) {
 
         try {
             final ByteArrayOutputStream file = new ByteArrayOutputStream();
@@ -110,7 +103,7 @@ public class WorkshopExportServiceImpl implements WorkshopExportService {
 
             this.styles = ExcelStyles.create(workbook);
 
-            final Sheet sheet = workbook.createSheet(messageSource.getMessage("signing.excel.sheet.1"
+            final Sheet sheet = workbook.createSheet(this.messageSource.getMessage("signing.excel.sheet.1"
                     , new Object[]{}, LocaleContextHolder.getLocale()));
 
             this.writeFile(sheet, workshopSigningFilterDto);
@@ -118,9 +111,9 @@ public class WorkshopExportServiceImpl implements WorkshopExportService {
             workbook.write(file);
 
             return file.toByteArray();
-        } catch(IOException ex) {
-            throw new WorkshopExportException(workshopSigningFilterDto.getUserId()
-                    , workshopSigningFilterDto.getStartDate(), workshopSigningFilterDto.getEndDate());
+        } catch (IOException ex) {
+            throw new WorkshopExportException(workshopSigningFilterDto.getStartDate(), workshopSigningFilterDto.getEndDate(),
+                    workshopSigningFilterDto.getProjectId(), workshopSigningFilterDto.getUserId());
         }
     }
 
@@ -139,10 +132,10 @@ public class WorkshopExportServiceImpl implements WorkshopExportService {
         dto.setStartDate(filterDto.getStartDate());
         dto.setEndDate(filterDto.getEndDate());
 
-        final List<WorkShopSigningDto> workshops = service.list(dto);
+        final List<WorkShopSigningDto> workshops = workshopSigningService.list(dto);
 
         if (workshops.isEmpty())
-            return ;
+            return;
 
         final List<Integer> projectIds = workshops
                 .stream()
@@ -181,14 +174,11 @@ public class WorkshopExportServiceImpl implements WorkshopExportService {
         final WarehouseSigningFilterDto warehouseFilter = new WarehouseSigningFilterDto();
         warehouseFilter.setIds(warehouseIds);
 
-        final List<WarehouseSigningDto> warehouses = warehouseService.list(warehouseFilter);
+        final List<WarehouseSigningDto> warehouses = warehouseSigningService.list(warehouseFilter);
 
-        for (UserDto user: users)
-        {
+        for (UserDto user : users) {
             if (currentRow != 1)
                 ExcelUtils.createRowAsSeparation(sheet, currentRow++, 15);
-
-            createUserRow(sheet, user.getId(), currentRow++, projectIds.size() + 2);
 
             final List<WorkShopSigningDto> userWorkshops = workshops
                     .stream()
@@ -206,18 +196,13 @@ public class WorkshopExportServiceImpl implements WorkshopExportService {
                     .filter(project -> userProjectIds.contains(project.getId()))
                     .collect(Collectors.toList());
 
-            final List<Integer> userWarehouseIds = userWorkshops
-                    .stream()
-                    .map(WorkShopSigningDto::getWarehouseId)
-                    .distinct()
-                    .collect(Collectors.toList());
-
             final List<WarehouseSigningDto> userWarehouses = warehouses
                     .stream()
-                    .filter(warehouse -> userWarehouseIds.contains(warehouse.getId()))
+                    .filter(warehouse -> warehouse.getUserId().equals(user.getId()))
                     .collect(Collectors.toList());
 
-            currentRow = createDetailsRow(sheet, userWorkshops, userProjects, userWarehouses, currentRow);
+            this.createUserRow(sheet, user.getId(), currentRow++, userProjects.size() + 2);
+            currentRow = this.createDetailsRow(sheet, userWorkshops, userProjects, userWarehouses, currentRow);
         }
 
         IntStream.rangeClosed(1, projectIds.size() + 2)
@@ -235,6 +220,7 @@ public class WorkshopExportServiceImpl implements WorkshopExportService {
 
         final double totalHoursWarehouse = warehouses
                 .stream()
+                .filter(warehouse -> warehouse.getClosedAt() != null)
                 .map(warehouse -> Utiles.getHoursWithMinutesPart(warehouse.getStartedAt(), warehouse.getClosedAt()))
                 .map(hour -> BigDecimal.valueOf(hour).setScale(2, RoundingMode.HALF_UP).doubleValue())
                 .reduce(0.0, Double::sum);
@@ -245,26 +231,26 @@ public class WorkshopExportServiceImpl implements WorkshopExportService {
         ExcelUtils.setCell(row1, 1, warehouseTitle, styles.workshopExportCellStyle);
         ExcelUtils.setCell(row2, 1, totalHoursWarehouse, styles.whiteBorderCenterStyle);
 
-        List<Double> projectHours = projects
+        final List<Double> projectHours = projects
                 .stream()
                 .map(project -> getHoursByProject(project.getId(), workshops))
                 .map(hour -> BigDecimal.valueOf(hour).setScale(2, RoundingMode.HALF_UP).doubleValue())
                 .collect(Collectors.toList());
 
-        double totalHours = projectHours
+        final double totalHours = projectHours
                 .stream()
                 .reduce(0.0, Double::sum);
 
         IntStream.range(0, projects.size())
-            .forEach(i -> {
+                .forEach(i -> {
 
-                ExcelUtils.setCell(row1, i + 2
-                        , projects.get(i).getName()
-                        , styles.workshopExportCellStyle);
+                    ExcelUtils.setCell(row1, i + 2
+                            , projects.get(i).getName()
+                            , styles.workshopExportCellStyle);
 
-                ExcelUtils.setCell(row2, i + 2, projectHours.get(i)
-                        , styles.whiteBorderCenterStyle);
-            });
+                    ExcelUtils.setCell(row2, i + 2, projectHours.get(i)
+                            , styles.whiteBorderCenterStyle);
+                });
 
         ExcelUtils.setCell(row1, projects.size() + 2
                 , messageSource.getMessage("totalHours.title", new Object[0]
@@ -296,7 +282,7 @@ public class WorkshopExportServiceImpl implements WorkshopExportService {
         final UserByIdFinderDto userFinder = new UserByIdFinderDto();
         userFinder.setId(userId);
 
-        UserDto user = userService.find(userFinder).orElseThrow(() -> new UserNotFoundException(userId));
+        final UserDto user = userService.find(userFinder).orElseThrow(() -> new UserNotFoundException(userId));
 
         final Cell userNameCell = userRow.createCell(1);
         userNameCell.setCellStyle(styles.userTitleStyle);
