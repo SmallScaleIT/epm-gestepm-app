@@ -52,6 +52,7 @@
 					<ul class="sub-menu children dropdown-menu">
 						<li><i class="fa fa-home"></i><a href="/signings/teleworking"><spring:message code="sidebar.signing.teleworking" /></a></li>
 						<li><i class="fas fa-pencil-alt"></i><a href="/signing/manual"><spring:message code="sidebar.signing.manual" /></a></li>
+						<li><i class="fas fa-warehouse"></i><a href="/signings/warehouse"><spring:message code="sidebar.signing.warehouse" /></a></li>
 						<sec:authorize access="hasAuthority('ROLE_JEFE_PROYECTO')">
 							<li><i class="fas fa-edit"></i><a href="/signing/modified-list"><spring:message code="sidebar.signing.modified.list" /></a></li>
 						</sec:authorize>
@@ -118,6 +119,7 @@
 						<li><i class="fa fa-people-carry"></i><a href="/admin/families"><spring:message code="sidebar.admin.families" /></a></li>
 						<li><i class="fas fa-flag"></i><a href="/countries"><spring:message code="sidebar.admin.countries" /></a></li>
 						<li><i class="fas fa-plane-departure"></i><a href="/admin/holidays"><spring:message code="sidebar.admin.holidays" /></a></li>
+						<li><i class="fas fa-file"></i><a href="/admin/summaries"><spring:message code="sidebar.admin.summaries" /></a></li>
 					</ul>
 				</li>
 			</sec:authorize>

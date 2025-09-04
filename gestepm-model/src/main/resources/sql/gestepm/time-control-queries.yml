@@ -122,6 +122,19 @@ sql:
         pr.name AS project_name
       FROM ${sch-gestepm}.work_share ws
       LEFT JOIN ${sch-gestepm}.project pr ON pr.project_id = ws.project_id
+      UNION
+      SELECT
+        whs.warehouse_signing_id AS id,
+        whs.user_id,
+        whs.started_at AS start_date,
+        whs.closed_at AS end_date,
+        null AS description,
+        CONCAT('/signings/warehouse/', whs.warehouse_signing_id) AS detail_url,
+        'WAREHOUSE_SIGNING' AS type,
+        whs.project_id,
+        pr.name AS project_name
+      FROM ${sch-gestepm}.warehouse_signing whs
+      LEFT JOIN ${sch-gestepm}.project pr ON pr.project_id = whs.project_id
     ) AS sublist
     
     #whereToken #filter

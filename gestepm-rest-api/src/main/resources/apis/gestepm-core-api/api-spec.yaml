@@ -2315,6 +2315,294 @@ paths:
       description: delete-teleworking-signing-v1
       tags:
         - teleworking-signing-v1
+  /v1/signings/warehouse:
+    get:
+      summary: v1 - List warehouse signing
+      tags:
+        - warehouse-signing-v1
+      responses:
+        '200':
+          $ref: '#/components/responses/WarehouseSigningList'
+      operationId: list-warehouse-signings-v1
+      description: list-warehouse-signings-v1
+      parameters:
+        - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-meta
+        - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-links
+        - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-expand
+        - $ref: ../../base-api-spec.yaml#/components/parameters/filter-pagination-offset
+        - $ref: ../../base-api-spec.yaml#/components/parameters/filter-pagination-limit
+        - $ref: ../../base-api-spec.yaml#/components/parameters/filter-order
+        - $ref: ../../base-api-spec.yaml#/components/parameters/filter-order-by
+        - schema:
+            type: array
+            items:
+              type: integer
+          in: query
+          name: ids
+          description: Filter by warehouse signing identificator.
+          deprecated: false
+        - schema:
+            type: array
+            items:
+              type: integer
+          in: query
+          name: userIds
+          description: Filter by user identificator.
+        - schema:
+            type: array
+            items:
+              type: integer
+          in: query
+          name: projectIds
+          description: Filter by project identificator.
+        - schema:
+            type: boolean
+          in: query
+          name: current
+          description: Filter by current warehouse signings.
+        - schema:
+            type: string
+            format: date-time
+          in: query
+          name: startDate
+          description: Filter by start date
+        - schema:
+            type: string
+            format: date-time
+          in: query
+          name: endDtae
+          description: Filter by end date
+      x-stoplight:
+        id: vez1e3c4qatf7
+    post:
+      summary: v1 - Create warehouse signing
+      responses:
+        '200':
+          $ref: '#/components/responses/WarehouseSigning'
+        '404':
+          description: user-not-found | project-not-found
+          content:
+            application/json:
+              schema:
+                $ref: ../../base-api-spec.yaml#/components/schemas/ResError
+      operationId: create-warehouse-signing-v1
+      requestBody:
+        $ref: '#/components/requestBodies/CreateWarehouseSigning'
+      x-stoplight:
+        id: idvh0ux7tc8i9
+      tags:
+        - warehouse-signing-v1
+      description: create-warehouse-signing-v1
+    parameters: []
+  '/v1/signings/warehouse/{warehouseSigningId}':
+    get:
+      summary: v1 - Find warehouse signing
+      tags:
+        - warehouse-signing-v1
+      responses:
+        '200':
+          $ref: '#/components/responses/WarehouseSigning'
+        '404':
+          description: warehouse-signing-not-found
+          content:
+            application/json:
+              schema:
+                $ref: ../../base-api-spec.yaml#/components/schemas/ResError
+      operationId: find-warehouse-signing-by-id-v1
+      x-stoplight:
+        id: 0umlzrfg5k2l3
+      parameters:
+        - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-meta
+        - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-links
+        - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-expand
+      description: find-warehouse-signing-by-id-v1
+    parameters:
+      - $ref: '#/components/parameters/Warehouse-Signing-Id'
+    patch:
+      summary: v1 - Update warehouse signing
+      responses:
+        '200':
+          $ref: '#/components/responses/WarehouseSigning'
+        '404':
+          description: warehouse-signing-not-found
+          content:
+            application/json:
+              schema:
+                $ref: ../../base-api-spec.yaml#/components/schemas/ResError
+      operationId: update-warehouse-signing-v1
+      x-stoplight:
+        id: vye0lwqwqebse
+      requestBody:
+        $ref: '#/components/requestBodies/UpdateWarehouseSigning'
+      tags:
+        - warehouse-signing-v1
+      description: update-warehouse-signing-v1
+    delete:
+      summary: v1 - Delete warehouse signing
+      tags:
+        - warehouse-signing-v1
+      responses:
+        '200':
+          description: '**OK**'
+          content:
+            application/json:
+              schema:
+                $ref: ../../base-api-spec.yaml#/components/schemas/ResSuccess
+        '404':
+          description: warehouse-signing-not-found
+          content:
+            application/json:
+              schema:
+                $ref: ../../base-api-spec.yaml#/components/schemas/ResError
+      operationId: delete-warehouse-signing-v1
+      x-stoplight:
+        id: obwffjg8fyncl
+      description: delete-warehouse-signing-v1
+  '/v1/signings/warehouse/{warehouseSigningId}/workshop-signings':
+    parameters:
+      - $ref: '#/components/parameters/Warehouse-Signing-Id'
+    get:
+      summary: v1 - List workshop signing
+      responses:
+        '200':
+          $ref: '#/components/responses/WorkshopSigningList'
+      operationId: list-workshop-signings-v1
+      x-stoplight:
+        id: 06vfmtaj1eo8x
+      parameters:
+        - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-meta
+        - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-links
+        - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-expand
+        - $ref: ../../base-api-spec.yaml#/components/parameters/filter-pagination-offset
+        - $ref: ../../base-api-spec.yaml#/components/parameters/filter-pagination-limit
+        - $ref: ../../base-api-spec.yaml#/components/parameters/filter-order
+        - $ref: ../../base-api-spec.yaml#/components/parameters/filter-order-by
+        - schema:
+            type: array
+            items:
+              type: integer
+          in: query
+          name: ids
+          description: Filter by current worskshop-signings.
+        - schema:
+            type: array
+            items:
+              type: integer
+          in: query
+          name: userIds
+          description: Filter by user identificator.
+        - schema:
+            type: array
+            items:
+              type: integer
+          in: query
+          name: projectIds
+          description: Filter by project identificator.
+        - schema:
+            type: boolean
+          in: query
+          name: current
+          description: Filter by current workshop signings.
+        - schema:
+            type: string
+            format: date-time
+          in: query
+          name: startDate
+          description: Filter by start date
+        - schema:
+            type: string
+            format: date-time
+          in: query
+          name: endDate
+          description: Filter by end date
+      tags:
+        - workshop-signing-v1
+      description: list-workshop-signings-v1
+    post:
+      summary: v1 - Create workshop signing
+      tags:
+        - workshop-signing-v1
+      responses:
+        '200':
+          $ref: '#/components/responses/WorkshopSigning'
+        '404':
+          description: user-not-found | project-not-found | warehouse-signing-not-found
+          content:
+            application/json:
+              schema:
+                $ref: ../../base-api-spec.yaml#/components/schemas/ResError
+      operationId: create-workshop-signing-v1
+      x-stoplight:
+        id: l3l7rhgc664eh
+      requestBody:
+        $ref: '#/components/requestBodies/CreateWorkshopSigning'
+      description: create-workshop-signing-v1
+  '/v1/signings/warehouse/{warehouseSigningId}/workshop-signings/{workshopSigningId}':
+    parameters:
+      - $ref: '#/components/parameters/Warehouse-Signing-Id'
+      - $ref: '#/components/parameters/Workshop-Signing-Id'
+    get:
+      summary: v1 - Find workshop signing
+      responses:
+        '200':
+          $ref: '#/components/responses/WorkshopSigning'
+        '404':
+          description: ' warehouse-signing-not-found | workshop-signing-not-found'
+          content:
+            application/json:
+              schema:
+                $ref: ../../base-api-spec.yaml#/components/schemas/ResError
+      operationId: find-workshop-signing-by-id-v1
+      x-stoplight:
+        id: pv3zmpmragyo1
+      parameters:
+        - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-meta
+        - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-links
+        - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-expand
+      tags:
+        - workshop-signing-v1
+      description: find-workshop-signing-by-id-v1
+    patch:
+      summary: v1 - Update workshop signing
+      tags:
+        - workshop-signing-v1
+      responses:
+        '200':
+          $ref: '#/components/responses/WorkshopSigning'
+        '404':
+          description: ' warehouse-signing-not-found | workshop-signing-not-found'
+          content:
+            application/json:
+              schema:
+                $ref: ../../base-api-spec.yaml#/components/schemas/ResError
+      operationId: update-workshop-signing-v1
+      x-stoplight:
+        id: u6uqu1bbawxqd
+      requestBody:
+        $ref: '#/components/requestBodies/UpdateWorkshopSigning'
+      description: update-workshop-signing-v1
+    delete:
+      summary: v1 - Delete workshop signing
+      tags:
+        - workshop-signing-v1
+      responses:
+        '200':
+          description: '**OK**'
+          content:
+            application/json:
+              schema:
+                $ref: ../../base-api-spec.yaml#/components/schemas/ResSuccess
+        '404':
+          description: ' warehouse-signing-not-found | workshop-signing-not-found'
+          headers: {}
+          content:
+            application/json:
+              schema:
+                $ref: ../../base-api-spec.yaml#/components/schemas/ResError
+      operationId: delete-workshop-signing-v1
+      x-stoplight:
+        id: mi969d0lupdzf
+      description: delete-workshop-signing-v1
   /v1/time-controls:
     get:
       summary: V1 - List time controls
@@ -2547,6 +2835,48 @@ paths:
       tags:
         - user-v1
       description: delete-user-v1
+      x-stoplight:
+        id: emrsbo8xorq6f
+  /v1/signings/workshop/export:
+    parameters: []
+    get:
+      summary: V1 - Export workshop-signing
+      responses:
+        '200':
+          $ref: '#/components/responses/WorkshopSigningExport'
+        '404':
+          description: workshop-signin-not-found
+          content:
+            application/json:
+              schema:
+                $ref: ../../base-api-spec.yaml#/components/schemas/ResError
+      operationId: export-workshop-signing-v1
+      x-stoplight:
+        id: 5bse5nqr6ojxy
+      description: export-workshop-signing-v1
+      parameters:
+        - schema:
+            type: string
+            format: date-time
+          in: query
+          required: true
+          name: startDate
+        - schema:
+            type: string
+            format: date-time
+          in: query
+          required: true
+          name: endDate
+        - schema:
+            type: integer
+          in: query
+          name: userId
+        - schema:
+            type: integer
+          in: query
+          name: projectId
+      tags:
+        - workshop-signing-v1
 components:
   schemas:
     ConstructionShare:
@@ -3260,6 +3590,7 @@ components:
             - PROGRAMMED_SHARES
             - TELEWORKING_SIGNING
             - WORK_SHARES
+            - WAREHOUSE_SIGNING
         description:
           type: string
           x-stoplight:
@@ -3454,6 +3785,78 @@ components:
         - nameEs
         - nameFr
         - required
+    WarehouseSigning:
+      title: WarehouseSigning
+      x-stoplight:
+        id: il6ntgzjryq7t
+      type: object
+      properties:
+        id:
+          type: integer
+          x-stoplight:
+            id: 97le3orb0r6lm
+        user:
+          $ref: '#/components/schemas/User'
+        project:
+          $ref: '#/components/schemas/Project'
+        startedAt:
+          type: string
+          x-stoplight:
+            id: 32h728sl8oov3
+          format: date-time
+        closedAt:
+          type: string
+          x-stoplight:
+            id: 8yvfv3exkqv1h
+          format: date-time
+        workshopSignings:
+          type: array
+          x-stoplight:
+            id: zga7bph7detnj
+          items:
+            $ref: '#/components/schemas/WorkshopSigning'
+      required:
+        - id
+        - user
+        - project
+        - startedAt
+        - workshopSignings
+    WorkshopSigning:
+      title: WorkshopSigning
+      x-stoplight:
+        id: vs2vqh15gqvt8
+      type: object
+      required:
+        - id
+        - warehouse
+        - user
+        - project
+        - startedAt
+      properties:
+        id:
+          type: integer
+          x-stoplight:
+            id: fipqgkzy9icy3
+        warehouse:
+          $ref: '#/components/schemas/WarehouseSigning'
+        user:
+          $ref: '#/components/schemas/User'
+        project:
+          $ref: '#/components/schemas/Project'
+        startedAt:
+          type: string
+          x-stoplight:
+            id: rruuvl31h0nuq
+          format: date-time
+        closedAt:
+          type: string
+          x-stoplight:
+            id: yf3vqpzj6hd8r
+          format: date-time
+        description:
+          type: string
+          x-stoplight:
+            id: l9y2l16v139oz
   securitySchemes:
     bearerAuth:
       type: http
@@ -3714,6 +4117,56 @@ components:
           schema:
             type: string
             format: binary
+    WarehouseSigning:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              metadata:
+                $ref: ../../base-api-spec.yaml#/components/schemas/Meta
+              data:
+                $ref: '#/components/schemas/WarehouseSigning'
+    WarehouseSigningList:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              metadata:
+                $ref: ../../base-api-spec.yaml#/components/schemas/Meta
+              data:
+                x-stoplight:
+                  id: wfrz0o66843af
+                type: array
+                items:
+                  $ref: '#/components/schemas/WarehouseSigning'
+    WorkshopSigning:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              metadata:
+                $ref: ../../base-api-spec.yaml#/components/schemas/Meta
+              data:
+                $ref: '#/components/schemas/WorkshopSigning'
+    WorkshopSigningList:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              metadata:
+                $ref: ../../base-api-spec.yaml#/components/schemas/Meta
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WorkshopSigning'
     WorkShare:
       description: Example response
       content:
@@ -3857,6 +4310,13 @@ components:
                 type: array
                 items:
                   $ref: '#/components/schemas/ProjectMaterial'
+    WorkshopSigningExport:
+      description: ''
+      content:
+        application/octet-stream:
+          schema:
+            type: string
+            format: binary
   requestBodies:
     CreateNoProgrammedShare:
       content:
@@ -4855,6 +5315,85 @@ components:
               - nameEs
               - nameFr
               - required
+    CreateWarehouseSigning:
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - userId
+              - projectId
+            properties:
+              userId:
+                type: integer
+                x-stoplight:
+                  id: 4otygdz0mqsdv
+              projectId:
+                type: integer
+                x-stoplight:
+                  id: 5plocpvtx6ik1
+    UpdateWarehouseSigning:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              startedAt:
+                type: string
+                x-stoplight:
+                  id: s9y1ris563322
+                format: date-time
+              closedAt:
+                type: string
+                x-stoplight:
+                  id: 1hy8i808iqf5l
+                format: date-time
+    CreateWorkshopSigning:
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - projectId
+              - userId
+            properties:
+              projectId:
+                type: integer
+                x-stoplight:
+                  id: xvdxi29jgwc83
+              userId:
+                type: integer
+                x-stoplight:
+                  id: 0h7rh7ma0d6lx
+              description:
+                type: string
+                x-stoplight:
+                  id: t6b0ag6jhvqg6
+      description: ''
+    UpdateWorkshopSigning:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              startedAt:
+                type: string
+                x-stoplight:
+                  id: jwcc5pbdkmv3y
+                format: date-time
+              closedAt:
+                type: string
+                x-stoplight:
+                  id: h5l48jokq9eg9
+                format: date-time
+              description:
+                type: string
+                x-stoplight:
+                  id: alk7wcv72seh6
+              finalize:
+                type: boolean
+                x-stoplight:
+                  id: bm6elje2hl1mo
   parameters:
     Share-Id:
       name: shareId
@@ -4926,6 +5465,20 @@ components:
       schema:
         type: integer
       description: Project material identificator.
+    Warehouse-Signing-Id:
+      name: warehouseSigningId
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: Warehouse signing identificator.
+    Workshop-Signing-Id:
+      name: workshopSigningId
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: Workshop signing identificator
 tags:
   - name: personal-expense-sheet-v1
     description: V1 - Personal Expense Sheets
@@ -4975,6 +5528,10 @@ tags:
     description: V1 - Time control
   - name: user-v1
     description: V1 - User
+  - name: warehouse-signing-v1
+    description: V1 - Warehouse Signing
+  - name: workshop-signing-v1
+    description: V1 - Workshop Signing
   - name: work-share-v1
     description: V1 - Work Share
   - name: work-share-break-v1
