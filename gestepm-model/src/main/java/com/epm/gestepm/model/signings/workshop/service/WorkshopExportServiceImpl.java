@@ -201,7 +201,7 @@ public class WorkshopExportServiceImpl implements WorkshopExportService {
                     .distinct()
                     .collect(Collectors.toList());
 
-            final List<ProjectDto> userProjectsD = projects
+            final List<ProjectDto> userProjects = projects
                     .stream()
                     .filter(project -> userProjectIds.contains(project.getId()))
                     .collect(Collectors.toList());
@@ -217,7 +217,7 @@ public class WorkshopExportServiceImpl implements WorkshopExportService {
                     .filter(warehouse -> userWarehouseIds.contains(warehouse.getId()))
                     .collect(Collectors.toList());
 
-            currentRow = createDetailsRow(sheet, workshops, projects, warehouses, currentRow);
+            currentRow = createDetailsRow(sheet, userWorkshops, userProjects, userWarehouses, currentRow);
         }
 
         IntStream.rangeClosed(1, projectIds.size() + 2)
