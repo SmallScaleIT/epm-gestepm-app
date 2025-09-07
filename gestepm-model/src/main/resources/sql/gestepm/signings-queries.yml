@@ -1,0 +1,14 @@
+sql:
+  qry-list-of-sgn: |
+    
+    SELECT *
+    FROM (
+      SELECT
+        cs.construction_share_id AS signing_id,
+        cs.created_at AS start_date,
+        CONCAT('/shares/construction/', cs.construction_share_id) AS detail_url,
+        'CONSTRUCTION_SHARES' AS signing_type,
+        pr.name AS project_name
+      FROM ${sch-gestepm}.construction_share cs
+      LEFT JOIN ${sch-gestepm}.project pr ON pr.project_id = cs.project_id
+    )
