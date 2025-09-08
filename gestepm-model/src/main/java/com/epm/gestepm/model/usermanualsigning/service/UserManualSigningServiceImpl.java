@@ -1,6 +1,5 @@
 package com.epm.gestepm.model.usermanualsigning.service;
 
-import com.epm.gestepm.model.signings.checker.HasActiveSigningChecker;
 import com.epm.gestepm.model.usermanualsigning.dao.UserManualSigningRepository;
 import com.epm.gestepm.modelapi.usermanualsigning.dto.UserManualSigning;
 import com.epm.gestepm.modelapi.usermanualsigning.dto.UserManualSigningTableDTO;
@@ -20,8 +19,6 @@ public class UserManualSigningServiceImpl implements UserManualSigningService {
 
     private final UserManualSigningRepository userManualSigningRepository;
 
-    private final HasActiveSigningChecker activeChecker;
-
     @Override
     public UserManualSigning getById(Long id) {
         return this.userManualSigningRepository.findById(id).orElse(null);
@@ -29,10 +26,6 @@ public class UserManualSigningServiceImpl implements UserManualSigningService {
 
     @Override
     public UserManualSigning save(UserManualSigning userManualSigning) {
-
-        if (userManualSigning.getId() == null)
-            activeChecker.validateSigningChecker(userManualSigning.getUser().getId().intValue());
-
         return this.userManualSigningRepository.save(userManualSigning);
     }
 
