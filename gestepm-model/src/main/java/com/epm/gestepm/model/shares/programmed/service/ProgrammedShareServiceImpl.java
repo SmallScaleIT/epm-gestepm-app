@@ -18,6 +18,7 @@ import com.epm.gestepm.model.shares.programmed.dao.entity.filter.ProgrammedShare
 import com.epm.gestepm.model.shares.programmed.dao.entity.finder.ProgrammedShareByIdFinder;
 import com.epm.gestepm.model.shares.programmed.dao.entity.updater.ProgrammedShareUpdate;
 import com.epm.gestepm.model.shares.programmed.service.mapper.*;
+import com.epm.gestepm.model.signings.checker.HasActiveSigningChecker;
 import com.epm.gestepm.model.user.utils.UserUtils;
 import com.epm.gestepm.modelapi.common.utils.Utiles;
 import com.epm.gestepm.modelapi.customer.dto.CustomerDto;
@@ -80,6 +81,7 @@ public class ProgrammedShareServiceImpl implements ProgrammedShareService {
 
     private final UserUtils userUtils;
 
+    private final HasActiveSigningChecker activeChecker;
 
     @Override
     @RequirePermits(value = PRMT_READ_PS, action = "List programmed shares")
@@ -148,6 +150,9 @@ public class ProgrammedShareServiceImpl implements ProgrammedShareService {
             msgOut = "New programmed share created OK",
             errorMsg = "Failed to create new programmed share")
     public ProgrammedShareDto create(ProgrammedShareCreateDto createDto) {
+
+        this.activeChecker.validateSigningChecker(createDto.getUserId());
+
         final ProgrammedShareCreate create = getMapper(MapPSToProgrammedShareCreate.class).from(createDto);
         create.setStartDate(LocalDateTime.now());
 

@@ -943,6 +943,11 @@ paths:
         - $ref: ../../base-api-spec.yaml#/components/parameters/filter-pagination-limit
         - $ref: ../../base-api-spec.yaml#/components/parameters/filter-order
         - $ref: ../../base-api-spec.yaml#/components/parameters/filter-order-by
+        - schema:
+            type: boolean
+          in: query
+          name: current
+          description: Filter by current inspection
       tags:
         - inspection-v1
     post:
@@ -2370,7 +2375,7 @@ paths:
             type: string
             format: date-time
           in: query
-          name: endDtae
+          name: endDate
           description: Filter by end date
       x-stoplight:
         id: vez1e3c4qatf7

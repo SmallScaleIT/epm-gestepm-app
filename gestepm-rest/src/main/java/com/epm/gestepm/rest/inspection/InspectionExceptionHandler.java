@@ -4,13 +4,14 @@ import com.epm.gestepm.lib.controller.error.APIError;
 import com.epm.gestepm.lib.controller.error.I18nErrorMessageSource;
 import com.epm.gestepm.lib.controller.exception.BaseRestExceptionHandler;
 import com.epm.gestepm.lib.executiontrace.ExecutionRequestProvider;
-import com.epm.gestepm.modelapi.inspection.exception.InspectionExportException;
-import com.epm.gestepm.modelapi.inspection.exception.InspectionFileNotFoundException;
-import com.epm.gestepm.modelapi.inspection.exception.InspectionNotEndedException;
-import com.epm.gestepm.modelapi.inspection.exception.InspectionNotFoundException;
+import com.epm.gestepm.modelapi.inspection.dto.InspectionDto;
+import com.epm.gestepm.modelapi.inspection.exception.*;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.ArrayList;
+import java.util.Optional;
 
 import static org.springframework.http.HttpStatus.*;
 
@@ -26,6 +27,8 @@ public class InspectionExceptionHandler extends BaseRestExceptionHandler {
     public static final String I_FILE_NOT_FOUND = "inspection-file-not-found";
 
     public static final String I_EXPORT_EXCEPTION = "inspection-export-exception";
+
+    public static final String I_ACTIVE = "inspection-active";
 
     public InspectionExceptionHandler(ExecutionRequestProvider executionRequestProvider, I18nErrorMessageSource i18nErrorMessageSource) {
         super(executionRequestProvider, i18nErrorMessageSource);
@@ -67,4 +70,10 @@ public class InspectionExceptionHandler extends BaseRestExceptionHandler {
         return toAPIError(I_ERROR_CODE, I_EXPORT_EXCEPTION, I_EXPORT_EXCEPTION, id);
     }
 
+    @ExceptionHandler(InspectionActiveException.class)
+    @ResponseStatus(CONFLICT)
+    public APIError handle(InspectionActiveException ex) {
+
+        return toAPIError(I_ERROR_CODE, I_ACTIVE, I_ACTIVE);
+    }
 }

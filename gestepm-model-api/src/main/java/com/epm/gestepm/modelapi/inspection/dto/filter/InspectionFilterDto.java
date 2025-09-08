@@ -23,6 +23,8 @@ public class InspectionFilterDto extends OrderableDto implements UsableAsCacheKe
 
   private LocalDateTime endDate;
 
+  private Boolean current;
+
   @Override
   public String asCacheKey() {
 
@@ -33,6 +35,7 @@ public class InspectionFilterDto extends OrderableDto implements UsableAsCacheKe
     cacheKeyBuilder.addElement("projectId", this.projectId);
     cacheKeyBuilder.addElement("startDate", this.startDate);
     cacheKeyBuilder.addElement("endDate", this.endDate);
+    cacheKeyBuilder.addElement("current", this.current);
 
     return cacheKeyBuilder.toString();
   }

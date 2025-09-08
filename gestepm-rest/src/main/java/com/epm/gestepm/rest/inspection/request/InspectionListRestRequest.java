@@ -16,4 +16,5 @@ public class InspectionListRestRequest extends RestRequest {
 
     private List<Integer> ids;
 
+    private Boolean current;
 }

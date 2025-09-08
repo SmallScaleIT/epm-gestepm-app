@@ -6,9 +6,116 @@ sql:
       SELECT
         cs.construction_share_id AS signing_id,
         cs.created_at AS start_date,
+        cs.closed_at AS end_date,
         CONCAT('/shares/construction/', cs.construction_share_id) AS detail_url,
         'CONSTRUCTION_SHARES' AS signing_type,
-        pr.name AS project_name
+        pr.name AS project_name,
+        cs.user_id
       FROM ${sch-gestepm}.construction_share cs
       LEFT JOIN ${sch-gestepm}.project pr ON pr.project_id = cs.project_id
-    )
+      UNION
+      SELECT
+        ds.displacement_share_id AS signing_id,
+        ds.start_date,
+        ds.end_date,
+        CONCAT('/shares/displacement/', ds.displacement_share_id) AS detail_url,
+        'DISPLACEMENT_SHARES' AS signing_type,
+        pr.name AS project_name,
+        ds.user_id
+      FROM ${sch-gestepm}.displacement_share ds
+      LEFT JOIN ${sch-gestepm}.project pr ON pr.project_id = ds.project_id
+      UNION
+      SELECT
+        ums.id AS signing_id,
+        ums.start_date,
+        ums.end_date,
+        '' AS detail_url,
+        'MANUAL_SIGNINGS' AS signing_type,
+        NULL AS project_name,
+        ums.user_id
+      FROM ${sch-gestepm}.user_manual_signings ums
+      UNION
+      SELECT
+        id AS signing_id,
+        start_date,
+        end_date,
+        '' AS detail_url,
+        'PERSONAL_SIGNINGS' AS signing_type,
+        NULL AS project_name,
+        user_id
+      FROM ${sch-gestepm}.personal_signings
+      UNION
+      SELECT
+        ps.programmed_share_id AS signing_id,
+        ps.start_date,
+        ps.end_date,
+        CONCAT('/shares/programmed/', ps.programmed_share_id) AS detail_url,
+        'PROGRAMMED_SHARES' AS signing_type,
+        pr.name AS project_name,
+        ps.user_id
+      FROM ${sch-gestepm}.programmed_share ps
+      LEFT JOIN ${sch-gestepm}.project pr ON pr.project_id = ps.project_id
+      UNION
+      SELECT
+        ts.teleworking_signing_id AS signing_id,
+        ts.started_at AS start_date,
+        ts.closed_at AS end_date,
+        CONCAT('/signings/teleworking/', ts.teleworking_signing_id) AS detail_url,
+        'OFFICE_SIGNING' AS signing_type,
+        pr.name AS project_name,
+        ts.user_id
+      FROM ${sch-gestepm}.teleworking_signing ts
+      LEFT JOIN ${sch-gestepm}.project pr ON pr.project_id = ts.project_id
+      WHERE pr.type = 'OFFICE'
+      UNION
+      SELECT
+        ts.teleworking_signing_id AS signing_id,
+        ts.started_at AS start_date,
+        ts.closed_at AS end_date,
+        CONCAT('/signings/teleworking/', ts.teleworking_signing_id) AS detail_url,
+        'TELEWORKING_SIGNING' AS signing_type,
+        pr.name AS project_name,
+        ts.user_id
+      FROM ${sch-gestepm}.teleworking_signing ts
+      LEFT JOIN ${sch-gestepm}.project pr ON pr.project_id = ts.project_id
+      WHERE pr.type = 'TELEWORKING'
+      UNION
+      SELECT
+        ws.work_share_id AS signing_id,
+        ws.start_date,
+        ws.end_date,
+        CONCAT('/shares/work/', ws.work_share_id) AS detail_url,
+        'WORK_SHARES' AS signing_type,
+        pr.name AS project_name,
+        ws.user_id
+      FROM ${sch-gestepm}.work_share ws
+      LEFT JOIN ${sch-gestepm}.project pr ON pr.project_id = ws.project_id
+      UNION
+      SELECT
+        whs.warehouse_signing_id AS signing_id,
+        whs.started_at AS start_date,
+        whs.closed_at AS end_date,
+        CONCAT('/signings/warehouse/', whs.warehouse_signing_id) AS detail_url,
+        'WAREHOUSE_SIGNING' AS signing_type,
+        pr.name AS project_name,
+        whs.user_id
+      FROM ${sch-gestepm}.warehouse_signing whs
+      LEFT JOIN ${sch-gestepm}.project pr ON pr.project_id = whs.project_id
+      UNION
+      SELECT
+        nps.no_programmed_share_id AS signing_id,
+        nps.start_date,
+        nps.end_date,
+        CONCAT('/shares/no-programmed/', nps.no_programmed_share_id) detail_url,
+        'NO_PROGRAMMED_SHARE' AS signing_type,
+        pr.name AS project_name,
+        nps.user_id
+      FROM ${sch-gestepm}.no_programmed_share nps
+      LEFT JOIN ${sch-gestepm}.project pr ON pr.project_id = nps.project_id
+    ) AS sublist
+    
+    #whereToken #filter
+
+  filter-current-sgn: |
+    
+    user_id = :attr_sgn_user_id AND end_date IS NULL

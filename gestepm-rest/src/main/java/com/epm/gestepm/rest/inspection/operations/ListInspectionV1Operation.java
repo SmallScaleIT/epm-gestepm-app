@@ -10,7 +10,8 @@ public class ListInspectionV1Operation extends APIOperation<InspectionV1Api, Ins
         super("listInspectionV1");
 
         this.generateLinksWith((apiClass, req) -> apiClass.listInspectionsV1(req.getShareId(), req.getMeta(),
-                req.getLinks(), req.getExpand(), req.getOffset(), req.getLimit(), req.getOrder(), req.getOrderBy()));
+                req.getLinks(), req.getExpand(), req.getOffset(), req.getLimit()
+                , req.getOrder(), req.getOrderBy(), req.getCurrent()));
     }
 
 }

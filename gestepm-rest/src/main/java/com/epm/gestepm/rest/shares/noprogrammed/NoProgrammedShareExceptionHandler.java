@@ -5,6 +5,7 @@ import com.epm.gestepm.lib.controller.error.I18nErrorMessageSource;
 import com.epm.gestepm.lib.controller.exception.BaseRestExceptionHandler;
 import com.epm.gestepm.lib.executiontrace.ExecutionRequestProvider;
 import com.epm.gestepm.modelapi.shares.noprogrammed.exception.NoProgrammedShareFileNotFoundException;
+import com.epm.gestepm.modelapi.shares.noprogrammed.exception.NoProgrammedShareFinalizedException;
 import com.epm.gestepm.modelapi.shares.noprogrammed.exception.NoProgrammedShareForbiddenException;
 import com.epm.gestepm.modelapi.shares.noprogrammed.exception.NoProgrammedShareNotFoundException;
 import org.apache.commons.lang3.StringUtils;
@@ -12,8 +13,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import static org.springframework.http.HttpStatus.FORBIDDEN;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.*;
 
 @RestControllerAdvice
 public class NoProgrammedShareExceptionHandler extends BaseRestExceptionHandler {
@@ -27,6 +27,8 @@ public class NoProgrammedShareExceptionHandler extends BaseRestExceptionHandler 
     public static final String NPS_FORBIDDEN = "no-programmed-share-forbidden";
 
     public static final String NPS_FORBIDDEN_TL = "no-programmed-share-forbidden-tl";
+
+    public static final String NPS_FINALIZED = "no-programmed-share-finalized";
 
     public NoProgrammedShareExceptionHandler(ExecutionRequestProvider executionRequestProvider, I18nErrorMessageSource i18nErrorMessageSource) {
         super(executionRequestProvider, i18nErrorMessageSource);
@@ -59,5 +61,13 @@ public class NoProgrammedShareExceptionHandler extends BaseRestExceptionHandler 
         final String message = StringUtils.isNoneBlank(subRole) ? NPS_FORBIDDEN : NPS_FORBIDDEN_TL;
 
         return toAPIError(NPS_ERROR_CODE, message, message, id, subRole);
+    }
+
+    @ExceptionHandler(NoProgrammedShareFinalizedException.class)
+    @ResponseStatus(CONFLICT)
+    public APIError handle(NoProgrammedShareFinalizedException ex) {
+        final Integer id = ex.getId();
+
+        return toAPIError(NPS_ERROR_CODE, NPS_FINALIZED, NPS_FINALIZED, id);
     }
 }

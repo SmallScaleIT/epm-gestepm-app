@@ -5,6 +5,7 @@ import com.epm.gestepm.lib.logging.annotation.LogExecution;
 import com.epm.gestepm.lib.security.annotation.RequirePermits;
 import com.epm.gestepm.lib.types.Page;
 import com.epm.gestepm.model.signings.warehouse.dao.WarehouseSigningDao;
+import com.epm.gestepm.model.signings.warehouse.dao.entity.WarehouseSigning;
 import com.epm.gestepm.model.signings.warehouse.dao.entity.finder.WarehouseSigningByIdFinder;
 import com.epm.gestepm.model.signings.workshop.dao.WorkshopSigningDao;
 import com.epm.gestepm.model.signings.workshop.dao.entity.creator.WorkshopSigningCreate;
@@ -13,6 +14,7 @@ import com.epm.gestepm.model.signings.workshop.dao.entity.filter.WorkshopSigning
 import com.epm.gestepm.model.signings.workshop.dao.entity.finder.WorkshopSigningByIdFinder;
 import com.epm.gestepm.model.signings.workshop.dao.entity.updater.WorkshopSigningUpdate;
 import com.epm.gestepm.model.signings.workshop.service.mapper.*;
+import com.epm.gestepm.modelapi.signings.warehouse.exception.WarehouseFinalizedException;
 import com.epm.gestepm.modelapi.signings.warehouse.exception.WarehouseSigningNotFoundException;
 import com.epm.gestepm.modelapi.signings.workshop.dto.WorkShopSigningDto;
 import com.epm.gestepm.modelapi.signings.workshop.dto.creator.WorkshopSigningCreateDto;
@@ -115,6 +117,7 @@ public class WorkshopSigningServiceImpl implements WorkshopSigningService {
             msgOut = "New warehouse signing created OK",
             errorMsg = "Failed to create new workshop signing")
     public WorkShopSigningDto create(WorkshopSigningCreateDto createDto) {
+        this.validateWorkshopSigning(createDto);
 
         WorkshopSigningCreate create = getMapper(MapWSSToWorkshopSigningCreate.class)
                 .from(createDto);
@@ -125,6 +128,20 @@ public class WorkshopSigningServiceImpl implements WorkshopSigningService {
 
         return getMapper(MapWSSToWorkshopSigningDto.class)
                 .from(repository.create(create));
+    }
+
+    protected void validateWorkshopSigning(WorkshopSigningCreateDto workshop) {
+        validateWarehouseSigningActive(workshop);
+    }
+
+    protected void validateWarehouseSigningActive(WorkshopSigningCreateDto workshop) {
+        WarehouseSigningByIdFinder finder = new WarehouseSigningByIdFinder(workshop.getWarehouseId());
+
+        WarehouseSigning warehouse = warehouseRepository.find(finder)
+                .orElseThrow(() -> new WarehouseSigningNotFoundException(workshop.getWarehouseId()));
+
+        if (warehouse.getClosedAt() != null)
+            throw new WarehouseFinalizedException(warehouse.getId());
     }
 
     @Override

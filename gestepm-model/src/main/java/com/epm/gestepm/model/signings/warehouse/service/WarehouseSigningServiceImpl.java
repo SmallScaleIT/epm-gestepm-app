@@ -4,6 +4,7 @@ import com.epm.gestepm.lib.logging.annotation.EnableExecutionLog;
 import com.epm.gestepm.lib.logging.annotation.LogExecution;
 import com.epm.gestepm.lib.security.annotation.RequirePermits;
 import com.epm.gestepm.lib.types.Page;
+import com.epm.gestepm.model.signings.checker.HasActiveSigningChecker;
 import com.epm.gestepm.model.signings.checker.SigningUpdateChecker;
 import com.epm.gestepm.model.signings.warehouse.dao.WarehouseSigningDao;
 import com.epm.gestepm.model.signings.warehouse.dao.entity.creator.WarehouseSigningCreate;
@@ -42,6 +43,8 @@ public class WarehouseSigningServiceImpl implements WarehouseSigningService {
     private final SigningUpdateChecker checker;
 
     private final WarehouseSigningDao repository;
+
+    private final HasActiveSigningChecker activeChecker;
 
     @Override
     @RequirePermits(value = PRMT_READ_WHS, action = "List warehouse signings")
@@ -106,6 +109,8 @@ public class WarehouseSigningServiceImpl implements WarehouseSigningService {
             msgOut = "New warehouse signing created OK",
             errorMsg = "Failed to create new warehouse signing")
     public WarehouseSigningDto create(WarehouseSigningCreateDto createDto) {
+
+        this.activeChecker.validateSigningChecker(createDto.getUserId());
 
         final WarehouseSigningCreate create = getMapper(MapWHSToWarehouseSigningCreate.class).from(createDto);
         create.setStartedAt(LocalDateTime.now());

@@ -18,6 +18,7 @@ import com.epm.gestepm.model.shares.construction.dao.entity.filter.ConstructionS
 import com.epm.gestepm.model.shares.construction.dao.entity.finder.ConstructionShareByIdFinder;
 import com.epm.gestepm.model.shares.construction.dao.entity.updater.ConstructionShareUpdate;
 import com.epm.gestepm.model.shares.construction.service.mapper.*;
+import com.epm.gestepm.model.signings.checker.HasActiveSigningChecker;
 import com.epm.gestepm.model.user.utils.UserUtils;
 import com.epm.gestepm.modelapi.common.utils.Utiles;
 import com.epm.gestepm.modelapi.customer.dto.CustomerDto;
@@ -79,6 +80,8 @@ public class ConstructionShareServiceImpl implements ConstructionShareService {
     private final ShareDateChecker shareDateChecker;
 
     private final UserUtils userUtils;
+
+    private final HasActiveSigningChecker activeChecker;
 
     @Override
     @RequirePermits(value = PRMT_READ_CS, action = "List construction shares")
@@ -149,6 +152,8 @@ public class ConstructionShareServiceImpl implements ConstructionShareService {
     public ConstructionShareDto create(ConstructionShareCreateDto createDto) {
         final ConstructionShareCreate create = getMapper(MapCSToConstructionShareCreate.class).from(createDto);
         create.setStartDate(LocalDateTime.now());
+
+        activeChecker.validateSigningChecker(createDto.getUserId());
 
         this.auditProvider.auditCreate(create);
 

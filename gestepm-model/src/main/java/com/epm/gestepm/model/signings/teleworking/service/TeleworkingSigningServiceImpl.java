@@ -4,6 +4,7 @@ import com.epm.gestepm.lib.logging.annotation.EnableExecutionLog;
 import com.epm.gestepm.lib.logging.annotation.LogExecution;
 import com.epm.gestepm.lib.security.annotation.RequirePermits;
 import com.epm.gestepm.lib.types.Page;
+import com.epm.gestepm.model.signings.checker.HasActiveSigningChecker;
 import com.epm.gestepm.model.signings.checker.SigningUpdateChecker;
 import com.epm.gestepm.model.signings.teleworking.dao.TeleworkingSigningDao;
 import com.epm.gestepm.model.signings.teleworking.dao.entity.TeleworkingSigning;
@@ -45,6 +46,8 @@ public class TeleworkingSigningServiceImpl implements TeleworkingSigningService 
     private final SigningUpdateChecker signingUpdateChecker;
 
     private final TeleworkingSigningDao teleworkingSigningDao;
+
+    private final HasActiveSigningChecker activeChecker;
 
     @Override
     @RequirePermits(value = PRMT_READ_TS, action = "List teleworking signings")
@@ -116,6 +119,8 @@ public class TeleworkingSigningServiceImpl implements TeleworkingSigningService 
             msgOut = "New teleworking signing created OK",
             errorMsg = "Failed to create new teleworking signing")
     public TeleworkingSigningDto create(TeleworkingSigningCreateDto createDto) {
+
+        this.activeChecker.validateSigningChecker(createDto.getUserId());
 
         final TeleworkingSigningCreate create = getMapper(MapTSToTeleworkingSigningCreate.class).from(createDto);
         create.setStartedAt(LocalDateTime.now());

@@ -30,6 +30,7 @@ import com.epm.gestepm.modelapi.inspection.dto.deleter.InspectionDeleteDto;
 import com.epm.gestepm.modelapi.inspection.dto.filter.InspectionFilterDto;
 import com.epm.gestepm.modelapi.inspection.dto.finder.InspectionByIdFinderDto;
 import com.epm.gestepm.modelapi.inspection.dto.updater.InspectionUpdateDto;
+import com.epm.gestepm.modelapi.inspection.exception.InspectionActiveException;
 import com.epm.gestepm.modelapi.inspection.exception.InspectionNotFoundException;
 import com.epm.gestepm.modelapi.inspection.service.InspectionExportService;
 import com.epm.gestepm.modelapi.inspection.service.InspectionService;
@@ -40,6 +41,7 @@ import com.epm.gestepm.modelapi.shares.noprogrammed.dto.NoProgrammedShareDto;
 import com.epm.gestepm.modelapi.shares.noprogrammed.dto.NoProgrammedShareStateEnumDto;
 import com.epm.gestepm.modelapi.shares.noprogrammed.dto.finder.NoProgrammedShareByIdFinderDto;
 import com.epm.gestepm.modelapi.shares.noprogrammed.dto.updater.NoProgrammedShareUpdateDto;
+import com.epm.gestepm.modelapi.shares.noprogrammed.exception.NoProgrammedShareFinalizedException;
 import com.epm.gestepm.modelapi.shares.noprogrammed.service.NoProgrammedShareService;
 import com.epm.gestepm.modelapi.user.dto.UserDto;
 import com.epm.gestepm.modelapi.user.dto.finder.UserByIdFinderDto;
@@ -169,6 +171,8 @@ public class InspectionServiceImpl implements InspectionService {
 
         this.inspectionChecker.checker(noProgrammedShare, createDto);
 
+        this.validateInspection(createDto);
+
         final InspectionCreate create = getMapper(MapIToInspectionCreate.class).from(createDto);
         create.setStartDate(LocalDateTime.now());
 
@@ -177,6 +181,43 @@ public class InspectionServiceImpl implements InspectionService {
         this.updateNoProgrammedShare(noProgrammedShare.getId(), createDto.getFirstTechnicalId(), NoProgrammedShareStateEnumDto.IN_PROGRESS);
 
         return getMapper(MapIToInspectionDto.class).from(result);
+    }
+
+    protected void validateInspection(InspectionCreateDto inspection) {
+        validateNoProgrammedShareActive(inspection);
+        validateInspectionActive(inspection);
+    }
+
+    protected void validateNoProgrammedShareActive(InspectionCreateDto inspection) {
+        NoProgrammedShareByIdFinderDto finder = new NoProgrammedShareByIdFinderDto(inspection.getShareId());
+
+        NoProgrammedShareDto noProgrammed = noProgrammedShareService.findOrNotFound(finder);
+
+        if (noProgrammed.getEndDate() == null)
+            return ;
+
+        throw new NoProgrammedShareFinalizedException(noProgrammed.getId());
+    }
+
+    protected void validateInspectionActive(InspectionCreateDto inspection) {
+        InspectionFilterDto filter = new InspectionFilterDto();
+
+        filter.setShareId(inspection.getShareId());
+        filter.setCurrent(true);
+
+        List<InspectionDto> inspectionList = list(filter);
+
+        if (inspectionList.isEmpty())
+            return ;
+
+        final InspectionDto inspectionActive = inspectionList.get(0);
+
+        final String detailUrl = "/shares/no-programmed/" +
+                inspectionActive.getShareId() +
+                "/inspections/" + inspectionActive.getId();
+
+        throw new InspectionActiveException(inspectionActive.getId(), inspectionActive.getStartDate()
+                , inspectionActive.getProjectName(), detailUrl);
     }
 
     @Override
