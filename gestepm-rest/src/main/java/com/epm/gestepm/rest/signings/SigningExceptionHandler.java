@@ -50,7 +50,12 @@ public class SigningExceptionHandler extends BaseRestExceptionHandler {
 
         final String strStartDate = Utiles.getDateFormatted(ex.getStartDate(), "yyyy-MM-dd");
 
-        return toAPIError(SI_ERROR_CODE, signingType + "-" + SI_ACTIVE, signingType + "-" + SI_ACTIVE
+        final APIError error = toAPIError(SI_ERROR_CODE, signingType + "-" + SI_ACTIVE, signingType + "-" + SI_ACTIVE
                 , ex.getId(), strStartDate, ex.getProjectName());
+
+        if (StringUtils.hasText(ex.getDetailUrl()))
+            error.putHelp("url", ex.getDetailUrl());
+
+        return error;
     }
 }

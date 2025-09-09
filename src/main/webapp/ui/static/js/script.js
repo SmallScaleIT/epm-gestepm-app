@@ -36,6 +36,47 @@ function parseStatus(data) {
 	return '';
 }
 
+function showError(error, modalId) {
+	error = error.response.data;
+
+	if (!error.help || !error.help.url || !modalId)
+	{
+		showNotify(error.detail, 'danger');
+		return ;
+	}
+
+	const modal = document.getElementById(modalId);
+
+	if (!modal)
+	{
+		showNotify(error.detail, 'danger');
+		return ;
+	}
+
+	const modalBody = modal.querySelector('.modal-body');
+
+	if (!modalBody)
+	{
+		showNotify(error.detail, 'danger');
+		return ;
+	}
+
+	const link = document.createElement('a');
+	link.href = error.help.url;
+	link.classList.add('text-danger');
+	link.classList.add('text-center');
+	link.classList.add('d-inline-block');
+
+	link.textContent = error.detail;
+
+	childs = modalBody.childNodes;
+
+	childs.forEach(node => modalBody.removeChild(node));
+	modalBody.appendChild(link);
+
+	$(modal).modal('show');
+}
+
 function showNotify(msg, type) {
 	$.notify({ message: msg }, { type: type });
 }

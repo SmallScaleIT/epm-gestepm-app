@@ -69,7 +69,7 @@ function submitWarehouse() {
             const warehouse = response.data.data;
             window.location.replace('/signings/warehouse/' + warehouse.id);
         })
-        .catch(error => showNotify(error.response.data.detail, 'danger'))
+        .catch(error => showError(error, 'errorModal'))
         .finally(() => hideLoading());
     }
 
