@@ -61,18 +61,12 @@ function showError(error, modalId) {
 		return ;
 	}
 
-	const link = document.createElement('a');
-	link.href = error.help.url;
-	link.classList.add('text-danger');
-	link.classList.add('text-center');
-	link.classList.add('d-inline-block');
+	const link = modal.querySelector('[data-modal-id="modal-href"]');
 
-	link.textContent = error.detail;
+	if (link)
+		link.href = error.help.url;
 
-	childs = modalBody.childNodes;
-
-	childs.forEach(node => modalBody.removeChild(node));
-	modalBody.appendChild(link);
+	modalBody.textContent = error.detail;
 
 	$(modal).modal('show');
 }

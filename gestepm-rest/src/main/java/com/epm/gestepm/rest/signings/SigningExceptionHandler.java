@@ -24,7 +24,7 @@ public class SigningExceptionHandler extends BaseRestExceptionHandler {
 
     public static final String SI_FORBIDDEN = "signing-forbidden";
 
-    public static String SI_ACTIVE = "active";
+    public static String SI_ACTIVE = "signing-active";
 
     public SigningExceptionHandler(ExecutionRequestProvider executionRequestProvider, I18nErrorMessageSource i18nErrorMessageSource) {
         super(executionRequestProvider, i18nErrorMessageSource);
@@ -43,15 +43,9 @@ public class SigningExceptionHandler extends BaseRestExceptionHandler {
     @ResponseStatus(value = CONFLICT)
     public APIError handle(SigningCheckerException ex) {
 
-        final String signingType = Optional.ofNullable(ex.getSigningType())
-                .filter(StringUtils::hasText)
-                .map(sType -> sType.toLowerCase().replaceAll("_", "-"))
-                .orElse("signing");
-
         final String strStartDate = Utiles.getDateFormatted(ex.getStartDate(), "yyyy-MM-dd");
 
-        final APIError error = toAPIError(SI_ERROR_CODE, signingType + "-" + SI_ACTIVE, signingType + "-" + SI_ACTIVE
-                , ex.getId(), strStartDate, ex.getProjectName());
+        final APIError error = toAPIError(SI_ERROR_CODE, SI_ACTIVE, SI_ACTIVE, strStartDate);
 
         if (StringUtils.hasText(ex.getDetailUrl()))
             error.putHelp("url", ex.getDetailUrl());

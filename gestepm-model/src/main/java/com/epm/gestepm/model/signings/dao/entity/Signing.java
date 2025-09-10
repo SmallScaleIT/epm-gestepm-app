@@ -15,11 +15,5 @@ public class Signing {
     private LocalDateTime startDate;
 
     @NotNull
-    private String signingType;
-
-    @NotNull
     private String detailUrl;
-
-    @NotNull
-    private String projectName;
 }

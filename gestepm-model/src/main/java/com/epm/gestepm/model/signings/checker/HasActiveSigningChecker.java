@@ -30,7 +30,6 @@ public class HasActiveSigningChecker {
 
         final SigningDto signing = signingList.get(0);
 
-        throw new SigningCheckerException(signing.getId(), signing.getStartDate()
-                , signing.getProjectName(), signing.getSigningType(), signing.getDetailUrl());
+        throw new SigningCheckerException(signing.getId(), signing.getStartDate(), signing.getDetailUrl());
     }
 }

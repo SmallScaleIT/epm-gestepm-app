@@ -4,9 +4,6 @@ import com.epm.gestepm.lib.logging.annotation.EnableExecutionLog;
 import com.epm.gestepm.lib.logging.annotation.LogExecution;
 import com.epm.gestepm.lib.security.annotation.RequirePermits;
 import com.epm.gestepm.lib.types.Page;
-import com.epm.gestepm.model.signings.warehouse.dao.WarehouseSigningDao;
-import com.epm.gestepm.model.signings.warehouse.dao.entity.WarehouseSigning;
-import com.epm.gestepm.model.signings.warehouse.dao.entity.finder.WarehouseSigningByIdFinder;
 import com.epm.gestepm.model.signings.workshop.dao.WorkshopSigningDao;
 import com.epm.gestepm.model.signings.workshop.dao.entity.creator.WorkshopSigningCreate;
 import com.epm.gestepm.model.signings.workshop.dao.entity.deleter.WorkshopSigningDelete;
@@ -14,8 +11,11 @@ import com.epm.gestepm.model.signings.workshop.dao.entity.filter.WorkshopSigning
 import com.epm.gestepm.model.signings.workshop.dao.entity.finder.WorkshopSigningByIdFinder;
 import com.epm.gestepm.model.signings.workshop.dao.entity.updater.WorkshopSigningUpdate;
 import com.epm.gestepm.model.signings.workshop.service.mapper.*;
+import com.epm.gestepm.modelapi.signings.warehouse.dto.WarehouseSigningDto;
+import com.epm.gestepm.modelapi.signings.warehouse.dto.finder.WarehouseSigningByIdFinderDto;
 import com.epm.gestepm.modelapi.signings.warehouse.exception.WarehouseFinalizedException;
 import com.epm.gestepm.modelapi.signings.warehouse.exception.WarehouseSigningNotFoundException;
+import com.epm.gestepm.modelapi.signings.warehouse.service.WarehouseSigningService;
 import com.epm.gestepm.modelapi.signings.workshop.dto.WorkShopSigningDto;
 import com.epm.gestepm.modelapi.signings.workshop.dto.creator.WorkshopSigningCreateDto;
 import com.epm.gestepm.modelapi.signings.workshop.dto.deleter.WorkshopSigningDeleteDto;
@@ -47,7 +47,7 @@ public class WorkshopSigningServiceImpl implements WorkshopSigningService {
 
     private final WorkshopSigningDao repository;
 
-    private final WarehouseSigningDao warehouseRepository;
+    private final WarehouseSigningService warehouseService;
 
     @Override
     @RequirePermits(value = PRMT_READ_WSS, action = "List workshop signings")
@@ -123,8 +123,7 @@ public class WorkshopSigningServiceImpl implements WorkshopSigningService {
                 .from(createDto);
         create.setStartedAt(LocalDateTime.now());
 
-        warehouseRepository.find(new WarehouseSigningByIdFinder(create.getWarehouseId()))
-                .orElseThrow(() -> new WarehouseSigningNotFoundException(create.getWarehouseId()));
+        warehouseService.findOrNotFound(new WarehouseSigningByIdFinderDto(create.getWarehouseId()));
 
         return getMapper(MapWSSToWorkshopSigningDto.class)
                 .from(repository.create(create));
@@ -135,10 +134,9 @@ public class WorkshopSigningServiceImpl implements WorkshopSigningService {
     }
 
     protected void validateWarehouseSigningActive(WorkshopSigningCreateDto workshop) {
-        WarehouseSigningByIdFinder finder = new WarehouseSigningByIdFinder(workshop.getWarehouseId());
+        WarehouseSigningByIdFinderDto finder = new WarehouseSigningByIdFinderDto(workshop.getWarehouseId());
 
-        WarehouseSigning warehouse = warehouseRepository.find(finder)
-                .orElseThrow(() -> new WarehouseSigningNotFoundException(workshop.getWarehouseId()));
+        WarehouseSigningDto warehouse = warehouseService.findOrNotFound(finder);
 
         if (warehouse.getClosedAt() != null)
             throw new WarehouseFinalizedException(warehouse.getId());

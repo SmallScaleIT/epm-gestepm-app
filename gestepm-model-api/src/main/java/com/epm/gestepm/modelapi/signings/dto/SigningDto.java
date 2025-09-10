@@ -15,11 +15,5 @@ public class SigningDto {
     private LocalDateTime startDate;
 
     @NotNull
-    private String signingType;
-
-    @NotNull
     private String detailUrl;
-
-    @NotNull
-    private String projectName;
 }

@@ -149,29 +149,16 @@
     </div>
 </div>
 
-<div id="errorModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">
-                    <h5><spring:message code="create.record.error" /></h5>
-                </div>
-            </div>
+<spring:message code="create.signing.error" var="errorTitle"/>
+<spring:message code="close" var="closeBtn"/>
+<spring:message code="close.record" var="hrefTitleVal"/>
 
-            <div class="modal-body"></div>
-
-            <div class="modal-footer clearfix">
-                <div class="w-100">
-                    <div class="float-left">
-                        <button type="button" class="btn btn-sm" data-dismiss="modal">
-                            <spring:message code="close"/>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<jsp:include page = "../../signings/errorModal.jsp">
+    <jsp:param name="id" value = "errorModal"/>
+    <jsp:param name="modalTitle" value="${errorTitle}"/>
+    <jsp:param name="closeButton" value="${closeBtn}"/>
+    <jsp:param name="hrefTitle" value="${hrefTitleVal}"/>
+</jsp:include>
 
 <script>
 

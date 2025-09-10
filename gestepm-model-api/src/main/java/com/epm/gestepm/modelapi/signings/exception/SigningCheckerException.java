@@ -15,9 +15,5 @@ public class SigningCheckerException extends RuntimeException {
 
     LocalDateTime startDate;
 
-    private String projectName;
-
-    private String signingType;
-
     private String detailUrl;
 }

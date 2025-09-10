@@ -19,7 +19,8 @@ import static com.epm.gestepm.lib.logging.constants.LogLayerMarkers.DAO;
 
 import static com.epm.gestepm.lib.logging.constants.LogOperations.OP_READ;
 import static com.epm.gestepm.model.signings.dao.constants.SigningQueries.*;
-import static com.epm.gestepm.model.signings.workshop.dao.mappers.WorkshopSigningRowMapper.COL_WSS_ID;
+
+import static com.epm.gestepm.model.signings.dao.mappers.SigningRowMapper.*;
 
 @Component("signingDao")
 @EnableExecutionLog(layerMarker = DAO)
@@ -50,7 +51,7 @@ public class SigningDaoImpl implements SigningDao {
     private void setOrder(final SQLOrderByType order, final String orderBy, final SQLQueryFetchMany<Signing> sqlQuery) {
         final String orderByStatement = StringUtils.isNoneBlank(orderBy) && !orderBy.equals("id")
                 ? this.getOrderColumn(orderBy)
-                : COL_WSS_ID;
+                : COL_SGN_ID;
         final SQLOrderByType orderStatement = order != null
                 ? order
                 : SQLOrderByType.DESC;
