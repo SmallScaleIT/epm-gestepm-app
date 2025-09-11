@@ -99,6 +99,7 @@ sql:
       -- ${sql.predicate-for-i-project-id}
       -- ${sql.predicate-for-i-start-date}
       -- ${sql.predicate-for-i-end-date}
+      -- ${sql.predicate-for-i-current}
     -- AND]
 
   filter-i-by-id: |
@@ -130,3 +131,6 @@ sql:
   predicate-for-i-end-date: |
     
     i.end_date > :attr_i_end_date
+
+  predicate-for-i-current: |
+    ((:attr_i_current IS TRUE AND i.end_date IS NULL) OR (:attr_i_current IS FALSE AND i.end_date IS NOT NULL))

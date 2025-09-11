@@ -5,7 +5,7 @@ import com.epm.gestepm.modelapi.usermanualsigning.dto.UserManualSigning;
 import com.epm.gestepm.modelapi.usermanualsigning.dto.UserManualSigningTableDTO;
 import com.epm.gestepm.modelapi.usermanualsigning.service.UserManualSigningService;
 import com.epm.gestepm.modelapi.common.utils.datatables.PaginationCriteria;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,10 +14,10 @@ import java.util.List;
 
 @Service
 @Transactional
+@AllArgsConstructor
 public class UserManualSigningServiceImpl implements UserManualSigningService {
 
-    @Autowired
-    private UserManualSigningRepository userManualSigningRepository;
+    private final UserManualSigningRepository userManualSigningRepository;
 
     @Override
     public UserManualSigning getById(Long id) {

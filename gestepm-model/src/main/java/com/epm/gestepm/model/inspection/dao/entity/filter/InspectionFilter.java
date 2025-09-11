@@ -26,6 +26,8 @@ public class InspectionFilter extends Orderable implements CollectableAttributes
 
   private LocalDateTime endDate;
 
+  private Boolean current;
+
   @Override
   public AttributeMap collectAttributes() {
 
@@ -36,6 +38,7 @@ public class InspectionFilter extends Orderable implements CollectableAttributes
     map.put(ATTR_NPS_P_ID, this.projectId);
     map.putTimestamp(ATTR_I_START_DATE, this.startDate);
     map.putTimestamp(ATTR_I_END_DATE, this.endDate);
+    map.put(ATTR_I_CURRENT, this.current);
 
     return map;
   }

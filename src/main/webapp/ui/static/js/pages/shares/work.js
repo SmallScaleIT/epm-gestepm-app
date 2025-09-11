@@ -131,8 +131,8 @@ function create() {
         }).then((response) => {
             const work = response.data.data;
             window.location.replace('/shares/work/' + work.id);
-        }).catch(error => showNotify(error.response.data.detail, 'danger'))
-            .finally(() => hideLoading());
+        }).catch(error => showError(error, 'errorModal'))
+        .finally(() => hideLoading());
     }
 }
 

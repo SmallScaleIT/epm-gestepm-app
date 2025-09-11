@@ -139,6 +139,17 @@
     </div>
 </div>
 
+<spring:message code="create.signing.error" var="errorTitle"/>
+<spring:message code="close" var="closeBtn"/>
+<spring:message code="close.record" var="hrefTitleVal"/>
+
+<jsp:include page = "../../signings/errorModal.jsp">
+    <jsp:param name="id" value = "errorModal"/>
+    <jsp:param name="modalTitle" value="${errorTitle}"/>
+    <jsp:param name="closeButton" value="${closeBtn}"/>
+    <jsp:param name="hrefTitle" value="${hrefTitleVal}"/>
+</jsp:include>
+
 <script type="text/javascript" src="${pageContext.request.contextPath}/webjars/bootstrap-select/1.13.17/js/bootstrap-select.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/ui/static/js/select2/select2-utils.js?v=<%= System.currentTimeMillis() %>"></script>
 

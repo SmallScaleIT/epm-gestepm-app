@@ -18,6 +18,7 @@ import com.epm.gestepm.model.shares.work.dao.entity.filter.WorkShareFilter;
 import com.epm.gestepm.model.shares.work.dao.entity.finder.WorkShareByIdFinder;
 import com.epm.gestepm.model.shares.work.dao.entity.updater.WorkShareUpdate;
 import com.epm.gestepm.model.shares.work.service.mapper.*;
+import com.epm.gestepm.model.signings.checker.HasActiveSigningChecker;
 import com.epm.gestepm.model.user.utils.UserUtils;
 import com.epm.gestepm.modelapi.common.utils.Utiles;
 import com.epm.gestepm.modelapi.customer.dto.CustomerDto;
@@ -79,6 +80,8 @@ public class WorkShareServiceImpl implements WorkShareService {
     private final ShareDateChecker shareDateChecker;
 
     private final UserUtils userUtils;
+
+    private final HasActiveSigningChecker activeChecker;
 
     @Override
     @RequirePermits(value = PRMT_READ_WS, action = "List work shares")
@@ -147,6 +150,9 @@ public class WorkShareServiceImpl implements WorkShareService {
             msgOut = "New work share created OK",
             errorMsg = "Failed to create new work share")
     public WorkShareDto create(WorkShareCreateDto createDto) {
+
+        this.activeChecker.validateSigningChecker(createDto.getUserId());
+
         final WorkShareCreate create = getMapper(MapWSToWorkShareCreate.class).from(createDto);
         create.setStartDate(LocalDateTime.now());
 

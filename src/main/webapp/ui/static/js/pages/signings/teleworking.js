@@ -110,7 +110,7 @@ function startTeleworking(projectId, location) {
         startedLocation: location
     }).then(() => {
         window.location.reload();
-    }).catch(error => showNotify(error.response.data.detail, 'danger'));
+    }).catch(error => showError(error, 'errorModal'));
 }
 
 function endTeleworking(location) {

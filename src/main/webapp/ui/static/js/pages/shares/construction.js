@@ -131,7 +131,7 @@ function create() {
         }).then((response) => {
             const construction = response.data.data;
             window.location.replace('/shares/construction/' + construction.id);
-        }).catch(error => showNotify(error.response.data.detail, 'danger'))
+        }).catch(error => showError(error, 'errorModal'))
             .finally(() => hideLoading());
     }
 }

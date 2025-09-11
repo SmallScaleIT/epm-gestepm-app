@@ -15,6 +15,7 @@ import com.epm.gestepm.model.shares.noprogrammed.dao.entity.finder.NoProgrammedS
 import com.epm.gestepm.model.shares.noprogrammed.dao.entity.updater.NoProgrammedShareUpdate;
 import com.epm.gestepm.model.shares.noprogrammed.decorator.NoProgrammedSharePostCreationDecorator;
 import com.epm.gestepm.model.shares.noprogrammed.service.mapper.*;
+import com.epm.gestepm.model.signings.checker.HasActiveSigningChecker;
 import com.epm.gestepm.modelapi.shares.noprogrammed.dto.NoProgrammedShareDto;
 import com.epm.gestepm.modelapi.shares.noprogrammed.dto.NoProgrammedShareStateEnumDto;
 import com.epm.gestepm.modelapi.shares.noprogrammed.dto.creator.NoProgrammedShareCreateDto;
@@ -53,6 +54,8 @@ public class NoProgrammedShareServiceImpl implements NoProgrammedShareService {
     private final NoProgrammedSharePostCreationDecorator noProgrammedSharePostCreationDecorator;
 
     private final ShareDateChecker shareDateChecker;
+
+    private final HasActiveSigningChecker activeChecker;
 
     @Override
     @RequirePermits(value = PRMT_READ_NPS, action = "List no programmed shares")
@@ -121,6 +124,7 @@ public class NoProgrammedShareServiceImpl implements NoProgrammedShareService {
             msgOut = "New no programmed share created OK",
             errorMsg = "Failed to create new no programmed share")
     public NoProgrammedShareDto create(NoProgrammedShareCreateDto createDto) {
+        this.activeChecker.validateSigningChecker(createDto.getUserId());
         this.noProgrammedShareChecker.checker(createDto);
 
         final NoProgrammedShareCreate create = getMapper(MapNPSToNoProgrammedShareCreate.class).from(createDto);
