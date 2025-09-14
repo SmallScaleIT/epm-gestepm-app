@@ -74,10 +74,6 @@
     <definition name="time-control-detail" extends="fullFrameLayout">
         <put-attribute name="body" value="/ui/jsp/view/signing/time_control/detail.jsp" />
     </definition>
-
-    <definition name="modified-list" extends="fullFrameLayout">
-        <put-attribute name="body" value="/ui/jsp/view/signing/modified_list.jsp" />
-    </definition>
     
     <!-- Expenses -->
     <definition name="personal-expense-sheets" extends="fullFrameLayout">
