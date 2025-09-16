@@ -1,6 +1,6 @@
 package com.epm.gestepm.model.signings.warehouse.dao.constants;
 
-public abstract class WarehouseSigningsQueries {
+public abstract class WarehouseSigningQueries {
     public static final String QRY_PAGE_OF_WHS = "qry-page-of-whs";
 
     public static final String QRY_LIST_OF_WHS = "qry-list-of-whs";
