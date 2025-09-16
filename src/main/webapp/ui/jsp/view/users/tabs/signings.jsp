@@ -92,46 +92,6 @@
     </div>
 </div>
 
-<div id="editModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">
-                    <h5><spring:message code="edit" /></h5>
-                </div>
-            </div>
-
-            <div class="modal-body">
-                <form id="editForm">
-                    <input name="shareId" type="hidden" />
-                    <input name="shareType" type="hidden" />
-
-                    <div class="row">
-                        <div class="col-6">
-                            <input type="datetime-local" class="form-control input" name="startDate">
-                        </div>
-
-                        <div class="col-6">
-                            <input type="datetime-local" class="form-control input" name="endDate">
-                        </div>
-                    </div>
-                </form>
-            </div>
-
-            <div class="modal-footer clearfix">
-                <div class="w-100">
-                    <div class="float-left">
-                        <button type="button" class="btn btn-sm" data-dismiss="modal"><spring:message code="close" /></button>
-                    </div>
-                    <div class="float-right">
-                        <button type="submit" class="btn btn-sm btn-success" onclick="editSigning()"><spring:message code="edit" /></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 <div id="exportModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <form id="exportForm">
         <div class="modal-dialog">
