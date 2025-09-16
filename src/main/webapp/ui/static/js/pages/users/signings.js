@@ -57,8 +57,6 @@ function initializeCalendar() {
 
             if (detailUrl) {
                 window.location.href = detailUrl;
-            } else {
-                loadModalForm(calendarSigning);
             }
         }
     });
@@ -116,49 +114,6 @@ function createSigning() {
             .then(() => calendar.refetchEvents())
             .catch(error => showNotify(error.response.data.detail, 'danger'))
             .finally(() => { hideLoading(); createModal.modal('hide'); });
-    }
-}
-
-function loadModalForm(calendarSigning) {
-    const allowedTypes = ['CONSTRUCTION_SHARES', 'DISPLACEMENT_SHARES', 'INSPECTIONS', 'MANUAL_SIGNINGS',
-        'PERSONAL_SIGNINGS', 'PROGRAMMED_SHARES', 'WORK_SHARES'];
-
-    const id = calendarSigning.id;
-    const type = calendarSigning.extendedProps.type;
-
-    if (!allowedTypes.some(allowedType => type.includes(allowedType))) {
-        return;
-    }
-
-    const startDate = new Date(calendarSigning.start).toISOString().slice(0, 16);
-    const endDate = new Date(calendarSigning.end).toISOString().slice(0, 16);
-
-    const form = document.querySelector('#editForm');
-
-    form.querySelector('[name="shareId"]').value = id;
-    form.querySelector('[name="shareType"]').value = type;
-    form.querySelector('[name="startDate"]').value = startDate;
-    form.querySelector('[name="endDate"]').value = endDate;
-
-    $('#editModal').modal('show');
-}
-
-function editSigning() {
-
-    const editModal = $('#editModal');
-    const editFromJQ = $('#editForm');
-
-    if (!isValidForm('#editForm')) {
-        editFromJQ.addClass('was-validated');
-    } else {
-
-        showLoading();
-        editFromJQ.removeClass('was-validated');
-
-        axios.post('/signing/share/update', editFromJQ.serialize())
-            .then(() => calendar.refetchEvents())
-            .catch(error => showNotify(error.response.data.detail, 'danger'))
-            .finally(() => { hideLoading(); editModal.modal('hide'); });
     }
 }
 
