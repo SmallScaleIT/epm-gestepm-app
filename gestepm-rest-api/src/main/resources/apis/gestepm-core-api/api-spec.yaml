@@ -2950,7 +2950,7 @@ paths:
   '/v1/signings/personal/{personalSigningId}':
     parameters:
       - schema:
-          type: string
+          type: integer
         name: personalSigningId
         in: path
         required: true

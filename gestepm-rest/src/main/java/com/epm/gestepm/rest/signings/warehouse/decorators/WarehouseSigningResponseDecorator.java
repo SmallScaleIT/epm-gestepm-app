@@ -11,7 +11,7 @@ import com.epm.gestepm.modelapi.project.service.ProjectService;
 import com.epm.gestepm.modelapi.signings.workshop.dto.finder.WorkshopSigningByIdFinderDto;
 import com.epm.gestepm.modelapi.signings.workshop.service.WorkshopSigningService;
 import com.epm.gestepm.rest.project.mappers.MapPRToProjectResponse;
-import com.epm.gestepm.rest.signings.teleworking.request.TeleworkingSigningFindRestRequest;
+import com.epm.gestepm.rest.signings.warehouse.request.WarehouseSigningFindRestRequest;
 import com.epm.gestepm.rest.signings.workshop.mappers.MapWSSToWorkshopSigningResponse;
 import com.epm.gestepm.restapi.openapi.model.Project;
 import com.epm.gestepm.restapi.openapi.model.User;
@@ -61,7 +61,7 @@ public class WarehouseSigningResponseDecorator extends BaseResponseDataDecorator
     public void decorate(RestRequest request, WarehouseSigning data) {
 
         if (request.getLinks()) {
-            final TeleworkingSigningFindRestRequest selfReq = new TeleworkingSigningFindRestRequest(data.getId());
+            final WarehouseSigningFindRestRequest selfReq = new WarehouseSigningFindRestRequest(data.getId());
             selfReq.commonValuesFrom(request);
         }
 

@@ -23,7 +23,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -49,7 +48,7 @@ public class PersonalSigningServiceImpl implements PersonalSigningService {
             msgIn = "Listing personal signings",
             msgOut = "Listing personal signings OK",
             errorMsg = "Failed to list personal signings")
-    public List<@Valid PersonalSigningDto> list(PersonalSigningFilterDto filterDto) {
+    public List<PersonalSigningDto> list(PersonalSigningFilterDto filterDto) {
 
         final PersonalSigningFilter filter = getMapper(MapPRSToPersonalSigningFilter.class)
                 .from(filterDto);
@@ -65,7 +64,7 @@ public class PersonalSigningServiceImpl implements PersonalSigningService {
             msgIn = "Paginating personal signings",
             msgOut = "Paginating personal signings OK",
             errorMsg = "Failed to paginate personal signings")
-    public Page<@Valid PersonalSigningDto> list(PersonalSigningFilterDto filterDto, Long offset, Long limit) {
+    public Page<PersonalSigningDto> list(PersonalSigningFilterDto filterDto, Long offset, Long limit) {
 
         final PersonalSigningFilter filter = getMapper(MapPRSToPersonalSigningFilter.class)
                 .from(filterDto);
@@ -81,7 +80,7 @@ public class PersonalSigningServiceImpl implements PersonalSigningService {
             msgIn = "Finding personal signing by ID, result can be empty",
             msgOut = "Found personal signing by ID",
             errorMsg = "Failed to find personal signing by ID")
-    public Optional<@Valid PersonalSigningDto> find(PersonalSigningByIdFinderDto finderDto) {
+    public Optional<PersonalSigningDto> find(PersonalSigningByIdFinderDto finderDto) {
 
         final PersonalSigningByIdFinder finder = getMapper(MapPRSToPersonalSigningByIdFinder.class)
                 .from(finderDto);

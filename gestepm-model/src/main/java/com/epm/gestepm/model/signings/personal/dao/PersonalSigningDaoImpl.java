@@ -22,7 +22,6 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
-import javax.validation.Valid;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
@@ -46,7 +45,7 @@ public class PersonalSigningDaoImpl implements PersonalSigningDao {
             msgIn = "Querying list of personal signings",
             msgOut = "Querying list of personal signings OK",
             errorMsg = "Failed to query list of personal signings")
-    public List<@Valid PersonalSigning> list(PersonalSigningFilter filter) {
+    public List<PersonalSigning> list(PersonalSigningFilter filter) {
 
         SQLQueryFetchMany<PersonalSigning> sqlQuery = new SQLQueryFetchMany<PersonalSigning>()
                 .useQuery(QRY_LIST_OF_PRS)
@@ -65,11 +64,11 @@ public class PersonalSigningDaoImpl implements PersonalSigningDao {
             msgIn = "Querying page of personal signings",
             msgOut = "Querying page of personal signings OK",
             errorMsg = "Failed to query page of personal signings")
-    public Page<@Valid PersonalSigning> list(PersonalSigningFilter filter, Long offset, Long limit) {
+    public Page<PersonalSigning> list(PersonalSigningFilter filter, Long offset, Long limit) {
 
         SQLQueryFetchPage<PersonalSigning> sqlQuery = new SQLQueryFetchPage<PersonalSigning>()
                 .useRowMapper(new PersonalSigningRowMapper())
-                .useQuery(QRY_LIST_OF_PRS)
+                .useQuery(QRY_PAGE_OF_PRS)
                 .useCountQuery(QRY_COUNT_OF_PRS)
                 .useFilter(FILTER_PRS_BY_PARAMS)
                 .limit(limit)
@@ -87,7 +86,7 @@ public class PersonalSigningDaoImpl implements PersonalSigningDao {
             msgIn = "Querying to find personal signing by ID",
             msgOut = "Querying to find personal signing by ID OK",
             errorMsg = "Failed query to find personal signing by ID")
-    public Optional<@Valid PersonalSigning> find(PersonalSigningByIdFinder finder) {
+    public Optional<PersonalSigning> find(PersonalSigningByIdFinder finder) {
 
         SQLQueryFetchOne<PersonalSigning> sqlQuery = new SQLQueryFetchOne<PersonalSigning>()
                 .useRowMapper(new PersonalSigningRowMapper())
@@ -104,7 +103,7 @@ public class PersonalSigningDaoImpl implements PersonalSigningDao {
             msgIn = "Querying to find personal signing by ID",
             msgOut = "Querying to find personal signing by ID OK",
             errorMsg = "Failed query to find personal signing by ID")
-    public Optional<@Valid PersonalSigningUpdate> findUpdate(PersonalSigningByIdFinder finder) {
+    public Optional<PersonalSigningUpdate> findUpdate(PersonalSigningByIdFinder finder) {
 
         SQLQueryFetchOne<PersonalSigningUpdate> sqlQuery = new SQLQueryFetchOne<PersonalSigningUpdate>()
                 .useRowMapper(new PersonalSigningUpdateRowMapper())
