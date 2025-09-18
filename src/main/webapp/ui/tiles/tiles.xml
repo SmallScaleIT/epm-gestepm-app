@@ -59,6 +59,10 @@
         <put-attribute name="body" value="/ui/jsp/view/signings/warehouse/workshop/view.jsp" />
     </definition>
 
+    <definition name="personal-signing-view" extends="fullFrameLayout">
+        <put-attribute name="body" value="/ui/jsp/view/signings/personal/view.jsp" />
+    </definition>
+
     <definition name="manual-signing" extends="fullFrameLayout">
         <put-attribute name="body" value="/ui/jsp/view/signing/manual.jsp" />
     </definition>

@@ -179,7 +179,17 @@
             }
         },
         "personal": {
-            "name": "Fichaje de horario personal"
+            "name": "Fichaje de horario personal",
+            "create": {
+                "success": "Fichaje Personal con id {0} creado con éxito."
+            },
+            "update": {
+                "success": "Fichaje Personal con id {0} actualizado con éxito."
+            },
+            "delete": {
+                "alert": "¿Está seguro que quiere borrar el fichaje personal {0}?",
+                "success": "Fichaje personal nº {0} eliminado con éxito."
+            }
         }
     },
     "shares": {
