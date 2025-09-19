@@ -3,7 +3,7 @@ sql:
   qry-list-of-prs: |
     
     SELECT
-      prs.id,
+      prs.personal_signings_id,
       prs.user_id,
       prs.start_date,
       prs.end_date
@@ -19,10 +19,10 @@ sql:
 
   qry-count-of-prs: |
     
-    SELECT COUNT(DISTINCT personal_signing_id) AS "count"
+    SELECT COUNT(DISTINCT personal_signings_id) AS "count"
     FROM (
       SELECT
-        prs.id AS personal_signing_id
+        prs.personal_signings_id
       FROM ${sch-gestepm}.personal_signings prs
       #whereToken #filter
     ) final
@@ -47,11 +47,11 @@ sql:
     SET
       start_date = :attr_prs_start_date,
       end_date = :attr_prs_end_date
-    WHERE id = :attr_prs_id
+    WHERE personal_signings_id = :attr_prs_id
 
   qry-delete-prs: |
     
-    DELETE FROM ${sch-gestepm}.personal_signings WHERE id = :attr_prs_id
+    DELETE FROM ${sch-gestepm}.personal_signings WHERE personal_signings_id = :attr_prs_id
 
   filter-prs-by-params: |
     
@@ -70,11 +70,11 @@ sql:
 
   predicate-for-prs-id: |
     
-    prs.id = :attr_prs_id
+    prs.personal_signings_id = :attr_prs_id
 
   predicate-for-prs-ids: |
     
-    prs.id IN (:attr_prs_ids)
+    prs.personal_signings_id IN (:attr_prs_ids)
 
   predicate-for-prs-u-id: |
     
