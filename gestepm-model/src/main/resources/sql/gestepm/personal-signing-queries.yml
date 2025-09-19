@@ -3,11 +3,11 @@ sql:
   qry-list-of-prs: |
     
     SELECT
-      prs.personal_signings_id,
+      prs.personal_signing_id,
       prs.user_id,
       prs.start_date,
       prs.end_date
-    FROM ${sch-gestepm}.personal_signings prs
+    FROM ${sch-gestepm}.personal_signing prs
     
     #whereToken #filter
     #orderByToken
@@ -19,17 +19,17 @@ sql:
 
   qry-count-of-prs: |
     
-    SELECT COUNT(DISTINCT personal_signings_id) AS "count"
+    SELECT COUNT(DISTINCT personal_signing_id) AS "count"
     FROM (
       SELECT
-        prs.personal_signings_id
-      FROM ${sch-gestepm}.personal_signings prs
+        prs.personal_signing_id
+      FROM ${sch-gestepm}.personal_signing prs
       #whereToken #filter
     ) final
 
   qry-create-prs: |
     
-    INSERT INTO ${sch-gestepm}.personal_signings (
+    INSERT INTO ${sch-gestepm}.personal_signing (
       user_id,
       start_date,
       end_date
@@ -43,21 +43,21 @@ sql:
   qry-update-prs: |
     
     UPDATE
-      ${sch-gestepm}.personal_signings 
+      ${sch-gestepm}.personal_signing
     SET
       start_date = :attr_prs_start_date,
       end_date = :attr_prs_end_date
-    WHERE personal_signings_id = :attr_prs_id
+    WHERE personal_signing_id = :attr_prs_id
 
   qry-delete-prs: |
     
-    DELETE FROM ${sch-gestepm}.personal_signings WHERE personal_signings_id = :attr_prs_id
+    DELETE FROM ${sch-gestepm}.personal_signing WHERE personal_signing_id = :attr_prs_id
 
   filter-prs-by-params: |
     
     --[AND
       -- ${sql.predicate-for-prs-ids}
-      -- ${sql.predicate-for-prs-u-id}
+      -- ${sql.predicate-for-prs-u-ids}
       -- ${sql.predicate-for-prs-start-date}
       -- ${sql.predicate-for-prs-end-date}
     --AND]
@@ -70,15 +70,15 @@ sql:
 
   predicate-for-prs-id: |
     
-    prs.personal_signings_id = :attr_prs_id
+    prs.personal_signing_id = :attr_prs_id
 
   predicate-for-prs-ids: |
     
-    prs.personal_signings_id IN (:attr_prs_ids)
+    prs.personal_signing_id IN (:attr_prs_ids)
 
-  predicate-for-prs-u-id: |
+  predicate-for-prs-u-ids: |
     
-    prs.user_id IN (:attr_prs_user_id)
+    prs.user_id IN (:attr_prs_user_ids)
 
   predicate-for-prs-start-date: |
     

@@ -11,7 +11,10 @@ public class PersonalSigningUpdateDto {
     @NotNull
     private Integer id;
 
+    @NotNull
     private LocalDateTime startDate;
 
+    @NotNull
     private LocalDateTime endDate;
+
 }

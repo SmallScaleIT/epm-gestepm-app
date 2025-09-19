@@ -19,8 +19,6 @@ public interface PersonalSigningDao {
 
     Optional<@Valid PersonalSigning> find(@Valid PersonalSigningByIdFinder finder);
 
-    Optional<@Valid PersonalSigningUpdate> findUpdate(@Valid PersonalSigningByIdFinder finder);
-
     @Valid
     PersonalSigning create(@Valid PersonalSigningCreate create);
 

@@ -17,7 +17,6 @@ import com.epm.gestepm.model.signings.personal.dao.entity.filter.PersonalSigning
 import com.epm.gestepm.model.signings.personal.dao.entity.finder.PersonalSigningByIdFinder;
 import com.epm.gestepm.model.signings.personal.dao.entity.updater.PersonalSigningUpdate;
 import com.epm.gestepm.model.signings.personal.dao.mappers.PersonalSigningRowMapper;
-import com.epm.gestepm.model.signings.personal.dao.mappers.PersonalSigningUpdateRowMapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -47,7 +46,7 @@ public class PersonalSigningDaoImpl implements PersonalSigningDao {
             errorMsg = "Failed to query list of personal signings")
     public List<PersonalSigning> list(PersonalSigningFilter filter) {
 
-        SQLQueryFetchMany<PersonalSigning> sqlQuery = new SQLQueryFetchMany<PersonalSigning>()
+        final SQLQueryFetchMany<PersonalSigning> sqlQuery = new SQLQueryFetchMany<PersonalSigning>()
                 .useQuery(QRY_LIST_OF_PRS)
                 .useRowMapper(new PersonalSigningRowMapper())
                 .useFilter(FILTER_PRS_BY_PARAMS)
@@ -55,7 +54,7 @@ public class PersonalSigningDaoImpl implements PersonalSigningDao {
 
         this.setOrder(filter.getOrder(),filter.getOrderBy(), sqlQuery);
 
-        return datasource.fetch(sqlQuery);
+        return this.datasource.fetch(sqlQuery);
     }
 
     @Override
@@ -66,7 +65,7 @@ public class PersonalSigningDaoImpl implements PersonalSigningDao {
             errorMsg = "Failed to query page of personal signings")
     public Page<PersonalSigning> list(PersonalSigningFilter filter, Long offset, Long limit) {
 
-        SQLQueryFetchPage<PersonalSigning> sqlQuery = new SQLQueryFetchPage<PersonalSigning>()
+        final SQLQueryFetchPage<PersonalSigning> sqlQuery = new SQLQueryFetchPage<PersonalSigning>()
                 .useRowMapper(new PersonalSigningRowMapper())
                 .useQuery(QRY_PAGE_OF_PRS)
                 .useCountQuery(QRY_COUNT_OF_PRS)
@@ -77,7 +76,7 @@ public class PersonalSigningDaoImpl implements PersonalSigningDao {
 
         this.setOrder(filter.getOrder(), filter.getOrderBy(), sqlQuery);
 
-        return datasource.fetch(sqlQuery);
+        return this.datasource.fetch(sqlQuery);
     }
 
     @Override
@@ -88,30 +87,13 @@ public class PersonalSigningDaoImpl implements PersonalSigningDao {
             errorMsg = "Failed query to find personal signing by ID")
     public Optional<PersonalSigning> find(PersonalSigningByIdFinder finder) {
 
-        SQLQueryFetchOne<PersonalSigning> sqlQuery = new SQLQueryFetchOne<PersonalSigning>()
+        final SQLQueryFetchOne<PersonalSigning> sqlQuery = new SQLQueryFetchOne<PersonalSigning>()
                 .useRowMapper(new PersonalSigningRowMapper())
                 .useQuery(QRY_LIST_OF_PRS)
                 .useFilter(FILTER_PRS_BY_ID)
                 .withParams(finder.collectAttributes());
 
-        return datasource.fetch(sqlQuery);
-    }
-
-    @Override
-    @LogExecution(operation = OP_READ,
-            debugOut = true,
-            msgIn = "Querying to find personal signing by ID",
-            msgOut = "Querying to find personal signing by ID OK",
-            errorMsg = "Failed query to find personal signing by ID")
-    public Optional<PersonalSigningUpdate> findUpdate(PersonalSigningByIdFinder finder) {
-
-        SQLQueryFetchOne<PersonalSigningUpdate> sqlQuery = new SQLQueryFetchOne<PersonalSigningUpdate>()
-                .useRowMapper(new PersonalSigningUpdateRowMapper())
-                .useQuery(QRY_LIST_OF_PRS)
-                .useFilter(FILTER_PRS_BY_ID)
-                .withParams(finder.collectAttributes());
-
-        return datasource.fetch(sqlQuery);
+        return this.datasource.fetch(sqlQuery);
     }
 
     @Override
@@ -122,14 +104,14 @@ public class PersonalSigningDaoImpl implements PersonalSigningDao {
             errorMsg = "Failed to persist new personal signing")
     public PersonalSigning create(PersonalSigningCreate create) {
 
-        PersonalSigningByIdFinder finder = new PersonalSigningByIdFinder();
+        final PersonalSigningByIdFinder finder = new PersonalSigningByIdFinder();
 
-        SQLInsert<BigInteger> sqlInsert = new SQLInsert<BigInteger>()
+        final SQLInsert<BigInteger> sqlInsert = new SQLInsert<BigInteger>()
                 .useQuery(QRY_CREATE_PRS)
                 .withParams(create.collectAttributes())
                 .onGeneratedKey(id -> finder.setId(id.intValue()));
 
-        datasource.insert(sqlInsert);
+        this.datasource.insert(sqlInsert);
 
         return find(finder).orElse(null);
     }
@@ -142,11 +124,11 @@ public class PersonalSigningDaoImpl implements PersonalSigningDao {
             errorMsg = "Failed to persist update for personal signing")
     public PersonalSigning update(PersonalSigningUpdate update) {
 
-        SQLQuery sqlUpdate = new SQLQuery()
+        final SQLQuery sqlUpdate = new SQLQuery()
                 .useQuery(QRY_UPDATE_PRS)
                 .withParams(update.collectAttributes());
 
-        datasource.execute(sqlUpdate);
+        this.datasource.execute(sqlUpdate);
 
         return find(new PersonalSigningByIdFinder(update.getId())).orElse(null);
     }
@@ -159,11 +141,11 @@ public class PersonalSigningDaoImpl implements PersonalSigningDao {
             errorMsg = "Failed to persist delete for personal signing")
     public void delete(PersonalSigningDelete delete) {
 
-        SQLQuery query = new SQLQuery()
+        final SQLQuery query = new SQLQuery()
                 .useQuery(QRY_DELETE_PRS)
                 .withParams(delete.collectAttributes());
 
-        datasource.execute(query);
+        this.datasource.execute(query);
     }
 
     private void setOrder(final SQLOrderByType order, final String orderBy, final SQLQueryFetchMany<PersonalSigning> sqlQuery) {

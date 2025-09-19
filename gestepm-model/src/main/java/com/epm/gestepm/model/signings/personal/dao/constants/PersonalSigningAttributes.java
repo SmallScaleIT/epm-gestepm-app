@@ -8,6 +8,8 @@ public abstract class PersonalSigningAttributes {
 
     public static final String ATTR_PRS_USER_ID = "attr_prs_user_id";
 
+    public static final String ATTR_PRS_USER_IDS = "attr_prs_user_ids";
+
     public static final String ATTR_PRS_START_DATE = "attr_prs_start_date";
 
     public static final String ATTR_PRS_END_DATE = "attr_prs_end_date";

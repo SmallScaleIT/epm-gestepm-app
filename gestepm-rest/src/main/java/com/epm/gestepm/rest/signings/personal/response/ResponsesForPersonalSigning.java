@@ -10,14 +10,14 @@ import static org.mapstruct.factory.Mappers.getMapper;
 
 public interface ResponsesForPersonalSigning {
 
-    default ResponseEntity<CreatePersonalSigningV1200Response> toResPersonalSigningResponse(PersonalSigning data) {
+    default ResponseEntity<CreatePersonalSigningV1200Response> toResPersonalSigningResponse(final PersonalSigning data) {
         final CreatePersonalSigningV1200Response response = new CreatePersonalSigningV1200Response();
         response.setData(data);
 
         return ResponseEntity.ok(response);
     }
 
-    default ResponseEntity<CreatePersonalSigningV1200Response> toResPersonalSigningResponse(APIMetadata metaData, PersonalSigning data) {
+    default ResponseEntity<CreatePersonalSigningV1200Response> toResPersonalSigningResponse(final APIMetadata metaData, final PersonalSigning data) {
         if (metaData == null)
             return toResPersonalSigningResponse(data);
 
@@ -28,13 +28,14 @@ public interface ResponsesForPersonalSigning {
         return ResponseEntity.ok(response);
     }
 
-    default ResponseEntity<CreatePersonalSigningV1200Response> toResPersonalSigningResponse(APIMetadata metaData, PersonalSigning data
-                                                                    , Object eTag) {
+    default ResponseEntity<CreatePersonalSigningV1200Response> toResPersonalSigningResponse(final APIMetadata metaData, final PersonalSigning data
+                                                                    , final Object eTag) {
 
-        if (eTag == null)
+        if (eTag == null) {
             return toResPersonalSigningResponse(metaData, data);
+        }
 
-        CreatePersonalSigningV1200Response response = new CreatePersonalSigningV1200Response();
+        final CreatePersonalSigningV1200Response response = new CreatePersonalSigningV1200Response();
         response.setMetadata(getMapper(MetadataMapper.class).from(metaData));
         response.setData(data);
 

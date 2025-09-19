@@ -16,6 +16,7 @@ public class PersonalSigningUpdate implements AuditUpdate, CollectableAttributes
     @NotNull
     private Integer id;
 
+    @NotNull
     private LocalDateTime startDate;
 
     @NotNull
@@ -24,7 +25,7 @@ public class PersonalSigningUpdate implements AuditUpdate, CollectableAttributes
     @Override
     public AttributeMap collectAttributes() {
 
-        AttributeMap attributes = new AttributeMap();
+        final AttributeMap attributes = new AttributeMap();
 
         attributes.put(ATTR_PRS_ID, this.id);
         attributes.putTimestamp(ATTR_PRS_START_DATE, this.startDate);

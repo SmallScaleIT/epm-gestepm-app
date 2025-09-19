@@ -29,7 +29,7 @@ public class PersonalSigningFilter extends Orderable implements CollectableAttri
         AttributeMap attributes = new AttributeMap();
 
         attributes.putList(ATTR_PRS_IDS, this.ids);
-        attributes.putList(ATTR_PRS_USER_ID, this.userIds);
+        attributes.putList(ATTR_PRS_USER_IDS, this.userIds);
         attributes.putTimestamp(ATTR_PRS_START_DATE, this.startDate);
         attributes.putTimestamp(ATTR_PRS_END_DATE, this.endDate);
 

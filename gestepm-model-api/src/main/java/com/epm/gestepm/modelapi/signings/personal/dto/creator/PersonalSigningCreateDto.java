@@ -11,7 +11,9 @@ public class PersonalSigningCreateDto {
     @NotNull
     private Integer userId;
 
+    @NotNull
     private LocalDateTime startDate;
 
+    @NotNull
     private LocalDateTime endDate;
 }

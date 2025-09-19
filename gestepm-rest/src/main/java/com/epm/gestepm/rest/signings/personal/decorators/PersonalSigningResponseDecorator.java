@@ -23,28 +23,26 @@ public class PersonalSigningResponseDecorator extends BaseResponseDataDecorator<
 
     private final UserService userService;
 
-    protected PersonalSigningResponseDecorator(ApplicationContext applicationContext, UserService userService) {
+    protected PersonalSigningResponseDecorator(final ApplicationContext applicationContext, final UserService userService) {
         super(applicationContext);
         this.userService = userService;
     }
 
     @Override
-    public void decorate(RestRequest request, PersonalSigning data) {
+    public void decorate(final RestRequest request, final PersonalSigning data) {
 
-        if (request.getLinks())
-        {
+        if (request.getLinks()) {
             final PersonalSigningFindRestRequest selfRequest = new PersonalSigningFindRestRequest(data.getId());
             selfRequest.commonValuesFrom(request);
         }
 
-        if (request.hasExpand(PRS_U_EXPAND))
-        {
+        if (request.hasExpand(PRS_U_EXPAND)) {
+
             final User user = data.getUser();
             final Integer userId = user.getId();
 
-            UserDto userDto = userService.findOrNotFound(new UserByIdFinderDto(userId));
-
-            User response = new User().id(userDto.getId()).name(userDto.getName());
+            final UserDto userDto = userService.findOrNotFound(new UserByIdFinderDto(userId));
+            final User response = new User().id(userDto.getId()).name(userDto.getName());
 
             data.setUser(response);
         }

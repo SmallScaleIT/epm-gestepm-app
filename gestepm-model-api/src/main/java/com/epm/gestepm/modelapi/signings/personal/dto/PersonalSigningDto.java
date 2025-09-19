@@ -17,5 +17,7 @@ public class PersonalSigningDto {
     @NotNull
     private LocalDateTime startDate;
 
+    @NotNull
     private LocalDateTime endDate;
+
 }

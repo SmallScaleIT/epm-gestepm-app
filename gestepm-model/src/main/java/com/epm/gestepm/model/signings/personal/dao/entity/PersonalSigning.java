@@ -19,5 +19,7 @@ public class PersonalSigning implements AuditCreateApprovePaidDischarge, Seriali
     @NotNull
     private LocalDateTime startDate;
 
+    @NotNull
     private LocalDateTime endDate;
+
 }
