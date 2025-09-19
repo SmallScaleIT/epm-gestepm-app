@@ -2974,7 +2974,7 @@ paths:
         - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-meta
         - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-links
         - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-expand
-    patch:
+    put:
       summary: V1- Update personal signing
       tags:
         - personal-signing-v1
