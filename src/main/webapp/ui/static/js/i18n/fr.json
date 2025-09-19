@@ -179,7 +179,17 @@
             }
         },
         "personal": {
-            "name": "Pointage horaire personnel"
+            "name": "Pointage horaire personnel",
+            "create": {
+                "success": "Fichier personnel avec l'identifiant {0} créé avec succès."
+            },
+            "update": {
+                "success": "Fiche personnelle avec l'identifiant {0} mise à jour avec succès."
+            },
+            "delete": {
+                "alert": "Êtes-vous sûr de vouloir supprimer le dossier personnel {0} ?",
+                "success": "Fichier personnel n° {0} supprimé avec succès."
+            }
         }
     },
     "shares": {

@@ -9,23 +9,23 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
-@Table(name = "personal_signings")
+@Table(name = "personal_signing")
 public class PersonalSigning {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "ID", unique = true, nullable = false, precision = 10)
+	@Column(name = "personal_signing_id", unique = true, nullable = false, precision = 10)
 	private Long id;
 
 	@JsonIgnore
 	@ManyToOne
-	@JoinColumn(name = "USER_ID", nullable = false)
+	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 
-	@Column(name = "START_DATE", nullable = false)
+	@Column(name = "start_date", nullable = false)
 	private LocalDateTime startDate;
 
-	@Column(name = "END_DATE")
+	@Column(name = "end_date")
 	private LocalDateTime endDate;
 
 }

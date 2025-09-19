@@ -53,6 +53,7 @@
 						<li><i class="fa fa-home"></i><a href="/signings/teleworking"><spring:message code="sidebar.signing.teleworking" /></a></li>
 						<li><i class="fas fa-pencil-alt"></i><a href="/signing/manual"><spring:message code="sidebar.signing.manual" /></a></li>
 						<li><i class="fas fa-warehouse"></i><a href="/signings/warehouse"><spring:message code="sidebar.signing.warehouse" /></a></li>
+					    <li><i class="fas fa-user"></i><a href="/signings/personal"><spring:message code="sidebar.signing.personal" /></a></li>
 					</ul>
 				</li>
 			</sec:authorize>

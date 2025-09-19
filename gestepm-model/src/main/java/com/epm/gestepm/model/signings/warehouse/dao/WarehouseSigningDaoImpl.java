@@ -28,7 +28,7 @@ import java.util.Optional;
 import static com.epm.gestepm.lib.logging.constants.LogLayerMarkers.DAO;
 
 import static com.epm.gestepm.lib.logging.constants.LogOperations.*;
-import static com.epm.gestepm.model.signings.warehouse.dao.constants.WarehouseSigningsQueries.*;
+import static com.epm.gestepm.model.signings.warehouse.dao.constants.WarehouseSigningQueries.*;
 import static com.epm.gestepm.model.signings.warehouse.dao.mappers.WarehouseSigningRowMapper.*;
 
 @Component("warehouseSigningDao")

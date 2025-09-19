@@ -19,12 +19,6 @@ function initializeDataTables() {
             render: function (data) {
                 return data ? moment(data).format('DD-MM-YYYY HH:mm') : null;
             }
-        },
-        {
-            targets: 4,
-            render: function (data) {
-                return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(data);
-            }
         }
     ]
 

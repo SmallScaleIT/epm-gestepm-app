@@ -2882,6 +2882,139 @@ paths:
           name: projectId
       tags:
         - workshop-signing-v1
+  /v1/signings/personal:
+    get:
+      summary: v1 - List personal signing
+      tags:
+        - personal-signing-v1
+      responses:
+        '200':
+          $ref: '#/components/responses/PersonalSigningList'
+      operationId: list-personal-signings-v1
+      x-stoplight:
+        id: n9px928t7zxk3
+      description: list-personal-signings-v1
+      parameters:
+        - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-meta
+        - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-links
+        - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-expand
+        - $ref: ../../base-api-spec.yaml#/components/parameters/filter-pagination-offset
+        - $ref: ../../base-api-spec.yaml#/components/parameters/filter-pagination-limit
+        - $ref: ../../base-api-spec.yaml#/components/parameters/filter-order
+        - $ref: ../../base-api-spec.yaml#/components/parameters/filter-order-by
+        - schema:
+            type: array
+            items:
+              type: integer
+          in: query
+          name: ids
+          description: Filter by personal signing identificator.
+        - schema:
+            type: array
+            items:
+              type: integer
+          in: query
+          name: userIds
+          description: Filter by user identificator.
+        - schema:
+            type: string
+            format: date-time
+          in: query
+          name: startDate
+          description: Filter by start date
+        - schema:
+            type: string
+            format: date-time
+          in: query
+          name: endDate
+          description: Filter by end date
+    post:
+      summary: v1 - Create personal signing
+      tags:
+        - personal-signing-v1
+      responses:
+        '200':
+          $ref: '#/components/responses/PersonalSigning'
+        '404':
+          description: user-not-found
+          content:
+            application/json:
+              schema:
+                $ref: ../../base-api-spec.yaml#/components/schemas/ResError
+      operationId: create-personal-signing-v1
+      x-stoplight:
+        id: 548hgfdvati5i
+      description: create-personal-signing-v1
+      requestBody:
+        $ref: '#/components/requestBodies/CreatePersonalSigning'
+  '/v1/signings/personal/{personalSigningId}':
+    parameters:
+      - schema:
+          type: integer
+        name: personalSigningId
+        in: path
+        required: true
+    get:
+      summary: V1 - Find personal signing
+      tags:
+        - personal-signing-v1
+      responses:
+        '200':
+          $ref: '#/components/responses/PersonalSigning'
+        '404':
+          description: personal-signing-not-found
+          content:
+            application/json:
+              schema:
+                $ref: ../../base-api-spec.yaml#/components/schemas/ResError
+      operationId: find-personal-signing-by-id-v1
+      description: find-personal-signing-by-id-v1
+      x-stoplight:
+        id: 0v9363rntztwc
+      parameters:
+        - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-meta
+        - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-links
+        - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-expand
+    put:
+      summary: V1- Update personal signing
+      tags:
+        - personal-signing-v1
+      responses:
+        '200':
+          $ref: '#/components/responses/PersonalSigning'
+        '404':
+          description: personal-signing-not-found
+          content:
+            application/json:
+              schema:
+                $ref: ../../base-api-spec.yaml#/components/schemas/ResError
+      operationId: update-personal-signing-v1
+      x-stoplight:
+        id: sn2csh1g6sjkv
+      description: update-personal-signing-v1
+      requestBody:
+        $ref: '#/components/requestBodies/UpdatePersonalSigning'
+    delete:
+      summary: V1 - Delete personal signing
+      tags:
+        - personal-signing-v1
+      responses:
+        '200':
+          description: '**OK**'
+          content:
+            application/json:
+              schema:
+                $ref: ../../base-api-spec.yaml#/components/schemas/ResSuccess
+        '404':
+          description: personal-signing-not-found
+          content:
+            application/json:
+              schema:
+                $ref: ../../base-api-spec.yaml#/components/schemas/ResError
+      operationId: delete-personal-signing-v1
+      x-stoplight:
+        id: zl51yyndmcojx
+      description: delete-personal-signing-v1
 components:
   schemas:
     ConstructionShare:
@@ -3862,6 +3995,33 @@ components:
           type: string
           x-stoplight:
             id: l9y2l16v139oz
+    PersonalSigning:
+      title: PersonalSigning
+      x-stoplight:
+        id: vbx7ha0j58jnn
+      type: object
+      properties:
+        id:
+          type: integer
+          x-stoplight:
+            id: h50mqv53ua511
+        user:
+          $ref: '#/components/schemas/User'
+        startDate:
+          type: string
+          x-stoplight:
+            id: 3thv4u54ip4zt
+          format: date-time
+        endDate:
+          type: string
+          x-stoplight:
+            id: 5xc8w1ohpwkk9
+          format: date-time
+      required:
+        - id
+        - user
+        - startDate
+        - endDate
   securitySchemes:
     bearerAuth:
       type: http
@@ -4322,6 +4482,32 @@ components:
           schema:
             type: string
             format: binary
+    PersonalSigning:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              metadata:
+                $ref: ../../base-api-spec.yaml#/components/schemas/Meta
+              data:
+                $ref: '#/components/schemas/PersonalSigning'
+    PersonalSigningList:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                x-stoplight:
+                  id: 57b70hff89zb0
+                type: array
+                items:
+                  $ref: '#/components/schemas/PersonalSigning'
+              metadata:
+                $ref: ../../base-api-spec.yaml#/components/schemas/Meta
   requestBodies:
     CreateNoProgrammedShare:
       content:
@@ -5399,6 +5585,49 @@ components:
                 type: boolean
                 x-stoplight:
                   id: bm6elje2hl1mo
+    CreatePersonalSigning:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              userId:
+                type: integer
+                x-stoplight:
+                  id: 0t697o7j4weo9
+              startDate:
+                type: string
+                x-stoplight:
+                  id: 8o3hp6t8cxfon
+                format: date-time
+              endDate:
+                type: string
+                x-stoplight:
+                  id: 862xz151igu2v
+                format: date-time
+            required:
+              - userId
+              - startDate
+              - endDate
+    UpdatePersonalSigning:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              startDate:
+                type: string
+                x-stoplight:
+                  id: lndrw9h2b0gfw
+                format: date-time
+              endDate:
+                type: string
+                x-stoplight:
+                  id: 8r86vnec1if3q
+                format: date-time
+            required:
+              - startDate
+              - endDate
   parameters:
     Share-Id:
       name: shareId
@@ -5537,6 +5766,8 @@ tags:
     description: V1 - Warehouse Signing
   - name: workshop-signing-v1
     description: V1 - Workshop Signing
+  - name: personal-signing-v1
+    description: V1 - Personal Signing
   - name: work-share-v1
     description: V1 - Work Share
   - name: work-share-break-v1
