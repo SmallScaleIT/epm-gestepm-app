@@ -1,0 +1,1 @@
+ALTER TABLE personal_signings CHANGE id personal_signings_id int(10) unsigned NOT NULL AUTO_INCREMENT;
