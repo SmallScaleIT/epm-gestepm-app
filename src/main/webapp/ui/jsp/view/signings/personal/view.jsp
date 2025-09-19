@@ -9,10 +9,6 @@
     .right-panel .page-header button {
         margin-top: 0;
     }
-
-    .start-date-info {
-        font-size: 11px;
-    }
 </style>
 
 <div class="row m-0">
@@ -62,7 +58,7 @@
     </div>
 </div>
 
-<div id="editPersonalSigning" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div id="editModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -72,7 +68,7 @@
             </div>
 
             <div class="modal-body">
-                <form id="editPersonalSigningForm" class="needs-validation">
+                <form id="editForm" class="needs-validation">
                     <div class="row">
                         <div class="col-sm-12 col-md-6">
                             <label class="col-form-label w-100"><spring:message code="start.date"/>
@@ -97,7 +93,7 @@
                     </div>
 
                     <div class="float-right">
-                        <button type="button" class="btn btn-sm btn-success" onclick="actionEdit()">
+                        <button id="saveBtn" type="button" class="btn btn-sm btn-success">
                             <spring:message code="edit"/>
                         </button>
                     </div>

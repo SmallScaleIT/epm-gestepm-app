@@ -2968,6 +2968,7 @@ paths:
               schema:
                 $ref: ../../base-api-spec.yaml#/components/schemas/ResError
       operationId: find-personal-signing-by-id-v1
+      description: find-personal-signing-by-id-v1
       x-stoplight:
         id: 0v9363rntztwc
       parameters:
@@ -3999,10 +4000,6 @@ components:
       x-stoplight:
         id: vbx7ha0j58jnn
       type: object
-      required:
-        - id
-        - user
-        - startDate
       properties:
         id:
           type: integer
@@ -4020,6 +4017,11 @@ components:
           x-stoplight:
             id: 5xc8w1ohpwkk9
           format: date-time
+      required:
+        - id
+        - user
+        - startDate
+        - endDate
   securitySchemes:
     bearerAuth:
       type: http
@@ -4489,8 +4491,6 @@ components:
             properties:
               metadata:
                 $ref: ../../base-api-spec.yaml#/components/schemas/Meta
-                x-stoplight:
-                  id: ly1rnfzbq1cln
               data:
                 $ref: '#/components/schemas/PersonalSigning'
     PersonalSigningList:
@@ -4508,8 +4508,6 @@ components:
                   $ref: '#/components/schemas/PersonalSigning'
               metadata:
                 $ref: ../../base-api-spec.yaml#/components/schemas/Meta
-                x-stoplight:
-                  id: lsn62n3fsc8p1
   requestBodies:
     CreateNoProgrammedShare:
       content:
@@ -5592,9 +5590,6 @@ components:
         application/json:
           schema:
             type: object
-            required:
-              - userId
-              - startDate
             properties:
               userId:
                 type: integer
@@ -5610,6 +5605,10 @@ components:
                 x-stoplight:
                   id: 862xz151igu2v
                 format: date-time
+            required:
+              - userId
+              - startDate
+              - endDate
     UpdatePersonalSigning:
       content:
         application/json:
@@ -5626,6 +5625,9 @@ components:
                 x-stoplight:
                   id: 8r86vnec1if3q
                 format: date-time
+            required:
+              - startDate
+              - endDate
   parameters:
     Share-Id:
       name: shareId

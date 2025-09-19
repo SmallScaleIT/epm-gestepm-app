@@ -1,32 +1,24 @@
 const endpoint = "/v1/signings/personal";
-let currentId;
-let rowIndex;
 
 function initializeDataTables() {
     const columns = ['id', 'startDate', 'endDate', 'id'];
-
     const actions = [
         {
-            action: 'edit'
-            , permission: 'edit_personal_signings'
+            action: 'edit',
+            permission: 'edit_personal_signings'
+        },
+        {
+            action: 'delete',
+            permission: 'edit_personal_signings'
         }
     ];
-
     const expand = [];
-
     const filters = [{'userIds': userId}];
-
     const columnDefs = [
         {
-            targets: [1, 2]
-            , render: function(data) {
+            targets: [1, 2],
+            render: function(data) {
                 return data ? moment(data).format('DD-MM-YYYY HH:mm') : null;
-            }
-        }
-        , {
-            targets: 3
-            , render: function(data) {
-                return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(data);
             }
         }
     ];
@@ -36,63 +28,47 @@ function initializeDataTables() {
     customDataTable.setCurrentTable(dTable);
 }
 
-function edit(personalSigningId) {
-    currentId = personalSigningId;
+function edit(id) {
 
-    let allData = dTable.rows().data().toArray();
-    let currentRow = allData.find(item => item.id === personalSigningId);
-    rowIndex = allData.indexOf(currentRow);
+    const editModal = $('#editModal');
+    const saveBtn = $('#saveBtn');
+    const editElement = document.getElementById('editModal');
+    const editForm = editElement.querySelector('#editForm');
 
-    const modal = document.getElementById('editPersonalSigning');
-    
-    if (!modal)
-        return ;
+    axios.get(endpoint + '/' + id).then((response) => {
+        editModal.find('[name="startDate"]').val(response.data.data.startDate);
+        editModal.find('[name="endDate"]').val(response.data.data.endDate);
+        editModal.modal('show');
+    });
 
-    const form = document.getElementById('editPersonalSigningForm');
+    saveBtn.click(function() {
 
-    if (!form)
-        return ;
+        showLoading();
 
-    let startDateField = form.querySelector('[name="startDate"]');
-    let endDateField = form.querySelector('[name="endDate"]');
-
-    if (startDateField)
-        startDateField.value = currentRow.startDate ? moment(currentRow.startDate).format('YYYY-MM-DDTHH:mm') : '';
-
-    if (endDateField)
-        endDateField.value = currentRow.endDate ? moment(currentRow.endDate).format('YYYY-MM-DDTHH:mm') : '';
-
-    $(modal).modal('show');
+        axios.put(endpoint + '/' + id, {
+            startDate: editForm.querySelector('[name="startDate"]').value,
+            endDate: editForm.querySelector('[name="endDate"]').value
+        }).then(() => {
+            dTable.ajax.reload(function() { dTable.page(dTable.page()).draw(false); }, false);
+            showNotify(messages.signings.personal.update.success.replace('{0}', id), 'success');
+        }).catch(error => showNotify(error.response.data.detail, 'danger'))
+            .finally(() => {
+                hideLoading();
+                editModal.modal('hide');
+            });
+    });
 }
 
-function actionEdit() {
-    if (!currentId)
-        return ;
+function remove(id) {
 
-    if (!isValidForm('#editPersonalSigningForm')) {
-        $('#editPersonalSigningForm').addClass('was-validated');
-        return ;
+    if (confirm(messages.signings.personal.delete.alert)) {
+
+        showLoading();
+
+        axios.delete(endpoint + '/' + id).then(() => {
+            dTable.ajax.reload(function() { dTable.page(dTable.page()).draw(false); }, false);
+            showNotify(messages.signings.personal.delete.success.replace('{0}', id));
+        }).catch(error => showNotify(error.response.data.detail, 'danger'))
+            .finally(() => hideLoading());
     }
-
-    showLoading();
-
-    $('#editPersonalSigningForm').removeClass('was-validated');
-
-    const form = document.getElementById('editPersonalSigningForm');
-
-    const formData = new FormData(form);
-    const data = Object.fromEntries(formData.entries());
-
-    axios.patch(endpoint + '/' + currentId, data)
-        .then(response => {
-            dTable.row(rowIndex).data(response.data).draw();
-            showNotify(messages.signings.personal.update.success.replace('{0}', currentId), 'success');
-            currentId = null;
-            rowIndex = null;
-        })
-        .catch(error => showNotify(error.response.data.detail, 'danger'))
-        .finally(() => {
-            hideLoading()
-            $('#editPersonalSigning').modal('hide');
-        });
 }
