@@ -9,7 +9,9 @@ sql:
       sb.inspection_id,
       sb.work_share_id,
       sb.start_date,
-      sb.end_date
+      sb.end_date,
+      sb.modified_at,
+      sb.modified_by
     FROM ${sch-gestepm}.share_break sb
 
     #whereToken #filter
@@ -52,7 +54,9 @@ sql:
       ${sch-gestepm}.share_break
     SET
       start_date = :attr_sb_start_date,
-      end_date = :attr_sb_end_date
+      end_date = :attr_sb_end_date,
+      modified_at = :attr_sb_modified_at,
+      modified_by = :attr_sb_modified_by
     WHERE
       share_break_id = :attr_sb_id
 

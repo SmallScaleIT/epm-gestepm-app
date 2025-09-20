@@ -4,6 +4,7 @@ import com.epm.gestepm.emailapi.dto.Attachment;
 import com.epm.gestepm.emailapi.dto.emailgroup.CloseInspectionGroup;
 import com.epm.gestepm.emailapi.service.EmailService;
 import com.epm.gestepm.forum.model.api.service.TopicService;
+import com.epm.gestepm.lib.audit.AuditProvider;
 import com.epm.gestepm.lib.locale.LocaleProvider;
 import com.epm.gestepm.lib.logging.annotation.EnableExecutionLog;
 import com.epm.gestepm.lib.logging.annotation.LogExecution;
@@ -98,6 +99,8 @@ public class InspectionServiceImpl implements InspectionService {
     private final UserService userService;
 
     private final UserUtils userUtils;
+
+    private final AuditProvider auditProvider;
 
     @Override
     @RequirePermits(value = PRMT_READ_I, action = "List inspections")
@@ -212,12 +215,7 @@ public class InspectionServiceImpl implements InspectionService {
 
         final InspectionDto inspectionActive = inspectionList.get(0);
 
-        final String detailUrl = "/shares/no-programmed/" +
-                inspectionActive.getShareId() +
-                "/inspections/" + inspectionActive.getId();
-
-        throw new InspectionActiveException(inspectionActive.getId(), inspectionActive.getStartDate()
-                , inspectionActive.getProjectName(), detailUrl);
+        throw new InspectionActiveException(inspectionActive.getShareId());
     }
 
     @Override
@@ -241,6 +239,8 @@ public class InspectionServiceImpl implements InspectionService {
 
         final InspectionUpdate update = getMapper(MapIToInspectionUpdate.class).from(updateDto,
                 getMapper(MapIToInspectionUpdate.class).from(inspection));
+
+        this.auditProvider.auditUpdate(update);
 
         final Inspection updated = this.inspectionDao.update(update);
 

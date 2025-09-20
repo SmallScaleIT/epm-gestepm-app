@@ -1,5 +1,7 @@
 package com.epm.gestepm.model.signings.personal.dao.mappers;
 
+import com.epm.gestepm.lib.audit.AuditCreateApprovePaidDischarge;
+import com.epm.gestepm.lib.audit.AuditUpdate;
 import com.epm.gestepm.lib.jdbc.impl.rowmapper.CommonRowMapper;
 import com.epm.gestepm.model.signings.personal.dao.entity.PersonalSigning;
 import org.springframework.jdbc.core.RowMapper;
@@ -25,6 +27,9 @@ public class PersonalSigningRowMapper extends CommonRowMapper implements RowMapp
         personalSigning.setUserId(rs.getInt(COL_PRS_USER_ID));
         personalSigning.setStartDate(rs.getTimestamp(COL_PRS_START_DATE).toLocalDateTime());
         personalSigning.setEndDate(rs.getTimestamp(COL_PRS_END_DATE).toLocalDateTime());
+
+        this.setCommonAudit((AuditCreateApprovePaidDischarge) personalSigning, rs);
+        this.setCommonAudit((AuditUpdate) personalSigning, rs);
 
         return personalSigning;
     }

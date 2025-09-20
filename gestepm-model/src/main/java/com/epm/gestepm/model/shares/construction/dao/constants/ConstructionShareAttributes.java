@@ -36,4 +36,8 @@ public class ConstructionShareAttributes {
 
     public static final String ATTR_CS_STATUS = "attr_cs_status";
 
+    public static final String ATTR_CS_MODIFIED_AT = "attr_cs_modified_at";
+
+    public static final String ATTR_CS_MODIFIED_BY = "attr_cs_modified_by";
+
 }

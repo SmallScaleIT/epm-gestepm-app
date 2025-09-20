@@ -1,5 +1,6 @@
 package com.epm.gestepm.model.signings.personal.service;
 
+import com.epm.gestepm.lib.audit.AuditProvider;
 import com.epm.gestepm.lib.logging.annotation.EnableExecutionLog;
 import com.epm.gestepm.lib.logging.annotation.LogExecution;
 import com.epm.gestepm.lib.security.annotation.RequirePermits;
@@ -50,6 +51,8 @@ import static org.mapstruct.factory.Mappers.getMapper;
 public class PersonalSigningServiceImpl implements PersonalSigningService {
 
     private final PersonalSigningDao personalSigningDao;
+
+    private final AuditProvider auditProvider;
 
     @Override
     @RequirePermits(value = PRMT_READ_PRS, action = "List personal signings")
@@ -142,6 +145,8 @@ public class PersonalSigningServiceImpl implements PersonalSigningService {
         this.findOrNotFound(new PersonalSigningByIdFinderDto(updateDto.getId()));
 
         final PersonalSigningUpdate update = getMapper(MapPRSToPersonalSigningUpdate.class).from(updateDto);
+
+        this.auditProvider.auditUpdate(update);
 
         final PersonalSigning updated = this.personalSigningDao.update(update);
 

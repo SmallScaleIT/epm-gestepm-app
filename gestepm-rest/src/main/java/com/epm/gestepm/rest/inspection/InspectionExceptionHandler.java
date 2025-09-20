@@ -74,6 +74,8 @@ public class InspectionExceptionHandler extends BaseRestExceptionHandler {
     @ResponseStatus(CONFLICT)
     public APIError handle(InspectionActiveException ex) {
 
-        return toAPIError(I_ERROR_CODE, I_ACTIVE, I_ACTIVE);
+        final Integer id = ex.getId();
+
+        return toAPIError(I_ERROR_CODE, I_ACTIVE, I_ACTIVE, id);
     }
 }

@@ -13,6 +13,7 @@ public interface MapTSToTeleworkingSigningResponse {
 
   @Mapping(source = "userId", target = "user.id")
   @Mapping(source = "projectId", target = "project.id")
+  @Mapping(source = "updatedBy", target = "updatedBy.id")
   TeleworkingSigning from(TeleworkingSigningDto dto);
 
   List<TeleworkingSigning> from(Page<TeleworkingSigningDto> list);

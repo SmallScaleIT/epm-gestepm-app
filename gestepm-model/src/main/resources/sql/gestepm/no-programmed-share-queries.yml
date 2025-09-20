@@ -16,6 +16,8 @@ sql:
       nps.topic_id,
       nps.forum_title,
       nps.state,
+      nps.modified_at,
+      nps.modified_by,
       GROUP_CONCAT(i.inspection_id) AS inspection_ids,
       GROUP_CONCAT(npsf.no_programmed_share_file_id) AS no_programmed_share_file_idS
     FROM ${sch-gestepm}.no_programmed_share nps
@@ -69,7 +71,9 @@ sql:
       sub_family_id = :attr_nps_sf_id,
       topic_id = :attr_nps_topic_id,
       forum_title = :attr_nps_forum_title,
-      state = :attr_nps_state
+      state = :attr_nps_state,
+      modified_at = :attr_nps_modified_at,
+      modified_by = :attr_nps_modified_by
     WHERE
       no_programmed_share_id = :attr_nps_id
 

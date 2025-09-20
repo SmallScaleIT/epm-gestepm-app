@@ -1,5 +1,6 @@
 package com.epm.gestepm.model.signings.teleworking.service;
 
+import com.epm.gestepm.lib.audit.AuditProvider;
 import com.epm.gestepm.lib.logging.annotation.EnableExecutionLog;
 import com.epm.gestepm.lib.logging.annotation.LogExecution;
 import com.epm.gestepm.lib.security.annotation.RequirePermits;
@@ -48,6 +49,8 @@ public class TeleworkingSigningServiceImpl implements TeleworkingSigningService 
     private final TeleworkingSigningDao teleworkingSigningDao;
 
     private final HasActiveSigningChecker activeChecker;
+
+    private final AuditProvider auditProvider;
 
     @Override
     @RequirePermits(value = PRMT_READ_TS, action = "List teleworking signings")
@@ -150,6 +153,8 @@ public class TeleworkingSigningServiceImpl implements TeleworkingSigningService 
 
         final TeleworkingSigningUpdate update = getMapper(MapTSToTeleworkingSigningUpdate.class).from(updateDto,
                 getMapper(MapTSToTeleworkingSigningUpdate.class).from(teleworkingSigning));
+
+        this.auditProvider.auditUpdate(update);
 
         if (teleworkingSigning.getClosedAt() == null) {
             update.setClosedAt(LocalDateTime.now());

@@ -1,5 +1,6 @@
 package com.epm.gestepm.model.shares.breaks.dao.mappers;
 
+import com.epm.gestepm.lib.jdbc.impl.rowmapper.CommonRowMapper;
 import com.epm.gestepm.model.shares.breaks.dao.entity.ShareBreak;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -9,7 +10,7 @@ import java.sql.SQLException;
 import static com.epm.gestepm.lib.jdbc.utils.ResultSetMappingUtils.nullableInt;
 import static com.epm.gestepm.lib.jdbc.utils.ResultSetMappingUtils.nullableLocalDateTime;
 
-public class ShareBreakRowMapper implements RowMapper<ShareBreak> {
+public class ShareBreakRowMapper extends CommonRowMapper implements RowMapper<ShareBreak> {
 
   public static final String COL_SB_ID = "share_break_id";
 
@@ -37,6 +38,8 @@ public class ShareBreakRowMapper implements RowMapper<ShareBreak> {
     shareBreak.setWorkShareId(nullableInt(rs, COL_SB_WORK_SHARE_ID));
     shareBreak.setStartDate(rs.getTimestamp(COL_SB_START_DATE).toLocalDateTime());
     shareBreak.setEndDate(nullableLocalDateTime(rs, COL_SB_END_DATE));
+
+    this.setCommonAudit(shareBreak, rs);
 
     return shareBreak;
   }

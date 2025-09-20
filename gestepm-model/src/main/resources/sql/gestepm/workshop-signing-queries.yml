@@ -10,7 +10,9 @@ sql:
       pr.name AS project_name,
       wss.started_at,
       wss.closed_at,
-      wss.description
+      wss.description,
+      wss.modified_at,
+      wss.modified_by
     FROM ${sch-gestepm}.workshop_signing wss
     LEFT JOIN ${sch-gestepm}.project pr ON wss.project_id = pr.project_id
 
@@ -57,7 +59,9 @@ sql:
       started_at = :attr_wss_started_at,
       closed_at = :attr_wss_closed_at,
       warehouse_signing_id = :attr_wss_warehouse_id,
-      description = :attr_wss_description
+      description = :attr_wss_description,
+      modified_at = :attr_wss_modified_at,
+      modified_by = :attr_wss_modified_by
     WHERE
       workshop_signing_id = :attr_wss_id
 

@@ -36,4 +36,8 @@ public class WorkShareAttributes {
 
     public static final String ATTR_WS_STATUS = "attr_ws_status";
 
+    public static final String ATTR_WS_MODIFIED_AT = "attr_ws_modified_at";
+
+    public static final String ATTR_WS_MODIFIED_BY = "attr_ws_modified_by";
+
 }

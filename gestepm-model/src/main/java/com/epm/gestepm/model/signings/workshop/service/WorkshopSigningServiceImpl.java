@@ -1,5 +1,6 @@
 package com.epm.gestepm.model.signings.workshop.service;
 
+import com.epm.gestepm.lib.audit.AuditProvider;
 import com.epm.gestepm.lib.logging.annotation.EnableExecutionLog;
 import com.epm.gestepm.lib.logging.annotation.LogExecution;
 import com.epm.gestepm.lib.security.annotation.RequirePermits;
@@ -14,7 +15,6 @@ import com.epm.gestepm.model.signings.workshop.service.mapper.*;
 import com.epm.gestepm.modelapi.signings.warehouse.dto.WarehouseSigningDto;
 import com.epm.gestepm.modelapi.signings.warehouse.dto.finder.WarehouseSigningByIdFinderDto;
 import com.epm.gestepm.modelapi.signings.warehouse.exception.WarehouseFinalizedException;
-import com.epm.gestepm.modelapi.signings.warehouse.exception.WarehouseSigningNotFoundException;
 import com.epm.gestepm.modelapi.signings.warehouse.service.WarehouseSigningService;
 import com.epm.gestepm.modelapi.signings.workshop.dto.WorkShopSigningDto;
 import com.epm.gestepm.modelapi.signings.workshop.dto.creator.WorkshopSigningCreateDto;
@@ -48,6 +48,8 @@ public class WorkshopSigningServiceImpl implements WorkshopSigningService {
     private final WorkshopSigningDao repository;
 
     private final WarehouseSigningService warehouseService;
+
+    private final AuditProvider auditProvider;
 
     @Override
     @RequirePermits(value = PRMT_READ_WSS, action = "List workshop signings")
@@ -170,6 +172,8 @@ public class WorkshopSigningServiceImpl implements WorkshopSigningService {
 
         if (finalize)
             signing.setClosedAt(LocalDateTime.now());
+
+        this.auditProvider.auditUpdate(signing);
 
         return getMapper(MapWSSToWorkshopSigningDto.class)
                 .from(repository.update(signing));

@@ -187,6 +187,8 @@ public class ConstructionShareServiceImpl implements ConstructionShareService {
 
         if (update.getClosedAt() == null) {
             this.auditProvider.auditClose(update);
+        } else {
+            this.auditProvider.auditUpdate(update);
         }
 
         final ConstructionShare updated = this.constructionShareDao.update(update);

@@ -1,11 +1,11 @@
 package com.epm.gestepm.model.signings.warehouse.service;
 
+import com.epm.gestepm.lib.audit.AuditProvider;
 import com.epm.gestepm.lib.logging.annotation.EnableExecutionLog;
 import com.epm.gestepm.lib.logging.annotation.LogExecution;
 import com.epm.gestepm.lib.security.annotation.RequirePermits;
 import com.epm.gestepm.lib.types.Page;
 import com.epm.gestepm.model.signings.checker.HasActiveSigningChecker;
-import com.epm.gestepm.model.signings.checker.SigningUpdateChecker;
 import com.epm.gestepm.model.signings.warehouse.dao.WarehouseSigningDao;
 import com.epm.gestepm.model.signings.warehouse.dao.entity.creator.WarehouseSigningCreate;
 import com.epm.gestepm.model.signings.warehouse.dao.entity.deleter.WarehouseSigningDelete;
@@ -40,11 +40,11 @@ import static org.mapstruct.factory.Mappers.getMapper;
 @EnableExecutionLog(layerMarker = SERVICE)
 public class WarehouseSigningServiceImpl implements WarehouseSigningService {
 
-    private final SigningUpdateChecker checker;
-
     private final WarehouseSigningDao repository;
 
     private final HasActiveSigningChecker activeChecker;
+
+    private final AuditProvider auditProvider;
 
     @Override
     @RequirePermits(value = PRMT_READ_WHS, action = "List warehouse signings")
@@ -140,6 +140,8 @@ public class WarehouseSigningServiceImpl implements WarehouseSigningService {
         //Update non null values from request dto
         getMapper(MapWHSToWarehouseSigningUpdate.class)
                 .from(updateDto, warehouseSigning);
+
+        this.auditProvider.auditUpdate(warehouseSigning);
 
         //If first time for update then close signing today
         if (firstClosed)

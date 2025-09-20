@@ -1,5 +1,7 @@
 package com.epm.gestepm.model.signings.teleworking.dao.mappers;
 
+import com.epm.gestepm.lib.audit.AuditCreateApprovePaidDischarge;
+import com.epm.gestepm.lib.audit.AuditUpdate;
 import com.epm.gestepm.lib.jdbc.impl.rowmapper.CommonRowMapper;
 import com.epm.gestepm.model.signings.teleworking.dao.entity.TeleworkingSigning;
 import org.springframework.jdbc.core.RowMapper;
@@ -39,6 +41,9 @@ public class TeleworkingSigningRowMapper extends CommonRowMapper implements RowM
         teleworkingSigning.setStartedLocation(nullableString(resultSet, COL_TS_STARTED_LOCATION));
         teleworkingSigning.setClosedAt(nullableLocalDateTime(resultSet, COL_TS_CLOSED_AT));
         teleworkingSigning.setClosedLocation(nullableString(resultSet, COL_TS_CLOSED_LOCATION));
+
+        this.setCommonAudit((AuditCreateApprovePaidDischarge) teleworkingSigning, resultSet);
+        this.setCommonAudit((AuditUpdate) teleworkingSigning, resultSet);
 
         return teleworkingSigning;
     }

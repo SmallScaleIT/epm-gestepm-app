@@ -1,6 +1,7 @@
 package com.epm.gestepm.model.inspection.dao.mappers;
 
 import com.epm.gestepm.lib.file.FileUtils;
+import com.epm.gestepm.lib.jdbc.impl.rowmapper.CommonRowMapper;
 import com.epm.gestepm.model.inspection.dao.entity.ActionEnum;
 import com.epm.gestepm.model.inspection.dao.entity.Inspection;
 import com.epm.gestepm.model.inspection.dao.entity.Material;
@@ -13,7 +14,7 @@ import java.util.stream.Collectors;
 
 import static com.epm.gestepm.lib.jdbc.utils.ResultSetMappingUtils.*;
 
-public class InspectionRowMapper implements RowMapper<Inspection> {
+public class InspectionRowMapper extends CommonRowMapper implements RowMapper<Inspection> {
 
     public static final String COL_I_ID = "inspection_id";
 
@@ -107,6 +108,8 @@ public class InspectionRowMapper implements RowMapper<Inspection> {
         }
 
         inspection.setFileIds(fileIds);
+
+        this.setCommonAudit(inspection, rs);
 
         return inspection;
     }

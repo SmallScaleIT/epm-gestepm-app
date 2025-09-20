@@ -188,6 +188,8 @@ public class ProgrammedShareServiceImpl implements ProgrammedShareService {
 
         if (update.getClosedAt() == null) {
             this.auditProvider.auditClose(update);
+        } else {
+            this.auditProvider.auditUpdate(update);
         }
 
         final ProgrammedShare updated = this.programmedShareDao.update(update);

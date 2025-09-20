@@ -1,5 +1,7 @@
 package com.epm.gestepm.model.signings.warehouse.dao.mappers;
 
+import com.epm.gestepm.lib.audit.AuditCreateApprovePaidDischarge;
+import com.epm.gestepm.lib.audit.AuditUpdate;
 import com.epm.gestepm.lib.jdbc.impl.rowmapper.CommonRowMapper;
 import com.epm.gestepm.model.signings.warehouse.dao.entity.WarehouseSigning;
 import org.springframework.jdbc.core.RowMapper;
@@ -47,6 +49,9 @@ public class WarehouseSigningRowMapper extends CommonRowMapper implements RowMap
         }
 
         warehouseSigning.setWorkshopIds(workshopSigningIds);
+
+        this.setCommonAudit((AuditCreateApprovePaidDischarge) warehouseSigning, rs);
+        this.setCommonAudit((AuditUpdate) warehouseSigning, rs);
 
         return warehouseSigning;
     }

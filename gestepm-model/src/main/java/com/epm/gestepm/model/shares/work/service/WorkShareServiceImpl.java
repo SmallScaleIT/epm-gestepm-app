@@ -188,6 +188,8 @@ public class WorkShareServiceImpl implements WorkShareService {
 
         if (update.getClosedAt() == null) {
             this.auditProvider.auditClose(update);
+        } else {
+            this.auditProvider.auditUpdate(update);
         }
 
         final WorkShare updated = this.workShareDao.update(update);

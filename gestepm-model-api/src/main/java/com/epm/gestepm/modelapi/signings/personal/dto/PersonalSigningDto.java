@@ -20,4 +20,7 @@ public class PersonalSigningDto {
     @NotNull
     private LocalDateTime endDate;
 
+    private LocalDateTime updatedAt;
+
+    private Integer updatedBy;
 }

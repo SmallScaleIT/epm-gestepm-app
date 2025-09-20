@@ -3022,6 +3022,13 @@ components:
       x-stoplight:
         id: 0d7ialsinsdm1
       type: object
+      required:
+        - id
+        - user
+        - project
+        - startDate
+        - createdAt
+        - createdBy
       properties:
         id:
           type: integer
@@ -3066,13 +3073,13 @@ components:
           format: date-time
         closedBy:
           $ref: '#/components/schemas/User'
-      required:
-        - id
-        - user
-        - project
-        - startDate
-        - createdAt
-        - createdBy
+        updatedAt:
+          type: string
+          x-stoplight:
+            id: 16pld4msxave0
+          format: date-time
+        updatedBy:
+          $ref: '#/components/schemas/User'
     DisplacementShare:
       title: DisplacementShare
       x-stoplight:
@@ -3143,6 +3150,12 @@ components:
       x-stoplight:
         id: isocdt4oo7s7y
       type: object
+      required:
+        - id
+        - share
+        - action
+        - startDate
+        - firstTechnical
       properties:
         id:
           type: integer
@@ -3214,17 +3227,27 @@ components:
             id: lxtp67qj9tr4z
           items:
             $ref: '#/components/schemas/ShareFile'
-      required:
-        - id
-        - share
-        - action
-        - startDate
-        - firstTechnical
+        updatedAt:
+          type: string
+          x-stoplight:
+            id: ymzpdb9dd1an7
+          format: date-time
+        updatedBy:
+          $ref: '#/components/schemas/User'
     NoProgrammedShare:
       title: NoProgrammedShare
       x-stoplight:
         id: nkbdyy6acj6uf
       type: object
+      required:
+        - id
+        - user
+        - project
+        - startDate
+        - description
+        - family
+        - subFamily
+        - state
       properties:
         id:
           type: integer
@@ -3284,20 +3307,25 @@ components:
           uniqueItems: true
           items:
             $ref: '#/components/schemas/ShareFile'
-      required:
-        - id
-        - user
-        - project
-        - startDate
-        - description
-        - family
-        - subFamily
-        - state
+        updatedAt:
+          type: string
+          x-stoplight:
+            id: 2uikrdc3sry78
+          format: date-time
+        updatedBy:
+          $ref: '#/components/schemas/User'
     ProgrammedShare:
       title: ProgrammedShare
       x-stoplight:
         id: 12zy34vxxw9uk
       type: object
+      required:
+        - id
+        - user
+        - project
+        - startDate
+        - createdAt
+        - createdBy
       properties:
         id:
           type: integer
@@ -3348,13 +3376,13 @@ components:
           format: date-time
         closedBy:
           $ref: '#/components/schemas/User'
-      required:
-        - id
-        - user
-        - project
-        - startDate
-        - createdAt
-        - createdBy
+        updatedAt:
+          type: string
+          x-stoplight:
+            id: ce438nwytaadv
+          format: date-time
+        updatedBy:
+          $ref: '#/components/schemas/User'
     Project:
       title: Project
       x-stoplight:
@@ -3645,6 +3673,9 @@ components:
       x-stoplight:
         id: 8d7wr0k5s4o13
       type: object
+      required:
+        - id
+        - startDate
       properties:
         id:
           type: integer
@@ -3666,14 +3697,23 @@ components:
           $ref: '#/components/schemas/Inspection'
         workShare:
           $ref: '#/components/schemas/WorkShare'
-      required:
-        - id
-        - startDate
+        updatedAt:
+          type: string
+          x-stoplight:
+            id: v876kvrcvm8di
+          format: date-time
+        updatedBy:
+          $ref: '#/components/schemas/User'
     TeleworkingSigning:
       title: TeleworkingSigning
       x-stoplight:
         id: csduyvebbu1tk
       type: object
+      required:
+        - id
+        - user
+        - project
+        - startedAt
       properties:
         id:
           type: integer
@@ -3699,11 +3739,13 @@ components:
           type: string
           x-stoplight:
             id: c339v3olkdaxa
-      required:
-        - id
-        - user
-        - project
-        - startedAt
+        updatedAt:
+          type: string
+          x-stoplight:
+            id: 7s9x4160uwjiq
+          format: date-time
+        updatedBy:
+          $ref: '#/components/schemas/User'
     TimeControl:
       title: TimeControl
       x-stoplight:
@@ -3816,6 +3858,13 @@ components:
       x-stoplight:
         id: pmo9no8g7upyf
       type: object
+      required:
+        - id
+        - user
+        - project
+        - startDate
+        - createdAt
+        - createdBy
       properties:
         id:
           type: integer
@@ -3860,13 +3909,13 @@ components:
           format: date-time
         closedBy:
           $ref: '#/components/schemas/User'
-      required:
-        - id
-        - user
-        - project
-        - startDate
-        - createdAt
-        - createdBy
+        updatedAt:
+          type: string
+          x-stoplight:
+            id: cedq10sve4jwq
+          format: date-time
+        updatedBy:
+          $ref: '#/components/schemas/User'
     Customer:
       title: Customer
       x-stoplight:
@@ -3928,6 +3977,14 @@ components:
       x-stoplight:
         id: il6ntgzjryq7t
       type: object
+      required:
+        - id
+        - user
+        - project
+        - startedAt
+        - workshopSignings
+        - createdAt
+        - createdBy
       properties:
         id:
           type: integer
@@ -3953,12 +4010,20 @@ components:
             id: zga7bph7detnj
           items:
             $ref: '#/components/schemas/WorkshopSigning'
-      required:
-        - id
-        - user
-        - project
-        - startedAt
-        - workshopSignings
+        createdAt:
+          type: string
+          x-stoplight:
+            id: drwnzyz20ta8o
+          format: date-time
+        createdBy:
+          $ref: '#/components/schemas/User'
+        updatedAt:
+          type: string
+          x-stoplight:
+            id: k46umjhdxuji1
+          format: date-time
+        updatedBy:
+          $ref: '#/components/schemas/User'
     WorkshopSigning:
       title: WorkshopSigning
       x-stoplight:
@@ -3995,11 +4060,23 @@ components:
           type: string
           x-stoplight:
             id: l9y2l16v139oz
+        updatedAt:
+          type: string
+          x-stoplight:
+            id: k6fv39qi1b4ib
+          format: date-time
+        updatedBy:
+          $ref: '#/components/schemas/User'
     PersonalSigning:
       title: PersonalSigning
       x-stoplight:
         id: vbx7ha0j58jnn
       type: object
+      required:
+        - id
+        - user
+        - startDate
+        - endDate
       properties:
         id:
           type: integer
@@ -4017,11 +4094,13 @@ components:
           x-stoplight:
             id: 5xc8w1ohpwkk9
           format: date-time
-      required:
-        - id
-        - user
-        - startDate
-        - endDate
+        updatedAt:
+          type: string
+          x-stoplight:
+            id: qarct20x0qwf0
+          format: date-time
+        updatedBy:
+          $ref: '#/components/schemas/User'
   securitySchemes:
     bearerAuth:
       type: http

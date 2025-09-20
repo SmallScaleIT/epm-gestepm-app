@@ -1,5 +1,6 @@
 package com.epm.gestepm.model.inspection.dao.entity;
 
+import com.epm.gestepm.lib.audit.AuditUpdate;
 import lombok.Data;
 import lombok.Singular;
 
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 @Data
-public class Inspection implements Serializable {
+public class Inspection implements AuditUpdate, Serializable {
 
   @NotNull
   private Integer id;
@@ -64,4 +65,7 @@ public class Inspection implements Serializable {
   @Singular
   private List<Integer> fileIds;
 
+  private LocalDateTime updatedAt;
+
+  private Integer updatedBy;
 }

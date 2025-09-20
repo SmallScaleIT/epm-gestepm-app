@@ -37,4 +37,8 @@ public abstract class InspectionAttributes {
   public static final String ATTR_I_EQUIPMENT_HOURS = "attr_i_equipment_hours";
 
   public static final String ATTR_I_CURRENT = "attr_i_current";
+
+  public static final String ATTR_I_MODIFIED_AT = "attr_i_modified_at";
+
+  public static final String ATTR_I_MODIFIED_BY = "attr_i_modified_by";
 }

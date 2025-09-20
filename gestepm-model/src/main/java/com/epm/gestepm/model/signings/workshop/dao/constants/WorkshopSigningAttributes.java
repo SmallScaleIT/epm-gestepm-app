@@ -18,4 +18,8 @@ public abstract class WorkshopSigningAttributes {
     public static final String ATTR_WSS_DESCRIPTION = "attr_wss_description";
 
     public static final String ATTR_WSS_CURRENT = "attr_wss_current";
+
+    public static final String ATTR_WSS_MODIFIED_AT = "attr_wss_modified_at";
+
+    public static final String ATTR_WSS_MODIFIED_BY = "attr_wss_modified_by";
 }

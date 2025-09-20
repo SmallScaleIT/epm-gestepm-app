@@ -45,4 +45,7 @@ public class NoProgrammedShareDto implements Serializable {
     @Singular
     private Set<Integer> fileIds;
 
+    private LocalDateTime updatedAt;
+
+    private Integer updatedBy;
 }

@@ -1,5 +1,6 @@
 package com.epm.gestepm.model.shares.noprogrammed.service;
 
+import com.epm.gestepm.lib.audit.AuditProvider;
 import com.epm.gestepm.lib.logging.annotation.EnableExecutionLog;
 import com.epm.gestepm.lib.logging.annotation.LogExecution;
 import com.epm.gestepm.lib.security.annotation.RequirePermits;
@@ -56,6 +57,8 @@ public class NoProgrammedShareServiceImpl implements NoProgrammedShareService {
     private final ShareDateChecker shareDateChecker;
 
     private final HasActiveSigningChecker activeChecker;
+
+    private final AuditProvider auditProvider;
 
     @Override
     @RequirePermits(value = PRMT_READ_NPS, action = "List no programmed shares")
@@ -157,6 +160,8 @@ public class NoProgrammedShareServiceImpl implements NoProgrammedShareService {
 
         final NoProgrammedShareUpdate update = getMapper(MapNPSToNoProgrammedShareUpdate.class).from(updateDto,
                 getMapper(MapNPSToNoProgrammedShareUpdate.class).from(noProgrammedShareDto));
+
+        this.auditProvider.auditUpdate(update);
 
         this.shareDateChecker.checkStartBeforeEndDate(update.getStartDate(), update.getEndDate());
 

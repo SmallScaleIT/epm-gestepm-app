@@ -6,7 +6,9 @@ sql:
       prs.personal_signing_id,
       prs.user_id,
       prs.start_date,
-      prs.end_date
+      prs.end_date,
+      prs.modified_at,
+      prs.modified_by
     FROM ${sch-gestepm}.personal_signing prs
     
     #whereToken #filter
@@ -46,7 +48,9 @@ sql:
       ${sch-gestepm}.personal_signing
     SET
       start_date = :attr_prs_start_date,
-      end_date = :attr_prs_end_date
+      end_date = :attr_prs_end_date,
+      modified_at = :attr_prs_modified_at,
+      modified_by = :attr_prs_modified_by
     WHERE personal_signing_id = :attr_prs_id
 
   qry-delete-prs: |
