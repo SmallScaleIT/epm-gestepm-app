@@ -70,7 +70,9 @@ public class DisplacementShareViewController {
         final List<ProjectDto> projects = this.filterProjects();
         model.addAttribute("projects", projects);
 
-        boolean canUpdate = Constants.ROLE_ADMIN.equals(user.getRole().getRoleName());
+        boolean canUpdate = Constants.ROLE_ADMIN.equals(user.getRole().getRoleName())
+                || displacementShare.getUserId().equals(user.getId().intValue());
+
         model.addAttribute("canUpdate", canUpdate);
 
         return "displacement-share-detail";

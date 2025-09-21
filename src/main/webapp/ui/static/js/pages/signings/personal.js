@@ -1,5 +1,18 @@
 const endpoint = "/v1/signings/personal";
 
+function initializeEdit(response) {
+    let canUpdate = response.data.data.user.id == userId
+        || isAdmin;
+
+    const editForm = document.querySelector('#editForm');
+
+    //editForm.querySelector('.actionable').style.display = 'none';
+
+    editForm.querySelectorAll('input, select, textarea, button').forEach(el => {
+        el.disabled = !canUpdate;
+    });
+}
+
 function initializeDataTables() {
     const columns = ['id', 'startDate', 'endDate', 'id'];
     const actions = [
@@ -38,6 +51,7 @@ function edit(id) {
     axios.get(endpoint + '/' + id).then((response) => {
         editModal.find('[name="startDate"]').val(response.data.data.startDate);
         editModal.find('[name="endDate"]').val(response.data.data.endDate);
+        initializeEdit(response);
         editModal.modal('show');
     });
 

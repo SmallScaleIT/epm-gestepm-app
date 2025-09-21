@@ -108,7 +108,8 @@ public class ProgrammedShareViewController {
         final List<UserDto> users = this.userService.list(userFilterDto);
         model.addAttribute("users", users);
 
-        boolean canUpdate = Constants.ROLE_ADMIN.equals(user.getRole().getRoleName());
+        boolean canUpdate = Constants.ROLE_ADMIN.equals(user.getRole().getRoleName())
+                || programmedShare.getUserId().equals(user.getId().intValue());
         model.addAttribute("canUpdate", canUpdate);
 
         final ProgrammedShareFileFilterDto filterDto = new ProgrammedShareFileFilterDto();

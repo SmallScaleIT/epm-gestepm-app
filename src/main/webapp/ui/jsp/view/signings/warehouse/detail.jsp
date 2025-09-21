@@ -168,4 +168,5 @@
 
 <script>
     let userId = ${user.id};
+    let canUpdate = ${canUpdate};
 </script>

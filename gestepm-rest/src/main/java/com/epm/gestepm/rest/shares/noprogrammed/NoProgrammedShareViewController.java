@@ -3,6 +3,7 @@ package com.epm.gestepm.rest.shares.noprogrammed;
 import com.epm.gestepm.lib.logging.annotation.EnableExecutionLog;
 import com.epm.gestepm.lib.logging.annotation.LogExecution;
 import com.epm.gestepm.modelapi.common.utils.ModelUtil;
+import com.epm.gestepm.modelapi.common.utils.classes.Constants;
 import com.epm.gestepm.modelapi.common.utils.datatables.SortOrder;
 import com.epm.gestepm.modelapi.family.dto.FamilyDTO;
 import com.epm.gestepm.modelapi.family.service.FamilyService;
@@ -94,7 +95,7 @@ public class NoProgrammedShareViewController {
     @LogExecution(operation = OP_VIEW)
     public String viewNoProgrammedShareDetailPage(@PathVariable final Integer id, final Locale locale, final Model model) {
 
-        this.loadCommonModelView(locale, model);
+        final User user = this.loadCommonModelView(locale, model);
 
         final NoProgrammedShareDto share = this.noProgrammedShareService.findOrNotFound(new NoProgrammedShareByIdFinderDto(id));
         final ProjectDto project = this.projectService.findOrNotFound(new ProjectByIdFinderDto(share.getProjectId()));
@@ -111,6 +112,10 @@ public class NoProgrammedShareViewController {
         final List<FamilyDTO> families = familyService.getCommonFamilyDTOsByProjectId(share.getProjectId().longValue(), locale);
         final List<UserDTO> usersTeam = userServiceOld.getUserDTOsByProjectId(share.getProjectId().longValue());
 
+        boolean canUpdate = Constants.ROLE_ADMIN.equals(user.getRole().getRoleName())
+                || share.getUserId().equals(user.getId().intValue());
+
+        model.addAttribute("canUpdate", canUpdate);
         model.addAttribute("families", families);
         model.addAttribute("usersTeam", usersTeam);
         model.addAttribute("nextAction", ActionEnumDto.getNextAction(lastAction));

@@ -242,6 +242,7 @@
 
     let locale = '${locale}';
     let returnBtn = $('#returnBtn');
+    let canUpdate = ${canUpdate};
 
     let share;
     let nextAction = '${nextAction}';
@@ -378,7 +379,14 @@
             forumTitle.target = '_blank';
         }
 
-        if (share.state === 'NEW') {
+        if (!canUpdate) {
+            editForm.querySelector('.actionable').style.display = 'none';
+
+            editForm.querySelectorAll('input, select, textarea, button').forEach(el => {
+                el.disabled = true;
+            });
+        }
+        else if (share.state === 'NEW') {
             setInitialMode();
         } else if (share.state === 'INITIALIZED' || share.state === 'IN_PROGRESS') {
             setWorkingMode();

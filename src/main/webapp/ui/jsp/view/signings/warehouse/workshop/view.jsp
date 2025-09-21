@@ -38,6 +38,7 @@
 <script>
     let locale = '${locale}';
     let workshop;
+    let canUpdate = ${canUpdate};
 
     async function getWorkshop() {
         await axios.get('/v1' + window.location.pathname, {})
@@ -56,7 +57,7 @@
     }
 
     $(document).ready(async function () {
-        await initialize();
+        await initialize(canUpdate);
         await getWorkshop();
         loadHeader();
         save();

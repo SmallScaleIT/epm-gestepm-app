@@ -107,6 +107,7 @@
 
     let locale = '${locale}';
     let userId = ${user.id};
+    let isAdmin = ${isAdmin};
 
     $(document).ready(async function () {
         initializeDataTables();

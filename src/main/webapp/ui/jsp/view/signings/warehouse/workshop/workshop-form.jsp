@@ -98,7 +98,7 @@
             closedAtField.value = workshop.closedAt;
     }
 
-    async function initialize() {
+    async function initialize(canUpdate) {
         const closedAtField = document.querySelector('[name="closedAt"]');
 
         if (closedAtField && closedAtField.value) {
@@ -107,6 +107,15 @@
             editBtn.classList.add('d-none');
 
             disableForm('#editForm');
+        }
+
+        if (canUpdate) {
+            const editForm = document.querySelector('#editForm');
+
+            //editForm.querySelector('.actionable').classList.remove('d-none');
+
+            editForm.querySelector('[name="startedAt"]').disabled = false;
+            editForm.querySelector('[name="closedAt"]').disabled = false;
         }
     }
 </script>

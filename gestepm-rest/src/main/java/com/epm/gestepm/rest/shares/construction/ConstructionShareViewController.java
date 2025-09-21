@@ -101,7 +101,9 @@ public class ConstructionShareViewController {
         final List<ProjectDto> projects = this.projectService.list(projectFilterDto);
         model.addAttribute("projects", projects);
 
-        boolean canUpdate = Constants.ROLE_ADMIN.equals(user.getRole().getRoleName());
+        boolean canUpdate = Constants.ROLE_ADMIN.equals(user.getRole().getRoleName())
+                || constructionShare.getUserId().equals(user.getId().intValue());
+
         model.addAttribute("canUpdate", canUpdate);
 
         final ConstructionShareFileFilterDto filterDto = new ConstructionShareFileFilterDto();

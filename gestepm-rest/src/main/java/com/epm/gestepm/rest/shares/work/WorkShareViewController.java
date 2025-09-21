@@ -101,7 +101,8 @@ public class WorkShareViewController {
         final List<ProjectDto> projects = this.projectService.list(projectFilterDto);
         model.addAttribute("projects", projects);
 
-        boolean canUpdate = Constants.ROLE_ADMIN.equals(user.getRole().getRoleName());
+        boolean canUpdate = Constants.ROLE_ADMIN.equals(user.getRole().getRoleName())
+                || workShare.getUserId().equals(user.getId().intValue());;
         model.addAttribute("canUpdate", canUpdate);
 
         final WorkShareFileFilterDto filterDto = new WorkShareFileFilterDto();
