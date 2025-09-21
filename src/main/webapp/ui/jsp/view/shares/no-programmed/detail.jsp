@@ -381,6 +381,8 @@
 
         if (!canUpdate) {
             editForm.querySelector('.actionable').style.display = 'none';
+            document.querySelector('#finishBtn').classList.add('d-none');
+            document.querySelector('#createInspectionBtn').classList.add('d-none');
 
             editForm.querySelectorAll('input, select, textarea, button').forEach(el => {
                 el.disabled = true;
