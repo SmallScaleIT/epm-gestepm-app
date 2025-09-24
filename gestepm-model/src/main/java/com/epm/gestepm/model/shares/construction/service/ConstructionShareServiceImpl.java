@@ -205,7 +205,7 @@ public class ConstructionShareServiceImpl implements ConstructionShareService {
         if (updateConstruction)
             this.sendUpdateEmail(result);
 
-        //this.sendMail(result, updateDto.getNotify());
+        this.sendMail(result, updateDto.getNotify());
 
         return result;
     }
