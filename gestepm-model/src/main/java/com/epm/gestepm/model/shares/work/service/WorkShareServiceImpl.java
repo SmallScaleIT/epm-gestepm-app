@@ -2,6 +2,7 @@ package com.epm.gestepm.model.shares.work.service;
 
 import com.epm.gestepm.emailapi.dto.Attachment;
 import com.epm.gestepm.emailapi.dto.emailgroup.CloseWorkShareGroup;
+import com.epm.gestepm.emailapi.dto.emailgroup.UpdateWorkShareGroup;
 import com.epm.gestepm.emailapi.service.EmailService;
 import com.epm.gestepm.lib.audit.AuditProvider;
 import com.epm.gestepm.lib.locale.LocaleProvider;
@@ -40,6 +41,7 @@ import com.epm.gestepm.modelapi.shares.work.service.WorkShareService;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -82,6 +84,9 @@ public class WorkShareServiceImpl implements WorkShareService {
     private final UserUtils userUtils;
 
     private final HasActiveSigningChecker activeChecker;
+
+    @Value("${mail.user.notify}")
+    private List<String> emailsTo;
 
     @Override
     @RequirePermits(value = PRMT_READ_WS, action = "List work shares")
@@ -186,10 +191,13 @@ public class WorkShareServiceImpl implements WorkShareService {
 
         this.shareDateChecker.checkStartBeforeEndDate(updateDto.getStartDate(), updateDto.getEndDate());
 
+        boolean updateWork = false;
+
         if (update.getClosedAt() == null) {
             this.auditProvider.auditClose(update);
         } else {
             this.auditProvider.auditUpdate(update);
+            updateWork = true;
         }
 
         final WorkShare updated = this.workShareDao.update(update);
@@ -197,7 +205,39 @@ public class WorkShareServiceImpl implements WorkShareService {
 
         this.sendMail(result, updateDto.getNotify());
 
+        if (updateWork)
+            this.sendUpdateEmail(result);
+
         return result;
+    }
+
+    private void sendUpdateEmail(final WorkShareDto workShare) {
+        final User user = Utiles.getCurrentUser();
+
+        if (!workShare.getUserId().equals(user.getId().intValue()))
+            return ;
+
+        final Locale locale = new Locale(this.localeProvider.getLocale().orElse("es"));
+
+        final String subject = messageSource.getMessage("email.workshare.update.subject", new Object[]{
+                workShare.getId()
+        }, locale);
+
+        final Set<String> emails = new HashSet<>(emailsTo);
+
+        final ProjectDto project = this.projectService.findOrNotFound(new ProjectByIdFinderDto(workShare.getProjectId()));
+
+        final UpdateWorkShareGroup updateGroup = new UpdateWorkShareGroup();
+        updateGroup.setEmails(new ArrayList<>(emails));
+        updateGroup.setSubject(subject);
+        updateGroup.setLocale(locale);
+        updateGroup.setWorkShareId(workShare.getId());
+        updateGroup.setFullName(user.getFullName());
+        updateGroup.setProjectName(project.getName());
+        updateGroup.setCreatedAt(workShare.getStartDate());
+        updateGroup.setClosedAt(workShare.getEndDate());
+
+        this.emailService.sendEmail(updateGroup);
     }
 
     @Override

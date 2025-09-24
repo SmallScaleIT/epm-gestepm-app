@@ -2,6 +2,7 @@ package com.epm.gestepm.model.shares.construction.service;
 
 import com.epm.gestepm.emailapi.dto.Attachment;
 import com.epm.gestepm.emailapi.dto.emailgroup.CloseConstructionShareGroup;
+import com.epm.gestepm.emailapi.dto.emailgroup.UpdateConstructionShareGroup;
 import com.epm.gestepm.emailapi.service.EmailService;
 import com.epm.gestepm.lib.audit.AuditProvider;
 import com.epm.gestepm.lib.locale.LocaleProvider;
@@ -40,6 +41,7 @@ import com.epm.gestepm.modelapi.shares.construction.service.ConstructionShareSer
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -82,6 +84,9 @@ public class ConstructionShareServiceImpl implements ConstructionShareService {
     private final UserUtils userUtils;
 
     private final HasActiveSigningChecker activeChecker;
+
+    @Value("${mail.user.notify}")
+    private List<String> emailsTo;
 
     @Override
     @RequirePermits(value = PRMT_READ_CS, action = "List construction shares")
@@ -183,18 +188,24 @@ public class ConstructionShareServiceImpl implements ConstructionShareService {
                 : LocalDateTime.now());
         update.setEndDate(endDate);
 
+        boolean updateConstruction = false;
+
         this.shareDateChecker.checkStartBeforeEndDate(update.getStartDate(), update.getEndDate());
 
         if (update.getClosedAt() == null) {
             this.auditProvider.auditClose(update);
         } else {
+            updateConstruction = true;
             this.auditProvider.auditUpdate(update);
         }
 
         final ConstructionShare updated = this.constructionShareDao.update(update);
         final ConstructionShareDto result = getMapper(MapCSToConstructionShareDto.class).from(updated);
 
-        this.sendMail(result, updateDto.getNotify());
+        if (updateConstruction)
+            this.sendUpdateEmail(result);
+
+        //this.sendMail(result, updateDto.getNotify());
 
         return result;
     }
@@ -215,6 +226,35 @@ public class ConstructionShareServiceImpl implements ConstructionShareService {
         final ConstructionShareDelete delete = getMapper(MapCSToConstructionShareDelete.class).from(deleteDto);
 
         this.constructionShareDao.delete(delete);
+    }
+
+    private void sendUpdateEmail(final ConstructionShareDto constructionShare) {
+        final User user = Utiles.getCurrentUser();
+
+        if (!constructionShare.getUserId().equals(user.getId().intValue()))
+            return ;
+
+        final Locale locale = new Locale(this.localeProvider.getLocale().orElse("es"));
+
+        final String subject = messageSource.getMessage("email.constructionshare.update.subject", new Object[]{
+                constructionShare.getId()
+        }, locale);
+
+        final Set<String> emails = new HashSet<>(emailsTo);
+
+        final ProjectDto project = this.projectService.findOrNotFound(new ProjectByIdFinderDto(constructionShare.getProjectId()));
+
+        final UpdateConstructionShareGroup updateGroup = new UpdateConstructionShareGroup();
+        updateGroup.setEmails(new ArrayList<>(emails));
+        updateGroup.setSubject(subject);
+        updateGroup.setLocale(locale);
+        updateGroup.setConstructionShareId(constructionShare.getId());
+        updateGroup.setFullName(user.getFullName());
+        updateGroup.setProjectName(project.getName());
+        updateGroup.setCreatedAt(constructionShare.getStartDate());
+        updateGroup.setClosedAt(constructionShare.getEndDate());
+
+        this.emailService.sendEmail(updateGroup);
     }
 
     private void sendMail(final ConstructionShareDto constructionShare, final Boolean notify) {

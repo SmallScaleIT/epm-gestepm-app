@@ -1,6 +1,9 @@
 package com.epm.gestepm.model.signings.teleworking.service;
 
+import com.epm.gestepm.emailapi.dto.emailgroup.UpdateTeleworkingSigningGroup;
+import com.epm.gestepm.emailapi.service.EmailService;
 import com.epm.gestepm.lib.audit.AuditProvider;
+import com.epm.gestepm.lib.locale.LocaleProvider;
 import com.epm.gestepm.lib.logging.annotation.EnableExecutionLog;
 import com.epm.gestepm.lib.logging.annotation.LogExecution;
 import com.epm.gestepm.lib.security.annotation.RequirePermits;
@@ -15,6 +18,11 @@ import com.epm.gestepm.model.signings.teleworking.dao.entity.filter.TeleworkingS
 import com.epm.gestepm.model.signings.teleworking.dao.entity.finder.TeleworkingSigningByIdFinder;
 import com.epm.gestepm.model.signings.teleworking.dao.entity.updater.TeleworkingSigningUpdate;
 import com.epm.gestepm.model.signings.teleworking.service.mapper.*;
+import com.epm.gestepm.modelapi.common.utils.Utiles;
+import com.epm.gestepm.modelapi.deprecated.user.dto.User;
+import com.epm.gestepm.modelapi.project.dto.ProjectDto;
+import com.epm.gestepm.modelapi.project.dto.finder.ProjectByIdFinderDto;
+import com.epm.gestepm.modelapi.project.service.ProjectService;
 import com.epm.gestepm.modelapi.signings.teleworking.dto.TeleworkingSigningDto;
 import com.epm.gestepm.modelapi.signings.teleworking.dto.creator.TeleworkingSigningCreateDto;
 import com.epm.gestepm.modelapi.signings.teleworking.dto.deleter.TeleworkingSigningDeleteDto;
@@ -24,12 +32,13 @@ import com.epm.gestepm.modelapi.signings.teleworking.dto.updater.TeleworkingSign
 import com.epm.gestepm.modelapi.signings.teleworking.exception.TeleworkingSigningNotFoundException;
 import com.epm.gestepm.modelapi.signings.teleworking.service.TeleworkingSigningService;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Supplier;
 
 import static com.epm.gestepm.lib.logging.constants.LogLayerMarkers.SERVICE;
@@ -51,6 +60,17 @@ public class TeleworkingSigningServiceImpl implements TeleworkingSigningService 
     private final HasActiveSigningChecker activeChecker;
 
     private final AuditProvider auditProvider;
+
+    private final EmailService emailService;
+
+    private final LocaleProvider localeProvider;
+
+    private final MessageSource messageSource;
+
+    private final ProjectService projectService;
+
+    @Value("${mail.user.notify}")
+    private List<String> emailsTo;
 
     @Override
     @RequirePermits(value = PRMT_READ_TS, action = "List teleworking signings")
@@ -162,7 +182,40 @@ public class TeleworkingSigningServiceImpl implements TeleworkingSigningService 
 
         final TeleworkingSigning updated = this.teleworkingSigningDao.update(update);
 
-        return getMapper(MapTSToTeleworkingSigningDto.class).from(updated);
+        final TeleworkingSigningDto result = getMapper(MapTSToTeleworkingSigningDto.class).from(updated);
+
+        this.sendUpdateEmail(result);
+
+        return result;
+    }
+
+    private void sendUpdateEmail(final TeleworkingSigningDto teleworking) {
+        final User user = Utiles.getCurrentUser();
+
+        if (!teleworking.getUserId().equals(user.getId().intValue()))
+            return ;
+
+        final Locale locale = new Locale(this.localeProvider.getLocale().orElse("es"));
+
+        final String subject = messageSource.getMessage("email.teleworkingsigning.update.subject", new Object[]{
+                teleworking.getId()
+        }, locale);
+
+        final Set<String> emails = new HashSet<>(emailsTo);
+
+        final ProjectDto project = this.projectService.findOrNotFound(new ProjectByIdFinderDto(teleworking.getProjectId()));
+
+        final UpdateTeleworkingSigningGroup updateGroup = new UpdateTeleworkingSigningGroup();
+        updateGroup.setEmails(new ArrayList<>(emails));
+        updateGroup.setSubject(subject);
+        updateGroup.setLocale(locale);
+        updateGroup.setTeleworkingSigningId(teleworking.getId());
+        updateGroup.setFullName(user.getFullName());
+        updateGroup.setProjectName(project.getName());
+        updateGroup.setCreatedAt(teleworking.getStartedAt());
+        updateGroup.setClosedAt(teleworking.getClosedAt());
+
+        this.emailService.sendEmail(updateGroup);
     }
 
     @Override

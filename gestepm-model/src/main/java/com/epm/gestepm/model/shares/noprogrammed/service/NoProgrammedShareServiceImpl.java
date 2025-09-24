@@ -1,6 +1,9 @@
 package com.epm.gestepm.model.shares.noprogrammed.service;
 
+import com.epm.gestepm.emailapi.dto.emailgroup.UpdateNoProgrammedShareGroup;
+import com.epm.gestepm.emailapi.service.EmailService;
 import com.epm.gestepm.lib.audit.AuditProvider;
+import com.epm.gestepm.lib.locale.LocaleProvider;
 import com.epm.gestepm.lib.logging.annotation.EnableExecutionLog;
 import com.epm.gestepm.lib.logging.annotation.LogExecution;
 import com.epm.gestepm.lib.security.annotation.RequirePermits;
@@ -17,6 +20,11 @@ import com.epm.gestepm.model.shares.noprogrammed.dao.entity.updater.NoProgrammed
 import com.epm.gestepm.model.shares.noprogrammed.decorator.NoProgrammedSharePostCreationDecorator;
 import com.epm.gestepm.model.shares.noprogrammed.service.mapper.*;
 import com.epm.gestepm.model.signings.checker.HasActiveSigningChecker;
+import com.epm.gestepm.modelapi.common.utils.Utiles;
+import com.epm.gestepm.modelapi.deprecated.user.dto.User;
+import com.epm.gestepm.modelapi.project.dto.ProjectDto;
+import com.epm.gestepm.modelapi.project.dto.finder.ProjectByIdFinderDto;
+import com.epm.gestepm.modelapi.project.service.ProjectService;
 import com.epm.gestepm.modelapi.shares.noprogrammed.dto.NoProgrammedShareDto;
 import com.epm.gestepm.modelapi.shares.noprogrammed.dto.NoProgrammedShareStateEnumDto;
 import com.epm.gestepm.modelapi.shares.noprogrammed.dto.creator.NoProgrammedShareCreateDto;
@@ -27,13 +35,14 @@ import com.epm.gestepm.modelapi.shares.noprogrammed.dto.updater.NoProgrammedShar
 import com.epm.gestepm.modelapi.shares.noprogrammed.exception.NoProgrammedShareNotFoundException;
 import com.epm.gestepm.modelapi.shares.noprogrammed.service.NoProgrammedShareService;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Supplier;
 
 import static com.epm.gestepm.lib.logging.constants.LogLayerMarkers.SERVICE;
@@ -59,6 +68,17 @@ public class NoProgrammedShareServiceImpl implements NoProgrammedShareService {
     private final HasActiveSigningChecker activeChecker;
 
     private final AuditProvider auditProvider;
+
+    private final MessageSource messageSource;
+
+    private final LocaleProvider localeProvider;
+
+    private final ProjectService projectService;
+
+    private final EmailService emailService;
+
+    @Value("${mail.user.notify}")
+    private List<String> emailsTo;
 
     @Override
     @RequirePermits(value = PRMT_READ_NPS, action = "List no programmed shares")
@@ -177,7 +197,38 @@ public class NoProgrammedShareServiceImpl implements NoProgrammedShareService {
             this.noProgrammedSharePostCreationDecorator.sendCloseEmail(result);
         }
 
+        this.sendUpdateEmail(result);
+
         return result;
+    }
+
+    private void sendUpdateEmail(final NoProgrammedShareDto noProgrammedShare) {
+        final User user = Utiles.getCurrentUser();
+
+        if (!noProgrammedShare.getUserId().equals(user.getId().intValue()))
+            return ;
+
+        final Locale locale = new Locale(this.localeProvider.getLocale().orElse("es"));
+
+        final String subject = messageSource.getMessage("email.noprogrammedshare.update.subject", new Object[]{
+                noProgrammedShare.getId()
+        }, locale);
+
+        final Set<String> emails = new HashSet<>(emailsTo);
+
+        final ProjectDto project = this.projectService.findOrNotFound(new ProjectByIdFinderDto(noProgrammedShare.getProjectId()));
+
+        final UpdateNoProgrammedShareGroup updateGroup = new UpdateNoProgrammedShareGroup();
+        updateGroup.setEmails(new ArrayList<>(emails));
+        updateGroup.setSubject(subject);
+        updateGroup.setLocale(locale);
+        updateGroup.setNoProgrammedShareId(noProgrammedShare.getId());
+        updateGroup.setFullName(user.getFullName());
+        updateGroup.setProjectName(project.getName());
+        updateGroup.setCreatedAt(noProgrammedShare.getStartDate());
+        updateGroup.setClosedAt(noProgrammedShare.getEndDate());
+
+        this.emailService.sendEmail(updateGroup);
     }
 
     @Override
