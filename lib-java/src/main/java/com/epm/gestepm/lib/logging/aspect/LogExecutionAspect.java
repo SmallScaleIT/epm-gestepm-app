@@ -8,6 +8,7 @@ import static com.epm.gestepm.lib.logging.constants.LogDataKeys.LOG_CODE_TRACE_O
 import static com.epm.gestepm.lib.logging.constants.LogLayerMarkers.*;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import com.epm.gestepm.lib.logging.AppLogger;
@@ -16,8 +17,12 @@ import com.epm.gestepm.lib.logging.annotation.LogExecution;
 import com.epm.gestepm.lib.logging.applog.LogHandler;
 import com.epm.gestepm.lib.logging.inputparser.LogInputParser;
 import com.epm.gestepm.lib.logging.outputparser.LogOutputParser;
+import com.epm.gestepm.lib.user.UserProvider;
+import com.epm.gestepm.lib.user.data.UserData;
+import com.epm.gestepm.lib.user.data.UserLogin;
 import com.epm.gestepm.lib.utils.TimeFormatUtils;
 import ch.qos.logback.classic.Level;
+import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -28,15 +33,14 @@ import org.springframework.stereotype.Component;
 @Aspect
 @Order(100)
 @Component
+@RequiredArgsConstructor
 public class LogExecutionAspect {
 
     private static final Set<String> INFO_LOG_LAYERS = Set.of(REST, VIEW, PROCESS_SERVICE);
 
     private final ApplicationContext applicationContext;
 
-    public LogExecutionAspect(ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
-    }
+    private final UserProvider userProvider;
 
     @Around(value = "@within(parent) && @annotation(execution)", argNames = "joinPoint,parent,execution")
     public Object logExecution(final ProceedingJoinPoint joinPoint, final EnableExecutionLog parent,
@@ -47,6 +51,10 @@ public class LogExecutionAspect {
         final LogHandler logInfoHandler = AppLogger.forClass(targetClass).handler();
         final LogHandler logDebugHandler = AppLogger.forClass(targetClass).handler();
 
+        final Optional<UserLogin> userLogin = this.userProvider.get(UserLogin.class);
+        final String userId = String.valueOf(userLogin.map(UserData::getValue).orElse(null));
+
+        final Map<String, Object> userInfo = Map.of("userId", userId);
         final Map<String, Object> permissions = LogExecutionAspectHelper.extractPermissionInfo(joinPoint);
         final Map<String, Object> codeMarkers = LogExecutionAspectHelper.extractCodeMarkers(joinPoint);
         final Map<String, Object> cacheInfo = LogExecutionAspectHelper.extractCacheInfo(joinPoint, applicationContext);
@@ -61,14 +69,16 @@ public class LogExecutionAspect {
             .operation(execution.operation())
             .data(cacheInfo)
             .data(codeMarkers)
-            .data(permissions);
+            .data(permissions)
+            .data(userInfo);
 
         logDebugHandler
             .layer(parent.layerMarker())
             .operation(execution.operation())
             .data(cacheInfo)
             .data(codeMarkers)
-            .data(permissions);
+            .data(permissions)
+            .data(userInfo);
 
         if (execution.logIn()) {
 
