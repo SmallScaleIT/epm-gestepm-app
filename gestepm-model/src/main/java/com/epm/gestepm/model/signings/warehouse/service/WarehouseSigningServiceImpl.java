@@ -14,6 +14,7 @@ import com.epm.gestepm.model.signings.warehouse.dao.entity.filter.WarehouseSigni
 import com.epm.gestepm.model.signings.warehouse.dao.entity.finder.WarehouseSigningByIdFinder;
 import com.epm.gestepm.model.signings.warehouse.dao.entity.updater.WarehouseSigningUpdate;
 import com.epm.gestepm.model.signings.warehouse.service.mapper.*;
+import com.epm.gestepm.model.user.utils.UserUtils;
 import com.epm.gestepm.modelapi.signings.warehouse.dto.WarehouseSigningDto;
 import com.epm.gestepm.modelapi.signings.warehouse.dto.creator.WarehouseSigningCreateDto;
 import com.epm.gestepm.modelapi.signings.warehouse.dto.deleter.WarehouseSigningDeleteDto;
@@ -48,6 +49,8 @@ public class WarehouseSigningServiceImpl implements WarehouseSigningService {
     private final AuditProvider auditProvider;
 
     private final SigningUpdateChecker signingUpdateChecker;
+
+    private final UserUtils userUtils;
 
     @Override
     @RequirePermits(value = PRMT_READ_WHS, action = "List warehouse signings")
@@ -135,17 +138,16 @@ public class WarehouseSigningServiceImpl implements WarehouseSigningService {
 
         final WarehouseSigningDto warehouseSigningDto = findOrNotFound(finderDto);
 
-        this.signingUpdateChecker.checker(warehouseSigningDto.getUserId()
-                , warehouseSigningDto.getProjectId());
-
         final WarehouseSigningUpdate update = getMapper(MapWHSToWarehouseSigningUpdate.class)
                 .from(updateDto, getMapper(MapWHSToWarehouseSigningUpdate.class).from(warehouseSigningDto));
 
+        this.signingUpdateChecker.checker(this.userUtils.getCurrentUserId(), warehouseSigningDto.getProjectId());
+
         this.auditProvider.auditUpdate(update);
 
-        //If first time for update then close signing today
-        if (update.getClosedAt() == null)
+        if (update.getClosedAt() == null) {
             update.setClosedAt(LocalDateTime.now());
+        }
 
         return getMapper(MapWHSToWarehouseSigningDto.class)
                 .from(repository.update(update));

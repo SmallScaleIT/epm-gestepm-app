@@ -289,8 +289,8 @@
                 equipmentHours: equipmentHours ? equipmentHours.value : null,
                 files: files,
                 notify: notify.checked,
-                startDate: startDate?.value,
-                endDate: endDate?.value
+                startDate: startDate.value,
+                endDate: endDate ? endDate.value : null,
             }).then((response) => {
                 const inspection = response.data.data;
                 window.location.replace('/shares/no-programmed/' + inspection.share.id);
@@ -323,24 +323,15 @@
             editForm.querySelector('[name="clientName"]').value = inspection.clientName;
         }
 
-        if (inspection.startDate)
-        {
-            const startDatePicker = editForm.querySelector('[name="startDate"]');
-
-            if (startDatePicker)
-            {
-                startDatePicker.value = inspection.startDate;
-            }
+        if (inspection.startDate) {
+            editForm.querySelector('[name="startDate"]').value = inspection.startDate;
         }
 
-        if (inspection.endDate)
-        {
-            const endDatePicker = editForm.querySelector('[name="endDate"]');
-
-            if (endDatePicker)
-            {
-                endDatePicker.value = inspection.endDate;
-            }
+        const endDatePicker = editForm.querySelector('[name="endDate"]');
+        if (inspection.endDate) {
+            endDatePicker.value = inspection.endDate;
+        } else {
+            endDatePicker.parentElement.remove();
         }
 
         let materialsFile = null;
@@ -355,8 +346,7 @@
             $('.visibility-id').hide();
         }
 
-        if (!canUpdate)
-        {
+        if (!canUpdate) {
             editBtn.remove();
             disableForm('#editForm');
         }

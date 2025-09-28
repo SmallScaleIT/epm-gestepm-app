@@ -73,59 +73,6 @@ public class WorkshopSigningController extends BaseController implements Respons
     }
 
     @Override
-    public ResponseEntity<CreateWorkshopSigningV1200Response> createWorkshopSigningV1(Integer warehouseSigningId, CreateWorkshopSigningV1Request createWorkshopSigningV1Request) {
-
-        final WorkshopSigningCreateDto createDto = getMapper(MapWSSToWorkshopSigningCreateDto.class)
-                .from(createWorkshopSigningV1Request);
-
-        createDto.setWarehouseId(warehouseSigningId);
-
-        final WorkShopSigningDto workShopSigningDto = service.create(createDto);
-
-        final APIMetadata meta = this.getDefaultMetadata();
-        final WorkshopSigning workshopSigning = getMapper(MapWSSToWorkshopSigningResponse.class)
-                .from(workShopSigningDto);
-
-        final CreateWorkshopSigningV1200Response response = new CreateWorkshopSigningV1200Response();
-        response.setData(workshopSigning);
-        response.setMetadata(getMapper(MetadataMapper.class).from(meta));
-
-        return ResponseEntity.ok(response);
-    }
-
-    @Override
-    public ResponseEntity<ResSuccess> deleteWorkshopSigningV1(Integer warehouseSigningId, Integer workshopSigningId) {
-
-        final WorkshopSigningDeleteDto deleteDto = new WorkshopSigningDeleteDto(workshopSigningId);
-        service.delete(deleteDto);
-
-        return this.success(getMapper(ResSuccessMapper.class)::from);
-    }
-
-    @Override
-    public ResponseEntity<CreateWorkshopSigningV1200Response> findWorkshopSigningByIdV1(Integer warehouseSigningId
-            , Integer workshopSigningId, List<String> meta, Boolean links
-            , Set<String> expand) {
-
-        final WorkshopSigningFindRestRequest req = new WorkshopSigningFindRestRequest(workshopSigningId, warehouseSigningId);
-
-        this.setCommon(req, meta, links, expand);
-
-        final WorkshopSigningByIdFinderDto finderDto = getMapper(MapWSSToWorkshopSigningByIdFinderDto.class)
-                .from(req);
-
-        final WorkShopSigningDto dto = service.findOrNotFound(finderDto);
-
-        final APIMetadata metaData = this.getMetadata(req, new FindWorkshopSigningV1Operation());
-        final WorkshopSigning data = getMapper(MapWSSToWorkshopSigningResponse.class)
-                .from(dto);
-
-        this.decorate(req, data, WorkshopSigningResponseDecorator.class);
-
-        return toResWorkshopSigningResponse(metaData, data, dto.hashCode());
-    }
-
-    @Override
     public ResponseEntity<ListWorkshopSigningsV1200Response> listWorkshopSigningsV1(Integer warehouseSigningId
             , List<String> meta, Boolean links, Set<String> expand
             , Long offset, Long limit, String order, String orderBy
@@ -155,6 +102,50 @@ public class WorkshopSigningController extends BaseController implements Respons
     }
 
     @Override
+    public ResponseEntity<CreateWorkshopSigningV1200Response> findWorkshopSigningByIdV1(Integer warehouseSigningId
+            , Integer workshopSigningId, List<String> meta, Boolean links
+            , Set<String> expand) {
+
+        final WorkshopSigningFindRestRequest req = new WorkshopSigningFindRestRequest(workshopSigningId, warehouseSigningId);
+
+        this.setCommon(req, meta, links, expand);
+
+        final WorkshopSigningByIdFinderDto finderDto = getMapper(MapWSSToWorkshopSigningByIdFinderDto.class)
+                .from(req);
+
+        final WorkShopSigningDto dto = service.findOrNotFound(finderDto);
+
+        final APIMetadata metaData = this.getMetadata(req, new FindWorkshopSigningV1Operation());
+        final WorkshopSigning data = getMapper(MapWSSToWorkshopSigningResponse.class)
+                .from(dto);
+
+        this.decorate(req, data, WorkshopSigningResponseDecorator.class);
+
+        return toResWorkshopSigningResponse(metaData, data, dto.hashCode());
+    }
+
+    @Override
+    public ResponseEntity<CreateWorkshopSigningV1200Response> createWorkshopSigningV1(Integer warehouseSigningId, CreateWorkshopSigningV1Request createWorkshopSigningV1Request) {
+
+        final WorkshopSigningCreateDto createDto = getMapper(MapWSSToWorkshopSigningCreateDto.class)
+                .from(createWorkshopSigningV1Request);
+
+        createDto.setWarehouseId(warehouseSigningId);
+
+        final WorkShopSigningDto workShopSigningDto = service.create(createDto);
+
+        final APIMetadata meta = this.getDefaultMetadata();
+        final WorkshopSigning workshopSigning = getMapper(MapWSSToWorkshopSigningResponse.class)
+                .from(workShopSigningDto);
+
+        final CreateWorkshopSigningV1200Response response = new CreateWorkshopSigningV1200Response();
+        response.setData(workshopSigning);
+        response.setMetadata(getMapper(MetadataMapper.class).from(meta));
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
     public ResponseEntity<CreateWorkshopSigningV1200Response> updateWorkshopSigningV1(Integer warehouseSigningId, Integer workshopSigningId, UpdateWorkshopSigningV1Request updateWorkshopSigningV1Request) {
 
         final WorkshopSigningUpdateDto updateDto = getMapper(MapWSSToWorkshopSigningUpdateDto.class)
@@ -174,6 +165,15 @@ public class WorkshopSigningController extends BaseController implements Respons
         response.setData(data);
 
         return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<ResSuccess> deleteWorkshopSigningV1(Integer warehouseSigningId, Integer workshopSigningId) {
+
+        final WorkshopSigningDeleteDto deleteDto = new WorkshopSigningDeleteDto(workshopSigningId);
+        service.delete(deleteDto);
+
+        return this.success(getMapper(ResSuccessMapper.class)::from);
     }
 
     @Override

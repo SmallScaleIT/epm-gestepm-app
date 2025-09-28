@@ -156,7 +156,7 @@ public class ConstructionShareServiceImpl implements ConstructionShareService {
         final ConstructionShareCreate create = getMapper(MapCSToConstructionShareCreate.class).from(createDto);
         create.setStartDate(LocalDateTime.now());
 
-        activeChecker.validateSigningChecker(createDto.getUserId());
+        this.activeChecker.validateSigningChecker(createDto.getUserId());
 
         this.auditProvider.auditCreate(create);
 
@@ -178,11 +178,10 @@ public class ConstructionShareServiceImpl implements ConstructionShareService {
 
         final ConstructionShareDto constructionShareDto = findOrNotFound(finderDto);
 
-        this.signingUpdateChecker.checker(constructionShareDto.getUserId()
-                , constructionShareDto.getProjectId());
-
         final ConstructionShareUpdate update = getMapper(MapCSToConstructionShareUpdate.class).from(updateDto,
                 getMapper(MapCSToConstructionShareUpdate.class).from(constructionShareDto));
+
+        this.signingUpdateChecker.checker(this.userUtils.getCurrentUserId(), update.getProjectId());
 
         final LocalDateTime endDate = this.shareDateChecker.checkMaxHours(update.getStartDate(), update.getEndDate() != null
                 ? update.getEndDate()

@@ -16,6 +16,7 @@ import com.epm.gestepm.model.shares.displacement.dao.entity.updater.Displacement
 import com.epm.gestepm.model.shares.displacement.service.mapper.*;
 import com.epm.gestepm.model.signings.checker.HasActiveSigningChecker;
 import com.epm.gestepm.model.signings.checker.SigningUpdateChecker;
+import com.epm.gestepm.model.user.utils.UserUtils;
 import com.epm.gestepm.modelapi.shares.displacement.dto.DisplacementShareDto;
 import com.epm.gestepm.modelapi.shares.displacement.dto.creator.DisplacementShareCreateDto;
 import com.epm.gestepm.modelapi.shares.displacement.dto.deleter.DisplacementShareDeleteDto;
@@ -55,6 +56,8 @@ public class DisplacementShareServiceImpl implements DisplacementShareService {
     private final HasActiveSigningChecker activeChecker;
 
     private final SigningUpdateChecker signingUpdateChecker;
+
+    private final UserUtils userUtils;
 
     @Override
     @RequirePermits(value = PRMT_READ_DS, action = "List displacement shares")
@@ -148,15 +151,11 @@ public class DisplacementShareServiceImpl implements DisplacementShareService {
             msgOut = "Displacement share updated OK",
             errorMsg = "Failed to update displacement share")
     public DisplacementShareDto update(final DisplacementShareUpdateDto updateDto) {
-        final DisplacementShareByIdFinderDto finderDto = new DisplacementShareByIdFinderDto(updateDto.getId());
-
-        final DisplacementShareDto displacementShareDto = findOrNotFound(finderDto);
-
         final DisplacementShareUpdate update = getMapper(MapDSToDisplacementShareUpdate.class).from(updateDto);
 
         this.auditProvider.auditUpdate(update);
 
-        this.signingUpdateChecker.checker(displacementShareDto.getUserId(), update.getProjectId());
+        this.signingUpdateChecker.checker(this.userUtils.getCurrentUserId(), update.getProjectId());
 
         final DisplacementShare updated = this.displacementShareDao.update(update);
 

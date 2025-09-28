@@ -179,11 +179,10 @@ public class ProgrammedShareServiceImpl implements ProgrammedShareService {
 
         final ProgrammedShareDto programmedShareDto = findOrNotFound(finderDto);
 
-        this.signingUpdateChecker.checker(programmedShareDto.getUserId()
-                , programmedShareDto.getProjectId());
-
         final ProgrammedShareUpdate update = getMapper(MapPSToProgrammedShareUpdate.class).from(updateDto,
                 getMapper(MapPSToProgrammedShareUpdate.class).from(programmedShareDto));
+
+        this.signingUpdateChecker.checker(this.userUtils.getCurrentUserId(), update.getProjectId());
 
         final LocalDateTime endDate = this.shareDateChecker.checkMaxHours(update.getStartDate(), update.getEndDate() != null
                 ? update.getEndDate()

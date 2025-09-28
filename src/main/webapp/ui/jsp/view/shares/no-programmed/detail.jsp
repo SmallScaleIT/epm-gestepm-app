@@ -304,92 +304,58 @@
         return response.data.data;
     }
 
-    function actionEditClosed(editForm, filesData, id) {
-        axios.patch('/v1/shares/no-programmed/' + id, {
-            userId: ${user.id},
-            familyId: editForm.querySelector('[name="familyId"]').value,
-            subFamilyId: editForm.querySelector('[name="subFamilyId"]').value,
-            description: editForm.querySelector('[name="description"]').value,
-            startDate: editForm.querySelector('[name="startDate"]').value,
-            endDate: editForm.querySelector('[name="endDate"]').value,
-            state: 'CLOSED',
-            files: filesData
-        }).then(async (response) => {
-            share = await getShare(response.data.data.id);
-            getPermissions();
-            update(share);
-            showNotify(messages.shares.noprogrammed.update.success)
-        }).catch(error => showNotify(error.response.data.detail, 'danger'))
-        .finally(() => hideLoading());
-    }
-
-    function actionEdit(editForm, filesData, id) {
-        axios.patch('/v1/shares/no-programmed/' + id, {
-            userId: ${user.id},
-            familyId: editForm.querySelector('[name="familyId"]').value,
-            subFamilyId: editForm.querySelector('[name="subFamilyId"]').value,
-            description: editForm.querySelector('[name="description"]').value,
-            startDate: editForm.querySelector('[name="startDate"]').value,
-            state: 'INITIALIZED',
-            files: filesData
-        }).then(async (response) => {
-            share = await getShare(response.data.data.id);
-            getPermissions();
-            update(share);
-            showNotify(messages.shares.noprogrammed.update.success)
-        }).catch(error => showNotify(error.response.data.detail, 'danger'))
-        .finally(() => hideLoading());
-    }
-
     function edit(id) {
         const editBtn = $('#editBtn');
         const editForm = document.querySelector('#editForm');
 
         editBtn.click(async () => {
-            if (!isValidForm('#editForm')) {
-                return;
-            }
-
-            showLoading();
-
-            const files = editForm.querySelector('[name="files"]')?.files;
-            let filesData = [];
-
-            for (let i = 0; i < files?.length; i++) {
-                const file = files[i];
-
-                filesData.push({
-                    name: file.name,
-                    content: await toBase64(file)
-                });
-            }
-
-            if (share?.endDate)
-                actionEditClosed(editForm, filesData, id);
-            else
-                actionEdit(editForm, filesData, id);
+            await updateShare(id, editForm, share.state === 'NEW' ? 'INITIALIZED' : share.state);
         });
     }
 
     function close(id) {
         const finishBtn = $('#finishBtn');
+        const editForm = document.querySelector('#editForm');
 
         finishBtn.click(async () => {
-            showLoading();
-
-            axios.patch('/v1/shares/no-programmed/' + id, {
-                userId: ${user.id},
-                familyId: editForm.querySelector('[name="familyId"]').value,
-                subFamilyId: editForm.querySelector('[name="subFamilyId"]').value,
-                description: editForm.querySelector('[name="description"]').value,
-                state: 'CLOSED'
-            }).then(async (response) => {
-                share = await getShare(response.data.data.id);
-                update(share);
-                showNotify(messages.shares.noprogrammed.update.success)
-            }).catch(error => showNotify(error.response.data.detail, 'danger'))
-                .finally(() => hideLoading());
+            await updateShare(id, editForm, share.endDate ? share.state : 'CLOSED')
         });
+    }
+
+    async function updateShare(id, form, state) {
+        if (!isValidForm('#editForm')) {
+            return;
+        }
+
+        showLoading();
+
+        const files = form.querySelector('[name="files"]')?.files;
+        let filesData = [];
+
+        for (let i = 0; i < files?.length; i++) {
+            const file = files[i];
+
+            filesData.push({
+                name: file.name,
+                content: await toBase64(file)
+            });
+        }
+
+        const endDateInput = form.querySelector('[name="endDate"]');
+
+        axios.patch('/v1/shares/no-programmed/' + id, {
+            userId: ${user.id},
+            familyId: form.querySelector('[name="familyId"]').value,
+            subFamilyId: form.querySelector('[name="subFamilyId"]').value,
+            description: form.querySelector('[name="description"]').value,
+            startDate: form.querySelector('[name="startDate"]').value,
+            endDate: endDateInput ? endDateInput.value : null,
+            state: state,
+            files: filesData
+        }).then(() => {
+            location.reload();
+        }).catch(error => showNotify(error.response.data.detail, 'danger'))
+            .finally(() => hideLoading());
     }
 
     function update(share) {
@@ -436,15 +402,14 @@
         }
 
         if (!canUpdate) {
-            editForm.querySelector('.actionable').style.display = 'none';
+            form.querySelector('.actionable').style.display = 'none';
             document.querySelector('#finishBtn').classList.add('d-none');
             document.querySelector('#createInspectionBtn').classList.add('d-none');
 
-            editForm.querySelectorAll('input, select, textarea, button').forEach(el => {
+            form.querySelectorAll('input, select, textarea, button').forEach(el => {
                 el.disabled = true;
             });
-        }
-        else if (share.state === 'NEW') {
+        } else if (share.state === 'NEW') {
             setInitialMode();
         } else if (share.state === 'INITIALIZED' || share.state === 'IN_PROGRESS') {
             setWorkingMode();
@@ -479,12 +444,8 @@
         document.querySelector('#finishBtn').classList.add('d-none');
         document.querySelector('#createInspectionBtn').classList.add('d-none');
 
-        const fieldsToDisable = ['projectId', 'startDate', 'endDate'];
-
-        fieldsToDisable.forEach(name => {
-            const field = editForm.querySelector('[name="' + name + '"]');
-            if (field) field.disabled = true;
-        });
+        const endDate = form.querySelector('[name="endDate"]');
+        endDate.parentElement.remove();
     }
 
     function setWorkingMode() {
@@ -498,17 +459,15 @@
 
         document.querySelector('#createInspectionBtn').classList.remove('d-none');
 
-        if (!canUpdate)
+        if (!canUpdate) {
             disableForm('#editForm');
-
-        const fieldsToDisable = ['projectId', 'startDate', 'endDate'];
-
-        fieldsToDisable.forEach(name => {
-            const field = editForm.querySelector('[name="' + name + '"]');
-            if (field) field.disabled = true;
-        });
+        }
 
         const form = document.querySelector('#editForm');
+
+        const endDate = form.querySelector('[name="endDate"]');
+        endDate.parentElement.remove();
+
         const files = form.querySelector('[name="files"]');
 
         files.value = '';
@@ -520,28 +479,19 @@
     function setCompletedMode() {
         currentMode = 'COMPLETED';
 
-        if (!canUpdate)
-        {
+        if (!canUpdate) {
             document.querySelector('#editBtn')?.remove();
             document.querySelector('#finishBtn')?.remove();
             document.querySelector('#createInspectionBtn')?.remove();
 
             disableForm('#editForm');
         }
-        else
-        {
-            const fieldsToEnable = ['projectId', 'startDate', 'endDate'];
-
-            fieldsToEnable.forEach(name => {
-                const field = editForm.querySelector('[name="' + name + '"]');
-                if (field) field.disabled = false;
-            });
-        }
 
         const finishBtn = document.getElementById('finishBtn');
 
-        if (finishBtn)
+        if (finishBtn) {
             finishBtn.classList.add('d-none');
+        }
 
         showFiles();
     }

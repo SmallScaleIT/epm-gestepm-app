@@ -174,7 +174,7 @@ public class InspectionServiceImpl implements InspectionService {
 
         this.inspectionChecker.checker(noProgrammedShare, createDto);
 
-        this.validateInspection(createDto);
+        this.validateInspection(noProgrammedShare);
 
         final InspectionCreate create = getMapper(MapIToInspectionCreate.class).from(createDto);
         create.setStartDate(LocalDateTime.now());
@@ -184,38 +184,6 @@ public class InspectionServiceImpl implements InspectionService {
         this.updateNoProgrammedShare(noProgrammedShare.getId(), createDto.getFirstTechnicalId(), NoProgrammedShareStateEnumDto.IN_PROGRESS);
 
         return getMapper(MapIToInspectionDto.class).from(result);
-    }
-
-    protected void validateInspection(InspectionCreateDto inspection) {
-        validateNoProgrammedShareActive(inspection);
-        validateInspectionActive(inspection);
-    }
-
-    protected void validateNoProgrammedShareActive(InspectionCreateDto inspection) {
-        NoProgrammedShareByIdFinderDto finder = new NoProgrammedShareByIdFinderDto(inspection.getShareId());
-
-        NoProgrammedShareDto noProgrammed = noProgrammedShareService.findOrNotFound(finder);
-
-        if (noProgrammed.getEndDate() == null)
-            return ;
-
-        throw new NoProgrammedShareFinalizedException(noProgrammed.getId());
-    }
-
-    protected void validateInspectionActive(InspectionCreateDto inspection) {
-        InspectionFilterDto filter = new InspectionFilterDto();
-
-        filter.setShareId(inspection.getShareId());
-        filter.setCurrent(true);
-
-        List<InspectionDto> inspectionList = list(filter);
-
-        if (inspectionList.isEmpty())
-            return ;
-
-        final InspectionDto inspectionActive = inspectionList.get(0);
-
-        throw new InspectionActiveException(inspectionActive.getShareId());
     }
 
     @Override
@@ -318,6 +286,32 @@ public class InspectionServiceImpl implements InspectionService {
         noProgrammedShareUpdateDto.setState(state);
 
         this.noProgrammedShareService.update(noProgrammedShareUpdateDto);
+    }
+
+    protected void validateInspection(final NoProgrammedShareDto noProgrammedShare) {
+        final boolean isNoProgrammedShareOpen = !NoProgrammedShareStateEnumDto.CLOSED.equals(noProgrammedShare.getState());
+
+        if (isNoProgrammedShareOpen) {
+            throw new NoProgrammedShareFinalizedException(noProgrammedShare.getId());
+        }
+
+        this.validateInspectionActive(noProgrammedShare.getId());
+    }
+
+    protected void validateInspectionActive(final Integer noProgrammedShareId) {
+        final InspectionFilterDto filter = new InspectionFilterDto();
+        filter.setShareId(noProgrammedShareId);
+        filter.setCurrent(true);
+
+        final List<InspectionDto> inspectionList = list(filter);
+
+        if (inspectionList.isEmpty()){
+            return;
+        }
+
+        final InspectionDto inspectionActive = inspectionList.get(0);
+
+        throw new InspectionActiveException(inspectionActive.getShareId());
     }
 
     private void sendMail(final InspectionDto inspection, final Boolean notify) {
