@@ -64,6 +64,9 @@ import static org.mapstruct.factory.Mappers.getMapper;
 @EnableExecutionLog(layerMarker = SERVICE)
 public class ProgrammedShareServiceImpl implements ProgrammedShareService {
 
+    @Value("${mail.user.notify}")
+    private List<String> emailsTo;
+  
     private final AuditProvider auditProvider;
 
     private final CustomerService customerService;
@@ -85,9 +88,6 @@ public class ProgrammedShareServiceImpl implements ProgrammedShareService {
     private final UserUtils userUtils;
 
     private final HasActiveSigningChecker activeChecker;
-
-    @Value("${mail.user.notify}")
-    private List<String> emailsTo;
 
     private final SigningUpdateChecker signingUpdateChecker;
 
@@ -189,6 +189,8 @@ public class ProgrammedShareServiceImpl implements ProgrammedShareService {
 
         final ProgrammedShareUpdate update = getMapper(MapPSToProgrammedShareUpdate.class).from(updateDto,
                 getMapper(MapPSToProgrammedShareUpdate.class).from(programmedShareDto));
+
+        this.signingUpdateChecker.checker(this.userUtils.getCurrentUserId(), update.getProjectId());
 
         final LocalDateTime endDate = this.shareDateChecker.checkMaxHours(update.getStartDate(), update.getEndDate() != null
                 ? update.getEndDate()

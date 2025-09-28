@@ -64,6 +64,9 @@ import static org.mapstruct.factory.Mappers.getMapper;
 @EnableExecutionLog(layerMarker = SERVICE)
 public class WorkShareServiceImpl implements WorkShareService {
 
+    @Value("${mail.user.notify}")
+    private List<String> emailsTo;
+  
     private final AuditProvider auditProvider;
 
     private final CustomerService customerService;
@@ -85,9 +88,6 @@ public class WorkShareServiceImpl implements WorkShareService {
     private final UserUtils userUtils;
 
     private final HasActiveSigningChecker activeChecker;
-
-    @Value("${mail.user.notify}")
-    private List<String> emailsTo;
 
     private final SigningUpdateChecker signingUpdateChecker;
 
@@ -190,12 +190,14 @@ public class WorkShareServiceImpl implements WorkShareService {
         final WorkShareUpdate update = getMapper(MapWSToWorkShareUpdate.class).from(updateDto,
                 getMapper(MapWSToWorkShareUpdate.class).from(workShareDto));
 
+        this.signingUpdateChecker.checker(this.userUtils.getCurrentUserId(), update.getProjectId());
+
         final LocalDateTime endDate = this.shareDateChecker.checkMaxHours(update.getStartDate(), update.getEndDate() != null
                 ? update.getEndDate()
                 : LocalDateTime.now());
         update.setEndDate(endDate);
 
-        this.shareDateChecker.checkStartBeforeEndDate(updateDto.getStartDate(), updateDto.getEndDate());
+        this.shareDateChecker.checkStartBeforeEndDate(update.getStartDate(), update.getEndDate());
 
         boolean updateWork = false;
 

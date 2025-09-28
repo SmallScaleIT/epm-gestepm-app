@@ -53,6 +53,9 @@ import static org.mapstruct.factory.Mappers.getMapper;
 @EnableExecutionLog(layerMarker = SERVICE)
 public class TeleworkingSigningServiceImpl implements TeleworkingSigningService {
 
+    @Value("${mail.user.notify}")
+    private List<String> emailsTo;
+  
     private final SigningUpdateChecker signingUpdateChecker;
 
     private final TeleworkingSigningDao teleworkingSigningDao;
@@ -68,9 +71,6 @@ public class TeleworkingSigningServiceImpl implements TeleworkingSigningService 
     private final MessageSource messageSource;
 
     private final ProjectService projectService;
-
-    @Value("${mail.user.notify}")
-    private List<String> emailsTo;
 
     @Override
     @RequirePermits(value = PRMT_READ_TS, action = "List teleworking signings")
@@ -189,6 +189,25 @@ public class TeleworkingSigningServiceImpl implements TeleworkingSigningService 
         return result;
     }
 
+    @Override
+    @RequirePermits(value = PRMT_EDIT_TS, action = "Delete teleworking signing")
+    @LogExecution(operation = OP_DELETE,
+            debugOut = true,
+            msgIn = "Deleting teleworking signing",
+            msgOut = "Personal expense sheet deleted OK",
+            errorMsg = "Failed to delete teleworking signing")
+    public void delete(TeleworkingSigningDeleteDto deleteDto) {
+
+        final TeleworkingSigningByIdFinderDto finderDto = new TeleworkingSigningByIdFinderDto();
+        finderDto.setId(deleteDto.getId());
+
+        findOrNotFound(finderDto);
+
+        final TeleworkingSigningDelete delete = getMapper(MapTSToTeleworkingSigningDelete.class).from(deleteDto);
+
+        this.teleworkingSigningDao.delete(delete);
+    }
+  
     private void sendUpdateEmail(final TeleworkingSigningDto teleworking) {
         final User user = Utiles.getCurrentUser();
 
@@ -216,24 +235,5 @@ public class TeleworkingSigningServiceImpl implements TeleworkingSigningService 
         updateGroup.setClosedAt(teleworking.getClosedAt());
 
         this.emailService.sendEmail(updateGroup);
-    }
-
-    @Override
-    @RequirePermits(value = PRMT_EDIT_TS, action = "Delete teleworking signing")
-    @LogExecution(operation = OP_DELETE,
-            debugOut = true,
-            msgIn = "Deleting teleworking signing",
-            msgOut = "Personal expense sheet deleted OK",
-            errorMsg = "Failed to delete teleworking signing")
-    public void delete(TeleworkingSigningDeleteDto deleteDto) {
-
-        final TeleworkingSigningByIdFinderDto finderDto = new TeleworkingSigningByIdFinderDto();
-        finderDto.setId(deleteDto.getId());
-
-        findOrNotFound(finderDto);
-
-        final TeleworkingSigningDelete delete = getMapper(MapTSToTeleworkingSigningDelete.class).from(deleteDto);
-
-        this.teleworkingSigningDao.delete(delete);
     }
 }

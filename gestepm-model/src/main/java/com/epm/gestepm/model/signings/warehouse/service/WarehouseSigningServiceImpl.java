@@ -17,11 +17,7 @@ import com.epm.gestepm.model.signings.warehouse.dao.entity.filter.WarehouseSigni
 import com.epm.gestepm.model.signings.warehouse.dao.entity.finder.WarehouseSigningByIdFinder;
 import com.epm.gestepm.model.signings.warehouse.dao.entity.updater.WarehouseSigningUpdate;
 import com.epm.gestepm.model.signings.warehouse.service.mapper.*;
-import com.epm.gestepm.modelapi.common.utils.Utiles;
-import com.epm.gestepm.modelapi.deprecated.user.dto.User;
-import com.epm.gestepm.modelapi.project.dto.ProjectDto;
-import com.epm.gestepm.modelapi.project.dto.finder.ProjectByIdFinderDto;
-import com.epm.gestepm.modelapi.project.service.ProjectService;
+import com.epm.gestepm.model.user.utils.UserUtils;
 import com.epm.gestepm.modelapi.signings.warehouse.dto.WarehouseSigningDto;
 import com.epm.gestepm.modelapi.signings.warehouse.dto.creator.WarehouseSigningCreateDto;
 import com.epm.gestepm.modelapi.signings.warehouse.dto.deleter.WarehouseSigningDeleteDto;
@@ -50,6 +46,9 @@ import static org.mapstruct.factory.Mappers.getMapper;
 @EnableExecutionLog(layerMarker = SERVICE)
 public class WarehouseSigningServiceImpl implements WarehouseSigningService {
 
+    @Value("${mail.user.notify}")
+    private List<String> emailsTo;
+  
     private final WarehouseSigningDao repository;
 
     private final HasActiveSigningChecker activeChecker;
@@ -64,11 +63,10 @@ public class WarehouseSigningServiceImpl implements WarehouseSigningService {
 
     private final ProjectService projectService;
 
-    @Value("${mail.user.notify}")
-    private List<String> emailsTo;
-
     private final SigningUpdateChecker signingUpdateChecker;
 
+    private final UserUtils userUtils;
+  
     @Override
     @RequirePermits(value = PRMT_READ_WHS, action = "List warehouse signings")
     @LogExecution(operation = OP_READ,
@@ -155,24 +153,41 @@ public class WarehouseSigningServiceImpl implements WarehouseSigningService {
 
         final WarehouseSigningDto warehouseSigningDto = findOrNotFound(finderDto);
 
-        this.signingUpdateChecker.checker(warehouseSigningDto.getUserId()
-                , warehouseSigningDto.getProjectId());
-
         final WarehouseSigningUpdate update = getMapper(MapWHSToWarehouseSigningUpdate.class)
                 .from(updateDto, getMapper(MapWHSToWarehouseSigningUpdate.class).from(warehouseSigningDto));
 
+        this.signingUpdateChecker.checker(this.userUtils.getCurrentUserId(), warehouseSigningDto.getProjectId());
+
         this.auditProvider.auditUpdate(update);
 
-        //If first time for update then close signing today
-        if (update.getClosedAt() == null)
+        if (update.getClosedAt() == null) {
             update.setClosedAt(LocalDateTime.now());
+        }
 
-        final WarehouseSigningDto result = getMapper(MapWHSToWarehouseSigningDto.class)
-                .from(repository.update(update));
+        final WarehouseSigningDto result = getMapper(MapWHSToWarehouseSigningDto.class).from(repository.update(update));
 
         this.sendUpdateEmail(result);
 
         return result;
+    }
+
+    @Override
+    @RequirePermits(value = PRMT_EDIT_WHS, action = "Delete warehouse signing")
+    @LogExecution(operation = OP_DELETE,
+            debugOut = true,
+            msgIn = "Deleting warehouse signing",
+            msgOut = "Warehouse signing deleted OK",
+            errorMsg = "Failed to delete warehouse signing")
+    public void delete(WarehouseSigningDeleteDto deleteDto) {
+        final WarehouseSigningByIdFinderDto finder = new WarehouseSigningByIdFinderDto();
+        finder.setId(deleteDto.getId());
+
+        findOrNotFound(finder);
+
+        final WarehouseSigningDelete delete = getMapper(MapWHSToWarehouseSigningDelete.class)
+                .from(deleteDto);
+
+        repository.delete(delete);
     }
 
     private void sendUpdateEmail(final WarehouseSigningDto warehouseSigning) {
@@ -202,24 +217,5 @@ public class WarehouseSigningServiceImpl implements WarehouseSigningService {
         updateGroup.setClosedAt(warehouseSigning.getClosedAt());
 
         this.emailService.sendEmail(updateGroup);
-    }
-
-    @Override
-    @RequirePermits(value = PRMT_EDIT_WHS, action = "Delete warehouse signing")
-    @LogExecution(operation = OP_DELETE,
-            debugOut = true,
-            msgIn = "Deleting warehouse signing",
-            msgOut = "Warehouse signing deleted OK",
-            errorMsg = "Failed to delete warehouse signing")
-    public void delete(WarehouseSigningDeleteDto deleteDto) {
-        final WarehouseSigningByIdFinderDto finder = new WarehouseSigningByIdFinderDto();
-        finder.setId(deleteDto.getId());
-
-        findOrNotFound(finder);
-
-        final WarehouseSigningDelete delete = getMapper(MapWHSToWarehouseSigningDelete.class)
-                .from(deleteDto);
-
-        repository.delete(delete);
     }
 }

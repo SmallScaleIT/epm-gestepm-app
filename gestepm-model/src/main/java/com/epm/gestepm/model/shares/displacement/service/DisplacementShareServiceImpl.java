@@ -24,6 +24,7 @@ import com.epm.gestepm.modelapi.project.dto.ProjectDto;
 import com.epm.gestepm.modelapi.project.dto.finder.ProjectByIdFinderDto;
 import com.epm.gestepm.modelapi.project.service.ProjectService;
 import com.epm.gestepm.model.signings.checker.SigningUpdateChecker;
+import com.epm.gestepm.model.user.utils.UserUtils;
 import com.epm.gestepm.modelapi.shares.displacement.dto.DisplacementShareDto;
 import com.epm.gestepm.modelapi.shares.displacement.dto.creator.DisplacementShareCreateDto;
 import com.epm.gestepm.modelapi.shares.displacement.dto.deleter.DisplacementShareDeleteDto;
@@ -55,6 +56,9 @@ import static org.mapstruct.factory.Mappers.getMapper;
 @EnableExecutionLog(layerMarker = SERVICE)
 public class DisplacementShareServiceImpl implements DisplacementShareService {
 
+    @Value("${mail.user.notify}")
+    private List<String> emailsTo;
+  
     private final AuditProvider auditProvider;
 
     private final DisplacementShareDao displacementShareDao;
@@ -71,10 +75,9 @@ public class DisplacementShareServiceImpl implements DisplacementShareService {
 
     private final EmailService emailService;
 
-    @Value("${mail.user.notify}")
-    private List<String> emailsTo;
-
     private final SigningUpdateChecker signingUpdateChecker;
+
+    private final UserUtils userUtils;
 
     @Override
     @RequirePermits(value = PRMT_READ_DS, action = "List displacement shares")
@@ -176,7 +179,7 @@ public class DisplacementShareServiceImpl implements DisplacementShareService {
 
         this.auditProvider.auditUpdate(update);
 
-        this.signingUpdateChecker.checker(displacementShareDto.getUserId(), update.getProjectId());
+        this.signingUpdateChecker.checker(this.userUtils.getCurrentUserId(), update.getProjectId());
 
         final DisplacementShare updated = this.displacementShareDao.update(update);
 

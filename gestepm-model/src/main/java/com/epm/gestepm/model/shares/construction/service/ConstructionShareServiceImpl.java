@@ -64,6 +64,9 @@ import static org.mapstruct.factory.Mappers.getMapper;
 @EnableExecutionLog(layerMarker = SERVICE)
 public class ConstructionShareServiceImpl implements ConstructionShareService {
 
+    @Value("${mail.user.notify}")
+    private List<String> emailsTo;
+  
     private final AuditProvider auditProvider;
 
     private final ConstructionShareDao constructionShareDao;
@@ -85,9 +88,6 @@ public class ConstructionShareServiceImpl implements ConstructionShareService {
     private final UserUtils userUtils;
 
     private final HasActiveSigningChecker activeChecker;
-
-    @Value("${mail.user.notify}")
-    private List<String> emailsTo;
 
     private final SigningUpdateChecker signingUpdateChecker;
 
@@ -161,7 +161,7 @@ public class ConstructionShareServiceImpl implements ConstructionShareService {
         final ConstructionShareCreate create = getMapper(MapCSToConstructionShareCreate.class).from(createDto);
         create.setStartDate(LocalDateTime.now());
 
-        activeChecker.validateSigningChecker(createDto.getUserId());
+        this.activeChecker.validateSigningChecker(createDto.getUserId());
 
         this.auditProvider.auditCreate(create);
 
@@ -188,6 +188,8 @@ public class ConstructionShareServiceImpl implements ConstructionShareService {
 
         final ConstructionShareUpdate update = getMapper(MapCSToConstructionShareUpdate.class).from(updateDto,
                 getMapper(MapCSToConstructionShareUpdate.class).from(constructionShareDto));
+
+        this.signingUpdateChecker.checker(this.userUtils.getCurrentUserId(), update.getProjectId());
 
         final LocalDateTime endDate = this.shareDateChecker.checkMaxHours(update.getStartDate(), update.getEndDate() != null
                 ? update.getEndDate()

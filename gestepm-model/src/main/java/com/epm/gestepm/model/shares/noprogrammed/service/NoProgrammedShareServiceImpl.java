@@ -26,6 +26,7 @@ import com.epm.gestepm.modelapi.project.dto.ProjectDto;
 import com.epm.gestepm.modelapi.project.dto.finder.ProjectByIdFinderDto;
 import com.epm.gestepm.modelapi.project.service.ProjectService;
 import com.epm.gestepm.model.signings.checker.SigningUpdateChecker;
+import com.epm.gestepm.model.user.utils.UserUtils;
 import com.epm.gestepm.modelapi.shares.noprogrammed.dto.NoProgrammedShareDto;
 import com.epm.gestepm.modelapi.shares.noprogrammed.dto.NoProgrammedShareStateEnumDto;
 import com.epm.gestepm.modelapi.shares.noprogrammed.dto.creator.NoProgrammedShareCreateDto;
@@ -82,6 +83,8 @@ public class NoProgrammedShareServiceImpl implements NoProgrammedShareService {
     private List<String> emailsTo;
 
     private final SigningUpdateChecker signingUpdateChecker;
+
+    private final UserUtils userUtils;
 
     @Override
     @RequirePermits(value = PRMT_READ_NPS, action = "List no programmed shares")
@@ -174,6 +177,9 @@ public class NoProgrammedShareServiceImpl implements NoProgrammedShareService {
 
         final NoProgrammedShareDto noProgrammedShareDto = findOrNotFound(finderDto);
 
+        final NoProgrammedShareUpdate update = getMapper(MapNPSToNoProgrammedShareUpdate.class).from(updateDto,
+                getMapper(MapNPSToNoProgrammedShareUpdate.class).from(noProgrammedShareDto));
+
         this.noProgrammedShareChecker.checker(updateDto, noProgrammedShareDto);
         this.signingUpdateChecker.checker(noProgrammedShareDto.getUserId()
                 , noProgrammedShareDto.getProjectId());
@@ -181,15 +187,18 @@ public class NoProgrammedShareServiceImpl implements NoProgrammedShareService {
         final NoProgrammedShareUpdate update = getMapper(MapNPSToNoProgrammedShareUpdate.class).from(updateDto,
                 getMapper(MapNPSToNoProgrammedShareUpdate.class).from(noProgrammedShareDto));
 
-        if (NoProgrammedShareStateEnumDto.CLOSED.equals(updateDto.getState())) {
+        this.signingUpdateChecker.checker(this.userUtils.getCurrentUserId(), noProgrammedShareDto.getProjectId());
+
+        if (NoProgrammedShareStateEnumDto.IN_PROGRESS.equals(noProgrammedShareDto.getState())
+                && NoProgrammedShareStateEnumDto.CLOSED.equals(updateDto.getState())) {
             final LocalDateTime endDate = this.shareDateChecker.checkMaxHours(noProgrammedShareDto.getStartDate(), update.getEndDate() != null
                     ? update.getEndDate() : LocalDateTime.now());
             update.setEndDate(endDate);
         }
 
-        this.auditProvider.auditUpdate(update);
-
         this.shareDateChecker.checkStartBeforeEndDate(update.getStartDate(), update.getEndDate());
+
+        this.auditProvider.auditUpdate(update);
 
         final NoProgrammedShare updated = this.noProgrammedShareDao.update(update);
 

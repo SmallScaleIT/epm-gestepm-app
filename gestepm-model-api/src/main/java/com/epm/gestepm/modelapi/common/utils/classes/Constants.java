@@ -11,14 +11,14 @@ public final class Constants {
 	public static final String APPROVED_COLOR = "#229954";
 	public static final String REJECTED_COLOR = "#E74C3C";
 	
-	public static final long ROLE_CUSTOMER_ID = 1;
-	public static final long ROLE_OFFICE_ID = 2;
-	public static final long ROLE_OPERATOR_ID = 3;
-	public static final long ROLE_PL_ID = 4;
-	public static final long ROLE_TECHNICAL_SUPERVISOR_ID = 5;
-	public static final long ROLE_RRHH_ID = 6;
-	public static final long ROLE_ADMINISTRATION_ID = 7;
-	public static final long ROLE_ADMIN_ID = 8;
+	public static final Long ROLE_CUSTOMER_ID = 1L;
+	public static final Long ROLE_OFFICE_ID = 2L;
+	public static final Long ROLE_OPERATOR_ID = 3L;
+	public static final Long ROLE_PL_ID = 4L;
+	public static final Long ROLE_TECHNICAL_SUPERVISOR_ID = 5L;
+	public static final Long ROLE_RRHH_ID = 6L;
+	public static final Long ROLE_ADMINISTRATION_ID = 7L;
+	public static final Long ROLE_ADMIN_ID = 8L;
 
 	public static final Integer ROLE_PROJECT_LEADER_ID = 4;
 
