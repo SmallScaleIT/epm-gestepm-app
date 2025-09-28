@@ -3,7 +3,6 @@ package com.epm.gestepm.rest.signings.personal.decorators;
 import com.epm.gestepm.lib.controller.RestRequest;
 import com.epm.gestepm.lib.controller.decorator.BaseResponseDataDecorator;
 import com.epm.gestepm.lib.logging.annotation.EnableExecutionLog;
-import com.epm.gestepm.modelapi.deprecated.user.service.UserServiceOld;
 import com.epm.gestepm.modelapi.user.dto.UserDto;
 import com.epm.gestepm.modelapi.user.dto.finder.UserByIdFinderDto;
 import com.epm.gestepm.modelapi.user.service.UserService;

@@ -2,6 +2,7 @@ package com.epm.gestepm.model.shares.programmed.service;
 
 import com.epm.gestepm.emailapi.dto.Attachment;
 import com.epm.gestepm.emailapi.dto.emailgroup.CloseProgrammedShareGroup;
+import com.epm.gestepm.emailapi.dto.emailgroup.UpdateProgrammedShareGroup;
 import com.epm.gestepm.emailapi.service.EmailService;
 import com.epm.gestepm.lib.audit.AuditProvider;
 import com.epm.gestepm.lib.locale.LocaleProvider;
@@ -41,6 +42,7 @@ import com.epm.gestepm.modelapi.shares.programmed.service.ProgrammedShareService
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,6 +64,9 @@ import static org.mapstruct.factory.Mappers.getMapper;
 @EnableExecutionLog(layerMarker = SERVICE)
 public class ProgrammedShareServiceImpl implements ProgrammedShareService {
 
+    @Value("${gestepm.mails.notify}")
+    private List<String> emailsTo;
+  
     private final AuditProvider auditProvider;
 
     private final CustomerService customerService;
@@ -182,7 +187,7 @@ public class ProgrammedShareServiceImpl implements ProgrammedShareService {
         final ProgrammedShareUpdate update = getMapper(MapPSToProgrammedShareUpdate.class).from(updateDto,
                 getMapper(MapPSToProgrammedShareUpdate.class).from(programmedShareDto));
 
-        this.signingUpdateChecker.checker(this.userUtils.getCurrentUserId(), update.getProjectId());
+        this.signingUpdateChecker.checker(programmedShareDto.getUserId(), update.getProjectId());
 
         final LocalDateTime endDate = this.shareDateChecker.checkMaxHours(update.getStartDate(), update.getEndDate() != null
                 ? update.getEndDate()
@@ -191,10 +196,13 @@ public class ProgrammedShareServiceImpl implements ProgrammedShareService {
 
         this.shareDateChecker.checkStartBeforeEndDate(update.getStartDate(), update.getEndDate());
 
+        boolean updatePrg = false;
+
         if (update.getClosedAt() == null) {
             this.auditProvider.auditClose(update);
         } else {
             this.auditProvider.auditUpdate(update);
+            updatePrg = true;
         }
 
         final ProgrammedShare updated = this.programmedShareDao.update(update);
@@ -202,7 +210,39 @@ public class ProgrammedShareServiceImpl implements ProgrammedShareService {
 
         this.sendMail(result, updateDto.getNotify());
 
+        if (updatePrg)
+            this.sendUpdateEmail(result);
+
         return result;
+    }
+
+    private void sendUpdateEmail(final ProgrammedShareDto programmedShare) {
+        final User user = Utiles.getCurrentUser();
+
+        if (!programmedShare.getUserId().equals(user.getId().intValue()))
+            return ;
+
+        final Locale locale = new Locale(this.localeProvider.getLocale().orElse("es"));
+
+        final String subject = messageSource.getMessage("email.programmedshare.update.subject", new Object[]{
+                programmedShare.getId()
+        }, locale);
+
+        final Set<String> emails = new HashSet<>(emailsTo);
+
+        final ProjectDto project = this.projectService.findOrNotFound(new ProjectByIdFinderDto(programmedShare.getProjectId()));
+
+        final UpdateProgrammedShareGroup updateGroup = new UpdateProgrammedShareGroup();
+        updateGroup.setEmails(new ArrayList<>(emails));
+        updateGroup.setSubject(subject);
+        updateGroup.setLocale(locale);
+        updateGroup.setProgrammedShareId(programmedShare.getId());
+        updateGroup.setFullName(user.getFullName());
+        updateGroup.setProjectName(project.getName());
+        updateGroup.setCreatedAt(programmedShare.getStartDate());
+        updateGroup.setClosedAt(programmedShare.getEndDate());
+
+        this.emailService.sendEmail(updateGroup);
     }
 
     @Override

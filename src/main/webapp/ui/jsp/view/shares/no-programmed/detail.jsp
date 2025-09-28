@@ -304,6 +304,43 @@
         return response.data.data;
     }
 
+    function actionEditClosed(editForm, filesData, id) {
+        axios.patch('/v1/shares/no-programmed/' + id, {
+            userId: ${user.id},
+            familyId: editForm.querySelector('[name="familyId"]').value,
+            subFamilyId: editForm.querySelector('[name="subFamilyId"]').value,
+            description: editForm.querySelector('[name="description"]').value,
+            startDate: editForm.querySelector('[name="startDate"]').value,
+            endDate: editForm.querySelector('[name="endDate"]').value,
+            state: 'CLOSED',
+            files: filesData
+        }).then(async (response) => {
+            share = await getShare(response.data.data.id);
+            getPermissions();
+            update(share);
+            showNotify(messages.shares.noprogrammed.update.success)
+        }).catch(error => showNotify(error.response.data.detail, 'danger'))
+        .finally(() => hideLoading());
+    }
+
+    function actionEdit(editForm, filesData, id) {
+        axios.patch('/v1/shares/no-programmed/' + id, {
+            userId: ${user.id},
+            familyId: editForm.querySelector('[name="familyId"]').value,
+            subFamilyId: editForm.querySelector('[name="subFamilyId"]').value,
+            description: editForm.querySelector('[name="description"]').value,
+            startDate: editForm.querySelector('[name="startDate"]').value,
+            state: 'INITIALIZED',
+            files: filesData
+        }).then(async (response) => {
+            share = await getShare(response.data.data.id);
+            getPermissions();
+            update(share);
+            showNotify(messages.shares.noprogrammed.update.success)
+        }).catch(error => showNotify(error.response.data.detail, 'danger'))
+        .finally(() => hideLoading());
+    }
+
     function edit(id) {
         const editBtn = $('#editBtn');
         const editForm = document.querySelector('#editForm');

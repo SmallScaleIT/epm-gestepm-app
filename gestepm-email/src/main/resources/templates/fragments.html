@@ -1,6 +1,43 @@
-<th:block th:fragment="close-construction-share">
+<th:block th:fragment="close-construction-share" xmlns:th="http://www.w3.org/1999/xhtml">
     <p th:text="#{email.constructionshare.close.line.1(${fullName}, ${constructionShareId}, ${projectName}, ${createdAt}, ${closedAt})}"></p>
     <p th:text="#{email.constructionshare.close.line.2}"></p>
+</th:block>
+
+<th:block th:fragment="update-construction-share">
+    <p th:text="#{email.constructionshare.update.line.1(${fullName}, ${constructionShareId}, ${projectName}, ${createdAt}, ${closedAt})}"></p>
+</th:block>
+
+<th:block th:fragment="update-displacement-share">
+    <p th:text="#{email.displacementshare.update.line.1(${fullName}, ${displacementShareId}, ${projectName}, ${createdAt}, ${closedAt})}"></p>
+</th:block>
+
+<th:block th:fragment="update-no-programmed-share">
+    <p th:text="#{email.noprogrammedshare.update.line.1(${fullName}, ${noProgrammedShareId}, ${projectName}, ${createdAt}, ${closedAt})}"></p>
+</th:block>
+
+<th:block th:fragment="update-programmed-share">
+    <p th:text="#{email.programmedshare.update.line.1(${fullName}, ${programmedShareId}, ${projectName}, ${createdAt}, ${closedAt})}"></p>
+</th:block>
+
+<th:block th:fragment="update-work-share">
+    <p th:text="#{email.workshare.update.line.1(${fullName}, ${workShareId}, ${projectName}, ${createdAt}, ${closedAt})}"></p>
+</th:block>
+
+<th:block th:fragment="update-personal-signing">
+    <p th:text="#{email.personalsigning.update.line.1(${fullName}, ${personalSigningId}, ${createdAt}, ${closedAt})}"></p>
+</th:block>
+
+<th:block th:fragment="update-teleworking-signing">
+    <p th:text="#{email.teleworkingsigning.update.line.1(${fullName}, ${teleworkingSigningId}, ${projectName}, ${createdAt}, ${closedAt})}"></p>
+</th:block>
+
+<th:block th:fragment="update-warehouse-signing">
+    <p th:text="#{email.warehousesigning.update.line.1(${fullName}, ${warehouseSigningId}, ${projectName}, ${createdAt}, ${closedAt})}"></p>
+</th:block>
+
+<th:block th:fragment="update-workshop-signing">
+    <p th:text="#{email.workshop.update.line.1(${fullName}, ${workshopSigningId}, ${projectName}, ${createdAt}, ${closedAt})}"></p>
+    <p th:text="#{email.workshop.update.line.2}"></p>
 </th:block>
 
 <th:block th:fragment="close-programmed-share">
