@@ -184,8 +184,7 @@ public class NoProgrammedShareServiceImpl implements NoProgrammedShareService {
 
         this.signingUpdateChecker.checker(noProgrammedShareDto.getUserId(), noProgrammedShareDto.getProjectId());
 
-        if (NoProgrammedShareStateEnumDto.IN_PROGRESS.equals(noProgrammedShareDto.getState())
-                && NoProgrammedShareStateEnumDto.CLOSED.equals(updateDto.getState())) {
+        if (NoProgrammedShareStateEnumDto.CLOSED.equals(updateDto.getState())) {
             final LocalDateTime endDate = this.shareDateChecker.checkMaxHours(noProgrammedShareDto.getStartDate(), update.getEndDate() != null
                     ? update.getEndDate() : LocalDateTime.now());
             update.setEndDate(endDate);
