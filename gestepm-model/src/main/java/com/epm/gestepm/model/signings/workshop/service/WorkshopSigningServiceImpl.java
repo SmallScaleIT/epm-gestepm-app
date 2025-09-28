@@ -166,7 +166,7 @@ public class WorkshopSigningServiceImpl implements WorkshopSigningService {
         final WorkshopSigningUpdate update = getMapper(MapWSSToWorkshopSigningUpdate.class)
                 .from(updateDto, getMapper(MapWSSToWorkshopSigningUpdate.class).from(workShopSigningDto));
 
-        if (updateDto.getClosedAt() == null && workShopSigningDto.getClosedAt() == null)
+        if (update.getClosedAt() == null)
             update.setClosedAt(LocalDateTime.now());
 
         this.auditProvider.auditUpdate(update);
