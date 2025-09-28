@@ -18,6 +18,7 @@ public interface MapWHSToWarehouseSigningResponse {
     @Mapping(source = "projectId", target = "project.id")
     @Mapping(source = "userId", target = "user.id")
     @Mapping(source = "workshopIds", target = "workshopSignings")
+    @Mapping(source = "updatedBy", target = "updatedBy.id")
     WarehouseSigning from(WarehouseSigningDto dto);
 
     List<WarehouseSigning> from(Page<WarehouseSigningDto> dtoList);

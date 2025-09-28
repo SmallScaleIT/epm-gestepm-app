@@ -26,4 +26,8 @@ public class WarehouseSigningDto {
 
     @Singular
     private List<Integer> workshopIds;
+
+    private LocalDateTime updatedAt;
+
+    private Integer updatedBy;
 }

@@ -9,6 +9,8 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 import static com.epm.gestepm.model.signings.personal.dao.constants.PersonalSigningAttributes.*;
+import static com.epm.gestepm.model.signings.teleworking.dao.constants.TeleworkingSigningAttributes.ATTR_TS_MODIFIED_AT;
+import static com.epm.gestepm.model.signings.teleworking.dao.constants.TeleworkingSigningAttributes.ATTR_TS_MODIFIED_BY;
 
 @Data
 public class PersonalSigningUpdate implements AuditUpdate, CollectableAttributes {
@@ -22,6 +24,10 @@ public class PersonalSigningUpdate implements AuditUpdate, CollectableAttributes
     @NotNull
     private LocalDateTime endDate;
 
+    private LocalDateTime updatedAt;
+
+    private Integer updatedBy;
+
     @Override
     public AttributeMap collectAttributes() {
 
@@ -30,6 +36,8 @@ public class PersonalSigningUpdate implements AuditUpdate, CollectableAttributes
         attributes.put(ATTR_PRS_ID, this.id);
         attributes.putTimestamp(ATTR_PRS_START_DATE, this.startDate);
         attributes.putTimestamp(ATTR_PRS_END_DATE, this.endDate);
+        attributes.put(ATTR_PRS_MODIFIED_AT, this.updatedAt);
+        attributes.put(ATTR_PRS_MODIFIED_BY, this.updatedBy);
 
         return attributes;
     }

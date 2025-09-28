@@ -1,5 +1,6 @@
 package com.epm.gestepm.model.signings.warehouse.service;
 
+import com.epm.gestepm.lib.audit.AuditProvider;
 import com.epm.gestepm.lib.logging.annotation.EnableExecutionLog;
 import com.epm.gestepm.lib.logging.annotation.LogExecution;
 import com.epm.gestepm.lib.security.annotation.RequirePermits;
@@ -13,6 +14,7 @@ import com.epm.gestepm.model.signings.warehouse.dao.entity.filter.WarehouseSigni
 import com.epm.gestepm.model.signings.warehouse.dao.entity.finder.WarehouseSigningByIdFinder;
 import com.epm.gestepm.model.signings.warehouse.dao.entity.updater.WarehouseSigningUpdate;
 import com.epm.gestepm.model.signings.warehouse.service.mapper.*;
+import com.epm.gestepm.model.user.utils.UserUtils;
 import com.epm.gestepm.modelapi.signings.warehouse.dto.WarehouseSigningDto;
 import com.epm.gestepm.modelapi.signings.warehouse.dto.creator.WarehouseSigningCreateDto;
 import com.epm.gestepm.modelapi.signings.warehouse.dto.deleter.WarehouseSigningDeleteDto;
@@ -40,11 +42,15 @@ import static org.mapstruct.factory.Mappers.getMapper;
 @EnableExecutionLog(layerMarker = SERVICE)
 public class WarehouseSigningServiceImpl implements WarehouseSigningService {
 
-    private final SigningUpdateChecker checker;
-
     private final WarehouseSigningDao repository;
 
     private final HasActiveSigningChecker activeChecker;
+
+    private final AuditProvider auditProvider;
+
+    private final SigningUpdateChecker signingUpdateChecker;
+
+    private final UserUtils userUtils;
 
     @Override
     @RequirePermits(value = PRMT_READ_WHS, action = "List warehouse signings")
@@ -128,25 +134,23 @@ public class WarehouseSigningServiceImpl implements WarehouseSigningService {
             errorMsg = "Failed to update warehouse signing")
     public WarehouseSigningDto update(WarehouseSigningUpdateDto updateDto) {
 
-        final WarehouseSigningByIdFinder finder = new WarehouseSigningByIdFinder();
-        finder.setId(updateDto.getId());
+        final WarehouseSigningByIdFinderDto finderDto = new WarehouseSigningByIdFinderDto(updateDto.getId());
 
-        //Get the Warehouse Signing from repository
-        final WarehouseSigningUpdate warehouseSigning = repository.findUpdateSigning(finder)
-                .orElseThrow(() -> new WarehouseSigningNotFoundException(updateDto.getId()));
+        final WarehouseSigningDto warehouseSigningDto = findOrNotFound(finderDto);
 
-        final boolean firstClosed = warehouseSigning.getClosedAt() == null;
+        final WarehouseSigningUpdate update = getMapper(MapWHSToWarehouseSigningUpdate.class)
+                .from(updateDto, getMapper(MapWHSToWarehouseSigningUpdate.class).from(warehouseSigningDto));
 
-        //Update non null values from request dto
-        getMapper(MapWHSToWarehouseSigningUpdate.class)
-                .from(updateDto, warehouseSigning);
+        this.signingUpdateChecker.checker(this.userUtils.getCurrentUserId(), warehouseSigningDto.getProjectId());
 
-        //If first time for update then close signing today
-        if (firstClosed)
-            warehouseSigning.setClosedAt(LocalDateTime.now());
+        this.auditProvider.auditUpdate(update);
+
+        if (update.getClosedAt() == null) {
+            update.setClosedAt(LocalDateTime.now());
+        }
 
         return getMapper(MapWHSToWarehouseSigningDto.class)
-                .from(repository.update(warehouseSigning));
+                .from(repository.update(update));
     }
 
     @Override

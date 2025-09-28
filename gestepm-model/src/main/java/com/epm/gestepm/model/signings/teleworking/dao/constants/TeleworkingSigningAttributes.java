@@ -19,4 +19,8 @@ public abstract class TeleworkingSigningAttributes {
   public static final String ATTR_TS_CLOSED_LOCATION = "attr_ts_closed_location";
 
   public static final String ATTR_TS_CURRENT = "attr_ts_current";
+
+  public static final String ATTR_TS_MODIFIED_AT = "attr_ts_modified_at";
+
+  public static final String ATTR_TS_MODIFIED_BY = "attr_ts_modified_by";
 }

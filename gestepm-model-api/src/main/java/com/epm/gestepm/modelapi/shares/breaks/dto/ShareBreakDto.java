@@ -25,4 +25,8 @@ public class ShareBreakDto implements Serializable {
 
     private LocalDateTime endDate;
 
+    private LocalDateTime updatedAt;
+
+    private Integer updatedBy;
+
 }

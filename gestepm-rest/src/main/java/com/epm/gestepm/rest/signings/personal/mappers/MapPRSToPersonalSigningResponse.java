@@ -12,6 +12,7 @@ import java.util.List;
 public interface MapPRSToPersonalSigningResponse {
 
     @Mapping(source = "userId", target = "user.id")
+    @Mapping(source = "updatedBy", target = "updatedBy.id")
     PersonalSigning from(PersonalSigningDto dto);
 
     List<PersonalSigning> from(Page<PersonalSigningDto> signings);

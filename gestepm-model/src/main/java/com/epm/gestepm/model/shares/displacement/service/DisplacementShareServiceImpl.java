@@ -15,6 +15,8 @@ import com.epm.gestepm.model.shares.displacement.dao.entity.finder.DisplacementS
 import com.epm.gestepm.model.shares.displacement.dao.entity.updater.DisplacementShareUpdate;
 import com.epm.gestepm.model.shares.displacement.service.mapper.*;
 import com.epm.gestepm.model.signings.checker.HasActiveSigningChecker;
+import com.epm.gestepm.model.signings.checker.SigningUpdateChecker;
+import com.epm.gestepm.model.user.utils.UserUtils;
 import com.epm.gestepm.modelapi.shares.displacement.dto.DisplacementShareDto;
 import com.epm.gestepm.modelapi.shares.displacement.dto.creator.DisplacementShareCreateDto;
 import com.epm.gestepm.modelapi.shares.displacement.dto.deleter.DisplacementShareDeleteDto;
@@ -52,6 +54,10 @@ public class DisplacementShareServiceImpl implements DisplacementShareService {
     private final ShareDateChecker shareDateChecker;
 
     private final HasActiveSigningChecker activeChecker;
+
+    private final SigningUpdateChecker signingUpdateChecker;
+
+    private final UserUtils userUtils;
 
     @Override
     @RequirePermits(value = PRMT_READ_DS, action = "List displacement shares")
@@ -148,6 +154,8 @@ public class DisplacementShareServiceImpl implements DisplacementShareService {
         final DisplacementShareUpdate update = getMapper(MapDSToDisplacementShareUpdate.class).from(updateDto);
 
         this.auditProvider.auditUpdate(update);
+
+        this.signingUpdateChecker.checker(this.userUtils.getCurrentUserId(), update.getProjectId());
 
         final DisplacementShare updated = this.displacementShareDao.update(update);
 

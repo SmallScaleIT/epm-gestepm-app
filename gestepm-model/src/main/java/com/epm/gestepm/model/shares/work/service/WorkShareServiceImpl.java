@@ -19,6 +19,7 @@ import com.epm.gestepm.model.shares.work.dao.entity.finder.WorkShareByIdFinder;
 import com.epm.gestepm.model.shares.work.dao.entity.updater.WorkShareUpdate;
 import com.epm.gestepm.model.shares.work.service.mapper.*;
 import com.epm.gestepm.model.signings.checker.HasActiveSigningChecker;
+import com.epm.gestepm.model.signings.checker.SigningUpdateChecker;
 import com.epm.gestepm.model.user.utils.UserUtils;
 import com.epm.gestepm.modelapi.common.utils.Utiles;
 import com.epm.gestepm.modelapi.customer.dto.CustomerDto;
@@ -82,6 +83,8 @@ public class WorkShareServiceImpl implements WorkShareService {
     private final UserUtils userUtils;
 
     private final HasActiveSigningChecker activeChecker;
+
+    private final SigningUpdateChecker signingUpdateChecker;
 
     @Override
     @RequirePermits(value = PRMT_READ_WS, action = "List work shares")
@@ -179,15 +182,19 @@ public class WorkShareServiceImpl implements WorkShareService {
         final WorkShareUpdate update = getMapper(MapWSToWorkShareUpdate.class).from(updateDto,
                 getMapper(MapWSToWorkShareUpdate.class).from(workShareDto));
 
+        this.signingUpdateChecker.checker(this.userUtils.getCurrentUserId(), update.getProjectId());
+
         final LocalDateTime endDate = this.shareDateChecker.checkMaxHours(update.getStartDate(), update.getEndDate() != null
                 ? update.getEndDate()
                 : LocalDateTime.now());
         update.setEndDate(endDate);
 
-        this.shareDateChecker.checkStartBeforeEndDate(updateDto.getStartDate(), updateDto.getEndDate());
+        this.shareDateChecker.checkStartBeforeEndDate(update.getStartDate(), update.getEndDate());
 
         if (update.getClosedAt() == null) {
             this.auditProvider.auditClose(update);
+        } else {
+            this.auditProvider.auditUpdate(update);
         }
 
         final WorkShare updated = this.workShareDao.update(update);

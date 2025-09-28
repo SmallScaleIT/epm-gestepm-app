@@ -1,5 +1,7 @@
 package com.epm.gestepm.model.shares.construction.dao.mappers;
 
+import com.epm.gestepm.lib.audit.AuditCreateClose;
+import com.epm.gestepm.lib.audit.AuditUpdate;
 import com.epm.gestepm.lib.jdbc.impl.rowmapper.CommonRowMapper;
 import com.epm.gestepm.model.shares.construction.dao.entity.ConstructionShare;
 import org.springframework.jdbc.core.RowMapper;
@@ -58,7 +60,8 @@ public class ConstructionShareRowMapper extends CommonRowMapper implements RowMa
 
         constructionShare.setFileIds(fileIds);
 
-        this.setCommonAudit(constructionShare, rs);
+        this.setCommonAudit((AuditCreateClose) constructionShare, rs);
+        this.setCommonAudit((AuditUpdate) constructionShare, rs);
 
         return constructionShare;
     }

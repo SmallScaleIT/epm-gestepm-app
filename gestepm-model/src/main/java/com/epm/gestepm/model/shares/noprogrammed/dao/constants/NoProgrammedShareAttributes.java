@@ -34,4 +34,8 @@ public abstract class NoProgrammedShareAttributes {
 
   public static final String ATTR_NPS_STATUS = "attr_nps_status";
 
+  public static final String ATTR_NPS_MODIFIED_AT = "attr_nps_modified_at";
+
+  public static final String ATTR_NPS_MODIFIED_BY = "attr_nps_modified_by";
+
 }

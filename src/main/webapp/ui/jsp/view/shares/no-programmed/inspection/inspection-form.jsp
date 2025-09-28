@@ -98,6 +98,22 @@
 
 <form id="editForm" class="needs-validation">
     <div class="row">
+        <div class="col-12 col-lg-6">
+            <div class="form-group mb-1">
+                <label class="col-form-label w-100"><spring:message code="start.date"/>
+                    <input type="datetime-local" name="startDate" class="form-control mt-1"/>
+                </label>
+            </div>
+        </div>
+        <div class="col-12 col-lg-6">
+            <div class="form-group mb-1">
+                <label class="col-form-label w-100"><spring:message code="end.date"/>
+                    <input type="datetime-local" name="endDate" class="form-control mt-1"/>
+                </label>
+            </div>
+        </div>
+    </div>
+    <div class="row">
         <div class="col-md-6">
             <div class="form-group mb-1">
                 <spring:message code="shares.intervention.create.intervention.desc.placeholder" var="placeholder" />
@@ -239,6 +255,8 @@
     let materialsModified = false;
     let hasRole = ${hasRole};
 
+    let canUpdate = ${canUpdate};
+
     let signatures = { customer: null, operator: null }
     let canvas = { customer: null, operator: null }
 
@@ -253,6 +271,8 @@
             const clientName = editForm.querySelector('[name="clientName"]');
             const equipmentHours = editForm.querySelector('[name="equipmentHours"]');
             const notify = editForm.querySelector('[name="clientNotif"]');
+            const startDate = editForm.querySelector('[name="startDate"]');
+            const endDate = editForm.querySelector('[name="endDate"]');
 
             const materials = materialsDataTable.rows().data().toArray().map(row => ({ ...row, id: row.id < 0 ? null : row.id}));
             const materialsFile = await parseMaterialsFile(editForm);
@@ -268,7 +288,9 @@
                 materialsFile: materialsFile,
                 equipmentHours: equipmentHours ? equipmentHours.value : null,
                 files: files,
-                notify: notify.checked
+                notify: notify.checked,
+                startDate: startDate.value,
+                endDate: endDate ? endDate.value : null,
             }).then((response) => {
                 const inspection = response.data.data;
                 window.location.replace('/shares/no-programmed/' + inspection.share.id);
@@ -301,6 +323,17 @@
             editForm.querySelector('[name="clientName"]').value = inspection.clientName;
         }
 
+        if (inspection.startDate) {
+            editForm.querySelector('[name="startDate"]').value = inspection.startDate;
+        }
+
+        const endDatePicker = editForm.querySelector('[name="endDate"]');
+        if (inspection.endDate) {
+            endDatePicker.value = inspection.endDate;
+        } else {
+            endDatePicker.parentElement.remove();
+        }
+
         let materialsFile = null;
         if (inspection.materialsFile) {
             materialsFile = {
@@ -313,10 +346,11 @@
             $('.visibility-id').hide();
         }
 
-        if (share.state === 'CLOSED') {
+        if (!canUpdate) {
             editBtn.remove();
             disableForm('#editForm');
-        } else {
+        }
+        else if (share.state !== 'CLOSED') {
             updateEditButton(editBtn);
         }
 
@@ -341,6 +375,15 @@
 
         $('.customer-signature .clearSignatureButton').click(function () { signatures.customer.clear(); });
         $('.operator-signature .clearSignatureButton').click(function () { signatures.operator.clear(); });
+
+        if (!canUpdate)
+        {
+            if (signatures.customer)
+                signatures.customer.off();
+
+            if (signatures.operator)
+                signatures.operator.off();
+        }
     }
 
     function loadMaterialsDataTable() {

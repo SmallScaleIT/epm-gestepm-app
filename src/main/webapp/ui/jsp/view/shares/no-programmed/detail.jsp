@@ -41,6 +41,24 @@
             <form id="editForm" class="needs-validation">
                 <div class="row">
                     <div class="col-12 col-lg-6">
+                        <div class="form-group mb-1">
+                            <label class="col-form-label w-100"><spring:message code="start.date"/>
+                                <input type="datetime-local" name="startDate" class="form-control mt-1"
+                                       value="${share.startDate}"/>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6">
+                        <div class="form-group mb-1">
+                            <label class="col-form-label w-100"><spring:message code="end.date"/>
+                                <input type="datetime-local" name="endDate" class="form-control mt-1"
+                                       value="${share.endDate}"/>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-lg-6">
                         <div class="form-group">
                             <label class="col-form-label w-100">
                                 <spring:message code="family"/>
@@ -242,6 +260,7 @@
 
     let locale = '${locale}';
     let returnBtn = $('#returnBtn');
+    let canUpdate = ${canUpdate};
 
     let share;
     let nextAction = '${nextAction}';
@@ -290,57 +309,53 @@
         const editForm = document.querySelector('#editForm');
 
         editBtn.click(async () => {
-            if (!isValidForm('#editForm')) {
-                return;
-            }
-
-            showLoading();
-
-            const files = editForm.querySelector('[name="files"]').files;
-            let filesData = [];
-
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-
-                filesData.push({
-                    name: file.name,
-                    content: await toBase64(file)
-                });
-            }
-
-            axios.patch('/v1/shares/no-programmed/' + id, {
-                userId: ${user.id},
-                familyId: editForm.querySelector('[name="familyId"]').value,
-                subFamilyId: editForm.querySelector('[name="subFamilyId"]').value,
-                description: editForm.querySelector('[name="description"]').value,
-                state: 'INITIALIZED',
-                files: filesData
-            }).then(async (response) => {
-                await getShare(response.data.data.id);
-                getPermissions();
-                setWorkingMode();
-                showNotify(messages.shares.noprogrammed.update.success)
-            }).catch(error => showNotify(error.response.data.detail, 'danger'))
-                .finally(() => hideLoading());
-        })
+            await updateShare(id, editForm, share.state === 'NEW' ? 'INITIALIZED' : share.state);
+        });
     }
 
     function close(id) {
         const finishBtn = $('#finishBtn');
+        const editForm = document.querySelector('#editForm');
 
         finishBtn.click(async () => {
-            showLoading();
-
-            axios.patch('/v1/shares/no-programmed/' + id, {
-                userId: ${user.id},
-                state: 'CLOSED'
-            }).then(async (response) => {
-                await getShare(response.data.data.id);
-                setCompletedMode();
-                showNotify(messages.shares.noprogrammed.update.success)
-            }).catch(error => showNotify(error.response.data.detail, 'danger'))
-                .finally(() => hideLoading());
+            await updateShare(id, editForm, share.endDate ? share.state : 'CLOSED')
         });
+    }
+
+    async function updateShare(id, form, state) {
+        if (!isValidForm('#editForm')) {
+            return;
+        }
+
+        showLoading();
+
+        const files = form.querySelector('[name="files"]')?.files;
+        let filesData = [];
+
+        for (let i = 0; i < files?.length; i++) {
+            const file = files[i];
+
+            filesData.push({
+                name: file.name,
+                content: await toBase64(file)
+            });
+        }
+
+        const endDateInput = form.querySelector('[name="endDate"]');
+
+        axios.patch('/v1/shares/no-programmed/' + id, {
+            userId: ${user.id},
+            familyId: form.querySelector('[name="familyId"]').value,
+            subFamilyId: form.querySelector('[name="subFamilyId"]').value,
+            description: form.querySelector('[name="description"]').value,
+            startDate: form.querySelector('[name="startDate"]').value,
+            endDate: endDateInput ? endDateInput.value : null,
+            state: state,
+            files: filesData
+        }).then(() => {
+            location.reload();
+        }).catch(error => showNotify(error.response.data.detail, 'danger'))
+            .finally(() => hideLoading());
     }
 
     function update(share) {
@@ -371,6 +386,14 @@
             form.querySelector('[name="description"]').value = share.description;
         }
 
+        if (share.startDate) {
+            form.querySelector('[name="startDate"]').value = share.startDate;
+        }
+
+        if (share.endDate) {
+            form.querySelector('[name="endDate"]').value = share.endDate;
+        }
+
         if (share.forumTitle) {
             const forumTitle = document.querySelector('#forumTitle');
             forumTitle.textContent = share.forumTitle;
@@ -378,7 +401,15 @@
             forumTitle.target = '_blank';
         }
 
-        if (share.state === 'NEW') {
+        if (!canUpdate) {
+            form.querySelector('.actionable').style.display = 'none';
+            document.querySelector('#finishBtn').classList.add('d-none');
+            document.querySelector('#createInspectionBtn').classList.add('d-none');
+
+            form.querySelectorAll('input, select, textarea, button').forEach(el => {
+                el.disabled = true;
+            });
+        } else if (share.state === 'NEW') {
             setInitialMode();
         } else if (share.state === 'INITIALIZED' || share.state === 'IN_PROGRESS') {
             setWorkingMode();
@@ -412,6 +443,9 @@
 
         document.querySelector('#finishBtn').classList.add('d-none');
         document.querySelector('#createInspectionBtn').classList.add('d-none');
+
+        const endDate = form.querySelector('[name="endDate"]');
+        endDate.parentElement.remove();
     }
 
     function setWorkingMode() {
@@ -425,9 +459,15 @@
 
         document.querySelector('#createInspectionBtn').classList.remove('d-none');
 
-        disableForm('#editForm');
+        if (!canUpdate) {
+            disableForm('#editForm');
+        }
 
         const form = document.querySelector('#editForm');
+
+        const endDate = form.querySelector('[name="endDate"]');
+        endDate.parentElement.remove();
+
         const files = form.querySelector('[name="files"]');
 
         files.value = '';
@@ -439,11 +479,20 @@
     function setCompletedMode() {
         currentMode = 'COMPLETED';
 
-        document.querySelector('#editBtn').remove();
-        document.querySelector('#finishBtn').remove();
-        document.querySelector('#createInspectionBtn').remove();
+        if (!canUpdate) {
+            document.querySelector('#editBtn')?.remove();
+            document.querySelector('#finishBtn')?.remove();
+            document.querySelector('#createInspectionBtn')?.remove();
 
-        disableForm('#editForm');
+            disableForm('#editForm');
+        }
+
+        const finishBtn = document.getElementById('finishBtn');
+
+        if (finishBtn) {
+            finishBtn.classList.add('d-none');
+        }
+
         showFiles();
     }
 

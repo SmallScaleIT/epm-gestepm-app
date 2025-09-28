@@ -1,12 +1,13 @@
 package com.epm.gestepm.model.signings.workshop.dao.entity;
 
+import com.epm.gestepm.lib.audit.AuditCreateUpdate;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Data
-public class WorkshopSigning {
+public class WorkshopSigning implements AuditCreateUpdate {
 
     @NotNull
     private Integer id;
@@ -26,4 +27,8 @@ public class WorkshopSigning {
     private LocalDateTime closedAt;
 
     private String description;
+
+    private LocalDateTime updatedAt;
+
+    private Integer updatedBy;
 }

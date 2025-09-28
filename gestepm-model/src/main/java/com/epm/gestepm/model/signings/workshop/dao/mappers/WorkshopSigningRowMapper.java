@@ -40,6 +40,8 @@ public class WorkshopSigningRowMapper extends CommonRowMapper implements RowMapp
         workshopSigning.setClosedAt(nullableLocalDateTime(rs, COL_WSS_CLOSED_AT));
         workshopSigning.setDescription(rs.getString(COL_WSS_DESCRIPTION));
 
+        this.setCommonAudit(workshopSigning, rs);
+
         return workshopSigning;
     }
 }

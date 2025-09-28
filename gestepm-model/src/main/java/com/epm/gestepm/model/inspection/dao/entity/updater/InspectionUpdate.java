@@ -1,5 +1,6 @@
 package com.epm.gestepm.model.inspection.dao.entity.updater;
 
+import com.epm.gestepm.lib.audit.AuditUpdate;
 import com.epm.gestepm.lib.entity.AttributeMap;
 import com.epm.gestepm.lib.entity.CollectableAttributes;
 import com.epm.gestepm.lib.file.FileUtils;
@@ -17,7 +18,7 @@ import java.util.List;
 import java.util.Set;
 
 @Data
-public class InspectionUpdate implements CollectableAttributes {
+public class InspectionUpdate implements AuditUpdate, CollectableAttributes {
 
     @NotNull
     private Integer id;
@@ -61,6 +62,10 @@ public class InspectionUpdate implements CollectableAttributes {
 
     private Set<InspectionFileCreate> files;
 
+    private LocalDateTime updatedAt;
+
+    private Integer updatedBy;
+
     @Override
     public AttributeMap collectAttributes() {
 
@@ -81,6 +86,8 @@ public class InspectionUpdate implements CollectableAttributes {
         map.put(InspectionAttributes.ATTR_I_MATERIALS_FILE_NAME, this.materialsFileName);
         map.put(InspectionAttributes.ATTR_I_EQUIPMENT_HOURS, this.equipmentHours);
         map.put(InspectionAttributes.ATTR_I_TOPIC_ID, this.topicId);
+        map.put(InspectionAttributes.ATTR_I_MODIFIED_AT, this.updatedAt);
+        map.put(InspectionAttributes.ATTR_I_MODIFIED_BY, this.updatedBy);
 
         return map;
     }

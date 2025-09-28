@@ -1,8 +1,11 @@
 package com.epm.gestepm.model.shares.noprogrammed.checker;
 
+import com.epm.gestepm.model.user.utils.UserUtils;
 import com.epm.gestepm.modelapi.project.dto.ProjectTypeDto;
 import com.epm.gestepm.modelapi.project.exception.ProjectIsNotStationException;
 import com.epm.gestepm.modelapi.deprecated.user.dto.User;
+import com.epm.gestepm.modelapi.user.dto.UserDto;
+import com.epm.gestepm.modelapi.user.dto.finder.UserByIdFinderDto;
 import com.epm.gestepm.modelapi.user.exception.UserNotFoundException;
 import com.epm.gestepm.modelapi.deprecated.user.service.UserServiceOld;
 import com.epm.gestepm.modelapi.project.dto.ProjectDto;
@@ -13,6 +16,7 @@ import com.epm.gestepm.modelapi.shares.noprogrammed.dto.NoProgrammedShareStateEn
 import com.epm.gestepm.modelapi.shares.noprogrammed.dto.creator.NoProgrammedShareCreateDto;
 import com.epm.gestepm.modelapi.shares.noprogrammed.dto.updater.NoProgrammedShareUpdateDto;
 import com.epm.gestepm.modelapi.shares.noprogrammed.exception.NoProgrammedShareForbiddenException;
+import com.epm.gestepm.modelapi.user.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -28,7 +32,9 @@ public class NoProgrammedShareChecker {
 
     private final ProjectService projectService;
 
-    private final UserServiceOld userServiceOld;
+    private final UserService userService;
+
+    private final UserUtils userUtils;
 
     public void checker(final NoProgrammedShareCreateDto dto) {
         this.checker(dto.getUserId(), dto.getProjectId(), dto, null);
@@ -40,21 +46,20 @@ public class NoProgrammedShareChecker {
 
     private void checker(final Integer userId, final Integer projectId, final NoProgrammedShareCreateDto createDto, final NoProgrammedShareUpdateDto updateDto) {
         final boolean closeShare = updateDto != null && NoProgrammedShareStateEnumDto.CLOSED.equals(updateDto.getState());
-
-        final Supplier<RuntimeException> userNotFound = () -> new UserNotFoundException(userId);
-        final User user = Optional.ofNullable(this.userServiceOld.getUserById(userId.longValue()))
-                .orElseThrow(userNotFound);
+        final UserDto userDto = this.userService.findOrNotFound(new UserByIdFinderDto(userId));
 
         if (closeShare) {
-            this.validateCloseSharePermission(user);
+            this.validateCloseSharePermission(userDto);
         } else if (createDto != null) {
             this.validateProject(projectId);
         }
     }
 
-    private void validateCloseSharePermission(User user) {
-        if (!user.getRole().getId().equals(ROLE_PL_ID) && !user.getRole().getId().equals(ROLE_ADMIN_ID)) {
-            throw new NoProgrammedShareForbiddenException(user.getId().intValue(), null);
+    private void validateCloseSharePermission(final UserDto user) {
+        if (!user.getId().equals(this.userUtils.getCurrentUserId())
+                && !user.getRoleId().equals(ROLE_PL_ID.intValue())
+                && !user.getRoleId().equals(ROLE_ADMIN_ID.intValue())) {
+            throw new NoProgrammedShareForbiddenException(user.getId(), null);
         }
     }
 

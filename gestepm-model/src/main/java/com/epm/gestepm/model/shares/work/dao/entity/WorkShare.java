@@ -1,6 +1,7 @@
 package com.epm.gestepm.model.shares.work.dao.entity;
 
 import com.epm.gestepm.lib.audit.AuditCreateClose;
+import com.epm.gestepm.lib.audit.AuditUpdate;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
@@ -9,7 +10,7 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 @Data
-public class WorkShare implements AuditCreateClose, Serializable {
+public class WorkShare implements AuditCreateClose, AuditUpdate, Serializable {
 
     @NotNull
     private Integer id;
@@ -46,5 +47,9 @@ public class WorkShare implements AuditCreateClose, Serializable {
     private Integer closedBy;
 
     private Set<Integer> fileIds;
+
+    private LocalDateTime updatedAt;
+
+    private Integer updatedBy;
 
 }

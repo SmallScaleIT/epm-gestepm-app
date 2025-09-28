@@ -3,6 +3,7 @@ package com.epm.gestepm.rest.signings.personal;
 import com.epm.gestepm.lib.logging.annotation.EnableExecutionLog;
 import com.epm.gestepm.lib.logging.annotation.LogExecution;
 import com.epm.gestepm.modelapi.common.utils.ModelUtil;
+import com.epm.gestepm.modelapi.common.utils.classes.Constants;
 import com.epm.gestepm.modelapi.deprecated.user.dto.User;
 import com.epm.gestepm.modelapi.signings.personal.service.PersonalSigningService;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +36,13 @@ public class PersonalSigningViewController {
     @GetMapping("/signings/personal")
     @LogExecution(operation = OP_VIEW)
     public String viewPersonalSigning(final Locale locale, final Model model) {
-        this.loadCommonModelView(locale, model);
+        final User user = this.loadCommonModelView(locale, model);
+
+        final Boolean isAdmin = Constants.ROLE_ADMIN.equals(user.getRole().getRoleName());
+
+        model.addAttribute("isAdmin", isAdmin);
+        model.addAttribute("userId", user.getId());
+
         return "personal-signing-view";
     }
 }

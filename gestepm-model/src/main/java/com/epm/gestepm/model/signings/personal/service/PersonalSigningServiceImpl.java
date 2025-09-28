@@ -1,9 +1,11 @@
 package com.epm.gestepm.model.signings.personal.service;
 
+import com.epm.gestepm.lib.audit.AuditProvider;
 import com.epm.gestepm.lib.logging.annotation.EnableExecutionLog;
 import com.epm.gestepm.lib.logging.annotation.LogExecution;
 import com.epm.gestepm.lib.security.annotation.RequirePermits;
 import com.epm.gestepm.lib.types.Page;
+import com.epm.gestepm.model.signings.checker.SigningUpdateChecker;
 import com.epm.gestepm.model.signings.personal.dao.PersonalSigningDao;
 import com.epm.gestepm.model.signings.personal.dao.entity.PersonalSigning;
 import com.epm.gestepm.model.signings.personal.dao.entity.creator.PersonalSigningCreate;
@@ -18,6 +20,7 @@ import com.epm.gestepm.model.signings.teleworking.dao.entity.finder.TeleworkingS
 import com.epm.gestepm.model.signings.teleworking.service.mapper.MapTSToTeleworkingSigningByIdFinder;
 import com.epm.gestepm.model.signings.teleworking.service.mapper.MapTSToTeleworkingSigningDto;
 import com.epm.gestepm.model.signings.teleworking.service.mapper.MapTSToTeleworkingSigningFilter;
+import com.epm.gestepm.model.user.utils.UserUtils;
 import com.epm.gestepm.modelapi.signings.personal.dto.PersonalSigningDto;
 import com.epm.gestepm.modelapi.signings.personal.dto.creator.PersonalSigningCreateDto;
 import com.epm.gestepm.modelapi.signings.personal.dto.deleter.PersonalSigningDeleteDto;
@@ -50,6 +53,12 @@ import static org.mapstruct.factory.Mappers.getMapper;
 public class PersonalSigningServiceImpl implements PersonalSigningService {
 
     private final PersonalSigningDao personalSigningDao;
+
+    private final AuditProvider auditProvider;
+
+    private final SigningUpdateChecker signingUpdateChecker;
+
+    private final UserUtils userUtils;
 
     @Override
     @RequirePermits(value = PRMT_READ_PRS, action = "List personal signings")
@@ -139,9 +148,11 @@ public class PersonalSigningServiceImpl implements PersonalSigningService {
             errorMsg = "Failed to update personal signing")
     public PersonalSigningDto update(PersonalSigningUpdateDto updateDto) {
 
-        this.findOrNotFound(new PersonalSigningByIdFinderDto(updateDto.getId()));
-
         final PersonalSigningUpdate update = getMapper(MapPRSToPersonalSigningUpdate.class).from(updateDto);
+
+        this.signingUpdateChecker.checker(this.userUtils.getCurrentUserId(), null);
+
+        this.auditProvider.auditUpdate(update);
 
         final PersonalSigning updated = this.personalSigningDao.update(update);
 

@@ -19,6 +19,7 @@ import com.epm.gestepm.model.shares.construction.dao.entity.finder.ConstructionS
 import com.epm.gestepm.model.shares.construction.dao.entity.updater.ConstructionShareUpdate;
 import com.epm.gestepm.model.shares.construction.service.mapper.*;
 import com.epm.gestepm.model.signings.checker.HasActiveSigningChecker;
+import com.epm.gestepm.model.signings.checker.SigningUpdateChecker;
 import com.epm.gestepm.model.user.utils.UserUtils;
 import com.epm.gestepm.modelapi.common.utils.Utiles;
 import com.epm.gestepm.modelapi.customer.dto.CustomerDto;
@@ -82,6 +83,8 @@ public class ConstructionShareServiceImpl implements ConstructionShareService {
     private final UserUtils userUtils;
 
     private final HasActiveSigningChecker activeChecker;
+
+    private final SigningUpdateChecker signingUpdateChecker;
 
     @Override
     @RequirePermits(value = PRMT_READ_CS, action = "List construction shares")
@@ -153,7 +156,7 @@ public class ConstructionShareServiceImpl implements ConstructionShareService {
         final ConstructionShareCreate create = getMapper(MapCSToConstructionShareCreate.class).from(createDto);
         create.setStartDate(LocalDateTime.now());
 
-        activeChecker.validateSigningChecker(createDto.getUserId());
+        this.activeChecker.validateSigningChecker(createDto.getUserId());
 
         this.auditProvider.auditCreate(create);
 
@@ -178,6 +181,8 @@ public class ConstructionShareServiceImpl implements ConstructionShareService {
         final ConstructionShareUpdate update = getMapper(MapCSToConstructionShareUpdate.class).from(updateDto,
                 getMapper(MapCSToConstructionShareUpdate.class).from(constructionShareDto));
 
+        this.signingUpdateChecker.checker(this.userUtils.getCurrentUserId(), update.getProjectId());
+
         final LocalDateTime endDate = this.shareDateChecker.checkMaxHours(update.getStartDate(), update.getEndDate() != null
                 ? update.getEndDate()
                 : LocalDateTime.now());
@@ -187,6 +192,8 @@ public class ConstructionShareServiceImpl implements ConstructionShareService {
 
         if (update.getClosedAt() == null) {
             this.auditProvider.auditClose(update);
+        } else {
+            this.auditProvider.auditUpdate(update);
         }
 
         final ConstructionShare updated = this.constructionShareDao.update(update);
