@@ -33,7 +33,14 @@ public class SigningUpdateChecker {
         final Integer currentUserId = this.getCurrentUserId();
         final UserDto currentUser = this.userService.findOrNotFound(new UserByIdFinderDto(currentUserId));
         final Boolean isAdmin = Constants.ROLE_ADMIN_ID == currentUser.getRoleId();
-        final Boolean isProjectTL = Constants.ROLE_PL_ID == currentUser.getRoleId() && this.isProjectLeader(userId, projectId);
+        Boolean isProjectTL = Boolean.FALSE;
+
+        if (projectId != null)
+        {
+            isProjectTL = Constants.ROLE_PL_ID == currentUser.getRoleId()
+                    && this.isProjectLeader(userId, projectId);
+        }
+
         final Boolean isOwner = Objects.equals(userId, currentUserId);
         final boolean canUpdate = isAdmin || isProjectTL || isOwner;
 

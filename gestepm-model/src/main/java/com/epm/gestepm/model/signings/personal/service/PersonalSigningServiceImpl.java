@@ -5,6 +5,7 @@ import com.epm.gestepm.lib.logging.annotation.EnableExecutionLog;
 import com.epm.gestepm.lib.logging.annotation.LogExecution;
 import com.epm.gestepm.lib.security.annotation.RequirePermits;
 import com.epm.gestepm.lib.types.Page;
+import com.epm.gestepm.model.signings.checker.SigningUpdateChecker;
 import com.epm.gestepm.model.signings.personal.dao.PersonalSigningDao;
 import com.epm.gestepm.model.signings.personal.dao.entity.PersonalSigning;
 import com.epm.gestepm.model.signings.personal.dao.entity.creator.PersonalSigningCreate;
@@ -53,6 +54,8 @@ public class PersonalSigningServiceImpl implements PersonalSigningService {
     private final PersonalSigningDao personalSigningDao;
 
     private final AuditProvider auditProvider;
+
+    private final SigningUpdateChecker signingUpdateChecker;
 
     @Override
     @RequirePermits(value = PRMT_READ_PRS, action = "List personal signings")
@@ -142,9 +145,12 @@ public class PersonalSigningServiceImpl implements PersonalSigningService {
             errorMsg = "Failed to update personal signing")
     public PersonalSigningDto update(PersonalSigningUpdateDto updateDto) {
 
-        this.findOrNotFound(new PersonalSigningByIdFinderDto(updateDto.getId()));
+        final PersonalSigningDto personalSigningDto = this.findOrNotFound(new PersonalSigningByIdFinderDto(updateDto.getId()));
 
         final PersonalSigningUpdate update = getMapper(MapPRSToPersonalSigningUpdate.class).from(updateDto);
+
+        this.signingUpdateChecker.checker(personalSigningDto.getUserId()
+                , null);
 
         this.auditProvider.auditUpdate(update);
 

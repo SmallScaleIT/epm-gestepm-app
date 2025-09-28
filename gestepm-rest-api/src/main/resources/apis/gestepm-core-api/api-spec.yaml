@@ -4700,6 +4700,8 @@ components:
         application/json:
           schema:
             type: object
+            required:
+              - userId
             properties:
               userId:
                 type: integer
@@ -4779,8 +4781,16 @@ components:
                 type: boolean
                 x-stoplight:
                   id: c5vq4d1j24aah
-            required:
-              - userId
+              startDate:
+                type: string
+                x-stoplight:
+                  id: 8bx8m9m6sf8we
+                format: date-time
+              endDate:
+                type: string
+                x-stoplight:
+                  id: x8iadh3wymskh
+                format: date-time
     CreatePersonalExpenseSheet:
       content:
         application/json:

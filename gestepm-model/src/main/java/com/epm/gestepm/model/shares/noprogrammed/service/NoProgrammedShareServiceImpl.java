@@ -17,6 +17,7 @@ import com.epm.gestepm.model.shares.noprogrammed.dao.entity.updater.NoProgrammed
 import com.epm.gestepm.model.shares.noprogrammed.decorator.NoProgrammedSharePostCreationDecorator;
 import com.epm.gestepm.model.shares.noprogrammed.service.mapper.*;
 import com.epm.gestepm.model.signings.checker.HasActiveSigningChecker;
+import com.epm.gestepm.model.signings.checker.SigningUpdateChecker;
 import com.epm.gestepm.modelapi.shares.noprogrammed.dto.NoProgrammedShareDto;
 import com.epm.gestepm.modelapi.shares.noprogrammed.dto.NoProgrammedShareStateEnumDto;
 import com.epm.gestepm.modelapi.shares.noprogrammed.dto.creator.NoProgrammedShareCreateDto;
@@ -59,6 +60,8 @@ public class NoProgrammedShareServiceImpl implements NoProgrammedShareService {
     private final HasActiveSigningChecker activeChecker;
 
     private final AuditProvider auditProvider;
+
+    private final SigningUpdateChecker signingUpdateChecker;
 
     @Override
     @RequirePermits(value = PRMT_READ_NPS, action = "List no programmed shares")
@@ -152,8 +155,12 @@ public class NoProgrammedShareServiceImpl implements NoProgrammedShareService {
         final NoProgrammedShareDto noProgrammedShareDto = findOrNotFound(finderDto);
 
         this.noProgrammedShareChecker.checker(updateDto, noProgrammedShareDto);
+        this.signingUpdateChecker.checker(noProgrammedShareDto.getUserId()
+                , noProgrammedShareDto.getProjectId());
 
-        if (NoProgrammedShareStateEnumDto.CLOSED.equals(updateDto.getState())) {
+        if (NoProgrammedShareStateEnumDto.CLOSED.equals(updateDto.getState())
+                && noProgrammedShareDto.getEndDate() == null
+                && updateDto.getEndDate() == null) {
             final LocalDateTime endDate = this.shareDateChecker.checkMaxHours(noProgrammedShareDto.getStartDate(), LocalDateTime.now());
             updateDto.setEndDate(endDate);
         }

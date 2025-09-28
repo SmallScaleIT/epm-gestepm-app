@@ -57,7 +57,7 @@
                         <div class="form-group mb-1">
                             <label class="col-form-label w-100"><spring:message code="start.date"/>
                                 <input type="datetime-local" name="startedAt" class="form-control mt-1"
-                                       value="${warehouseSigning.startedAt}" disabled/>
+                                       value="${warehouseSigning.startedAt}" />
                             </label>
                         </div>
                     </div>
@@ -65,7 +65,7 @@
                         <div class="form-group mb-1">
                             <label class="col-form-label w-100"><spring:message code="end.date"/>
                                 <input type="datetime-local" name="closedAt" class="form-control mt-1"
-                                       value="${warehouseSigning.closedAt}" disabled/>
+                                       value="${warehouseSigning.closedAt}" />
                             </label>
                         </div>
                     </div>
@@ -73,8 +73,9 @@
 
                 <div class="row actionable">
                     <div class="col text-right">
-                        <button id="finishBtn" type="button" class="btn btn-danger btn-sm"><spring:message
-                                code="finish"/></button>
+                        <button id="editBtn" type="button" class="btn btn-standard btn-sm movile-full">
+                            <spring:message code="save"/>
+                        </button>
                     </div>
                 </div>
             </form>
@@ -169,4 +170,5 @@
 <script>
     let userId = ${user.id};
     let canUpdate = ${canUpdate};
+    let isSigningFinished = ${ warehouseSigning.closedAt != null };
 </script>

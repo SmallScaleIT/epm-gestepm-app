@@ -41,6 +41,24 @@
             <form id="editForm" class="needs-validation">
                 <div class="row">
                     <div class="col-12 col-lg-6">
+                        <div class="form-group mb-1">
+                            <label class="col-form-label w-100"><spring:message code="start.date"/>
+                                <input type="datetime-local" name="startDate" class="form-control mt-1"
+                                       value="${share.startDate}"/>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6">
+                        <div class="form-group mb-1">
+                            <label class="col-form-label w-100"><spring:message code="end.date"/>
+                                <input type="datetime-local" name="endDate" class="form-control mt-1"
+                                       value="${share.endDate}"/>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-lg-6">
                         <div class="form-group">
                             <label class="col-form-label w-100">
                                 <spring:message code="family"/>
@@ -286,6 +304,43 @@
         return response.data.data;
     }
 
+    function actionEditClosed(editForm, filesData, id) {
+        axios.patch('/v1/shares/no-programmed/' + id, {
+            userId: ${user.id},
+            familyId: editForm.querySelector('[name="familyId"]').value,
+            subFamilyId: editForm.querySelector('[name="subFamilyId"]').value,
+            description: editForm.querySelector('[name="description"]').value,
+            startDate: editForm.querySelector('[name="startDate"]').value,
+            endDate: editForm.querySelector('[name="endDate"]').value,
+            state: 'CLOSED',
+            files: filesData
+        }).then(async (response) => {
+            share = await getShare(response.data.data.id);
+            getPermissions();
+            update(share);
+            showNotify(messages.shares.noprogrammed.update.success)
+        }).catch(error => showNotify(error.response.data.detail, 'danger'))
+        .finally(() => hideLoading());
+    }
+
+    function actionEdit(editForm, filesData, id) {
+        axios.patch('/v1/shares/no-programmed/' + id, {
+            userId: ${user.id},
+            familyId: editForm.querySelector('[name="familyId"]').value,
+            subFamilyId: editForm.querySelector('[name="subFamilyId"]').value,
+            description: editForm.querySelector('[name="description"]').value,
+            startDate: editForm.querySelector('[name="startDate"]').value,
+            state: 'INITIALIZED',
+            files: filesData
+        }).then(async (response) => {
+            share = await getShare(response.data.data.id);
+            getPermissions();
+            update(share);
+            showNotify(messages.shares.noprogrammed.update.success)
+        }).catch(error => showNotify(error.response.data.detail, 'danger'))
+        .finally(() => hideLoading());
+    }
+
     function edit(id) {
         const editBtn = $('#editBtn');
         const editForm = document.querySelector('#editForm');
@@ -297,10 +352,10 @@
 
             showLoading();
 
-            const files = editForm.querySelector('[name="files"]').files;
+            const files = editForm.querySelector('[name="files"]')?.files;
             let filesData = [];
 
-            for (let i = 0; i < files.length; i++) {
+            for (let i = 0; i < files?.length; i++) {
                 const file = files[i];
 
                 filesData.push({
@@ -309,21 +364,11 @@
                 });
             }
 
-            axios.patch('/v1/shares/no-programmed/' + id, {
-                userId: ${user.id},
-                familyId: editForm.querySelector('[name="familyId"]').value,
-                subFamilyId: editForm.querySelector('[name="subFamilyId"]').value,
-                description: editForm.querySelector('[name="description"]').value,
-                state: 'INITIALIZED',
-                files: filesData
-            }).then(async (response) => {
-                await getShare(response.data.data.id);
-                getPermissions();
-                setWorkingMode();
-                showNotify(messages.shares.noprogrammed.update.success)
-            }).catch(error => showNotify(error.response.data.detail, 'danger'))
-                .finally(() => hideLoading());
-        })
+            if (share?.endDate)
+                actionEditClosed(editForm, filesData, id);
+            else
+                actionEdit(editForm, filesData, id);
+        });
     }
 
     function close(id) {
@@ -334,10 +379,13 @@
 
             axios.patch('/v1/shares/no-programmed/' + id, {
                 userId: ${user.id},
+                familyId: editForm.querySelector('[name="familyId"]').value,
+                subFamilyId: editForm.querySelector('[name="subFamilyId"]').value,
+                description: editForm.querySelector('[name="description"]').value,
                 state: 'CLOSED'
             }).then(async (response) => {
-                await getShare(response.data.data.id);
-                setCompletedMode();
+                share = await getShare(response.data.data.id);
+                update(share);
                 showNotify(messages.shares.noprogrammed.update.success)
             }).catch(error => showNotify(error.response.data.detail, 'danger'))
                 .finally(() => hideLoading());
@@ -370,6 +418,14 @@
 
         if (share.description) {
             form.querySelector('[name="description"]').value = share.description;
+        }
+
+        if (share.startDate) {
+            form.querySelector('[name="startDate"]').value = share.startDate;
+        }
+
+        if (share.endDate) {
+            form.querySelector('[name="endDate"]').value = share.endDate;
         }
 
         if (share.forumTitle) {
@@ -422,6 +478,13 @@
 
         document.querySelector('#finishBtn').classList.add('d-none');
         document.querySelector('#createInspectionBtn').classList.add('d-none');
+
+        const fieldsToDisable = ['projectId', 'startDate', 'endDate'];
+
+        fieldsToDisable.forEach(name => {
+            const field = editForm.querySelector('[name="' + name + '"]');
+            if (field) field.disabled = true;
+        });
     }
 
     function setWorkingMode() {
@@ -435,7 +498,15 @@
 
         document.querySelector('#createInspectionBtn').classList.remove('d-none');
 
-        disableForm('#editForm');
+        if (!canUpdate)
+            disableForm('#editForm');
+
+        const fieldsToDisable = ['projectId', 'startDate', 'endDate'];
+
+        fieldsToDisable.forEach(name => {
+            const field = editForm.querySelector('[name="' + name + '"]');
+            if (field) field.disabled = true;
+        });
 
         const form = document.querySelector('#editForm');
         const files = form.querySelector('[name="files"]');
@@ -449,11 +520,24 @@
     function setCompletedMode() {
         currentMode = 'COMPLETED';
 
-        document.querySelector('#editBtn').remove();
-        document.querySelector('#finishBtn').remove();
-        document.querySelector('#createInspectionBtn').remove();
+        if (!canUpdate)
+        {
+            document.querySelector('#editBtn')?.remove();
+            document.querySelector('#finishBtn')?.remove();
+            document.querySelector('#createInspectionBtn')?.remove();
 
-        disableForm('#editForm');
+            disableForm('#editForm');
+        }
+        else
+        {
+            const fieldsToEnable = ['projectId', 'startDate', 'endDate'];
+
+            fieldsToEnable.forEach(name => {
+                const field = editForm.querySelector('[name="' + name + '"]');
+                if (field) field.disabled = false;
+            });
+        }
+
         showFiles();
     }
 

@@ -14,17 +14,25 @@ async function init() {
     const warehouseId = getWarehouseId();
 
     warehouseSigning = await getWarehouse(warehouseId);
+    const editForm = document.querySelector('#editForm');
 
-    if (canUpdate) {
-        const editForm = document.querySelector('#editForm');
+    if (!canUpdate) {
+        editForm.querySelector('.actionable').style.display = 'none';
 
-        editForm.querySelector('.actionable').classList.remove('d-none');
+        editForm.querySelectorAll('input, select, textarea, button').forEach(el => {
+            el.disabled = true;
+        });
+    }
+    else if (!isSigningFinished) {
+        const fieldsToDisable = ['projectId', 'startedAt', 'closedAt'];
 
-        editForm.querySelector('[name="startedAt"]').disabled = false;
-        editForm.querySelector('[name="closedAt"]').disabled = false;
+        fieldsToDisable.forEach(name => {
+            const field = editForm.querySelector('[name="' + name + '"]');
+            if (field) field.disabled = true;
+        });
     }
 
-    if (warehouseSigning.closedAt)
+    if (isSigningFinished)
     {
         const createWorkshopBtn = document.getElementById('createWorkshopBtn');
         createWorkshopBtn.classList.add('d-none');
@@ -42,40 +50,61 @@ function initializeSelects() {
     });
 }
 
-function setEndDate() {
-    const endDateEditor = document.querySelector('[name="closedAt"]');
-
-    if (endDateEditor && warehouseSigning && warehouseSigning.closedAt)
-        endDateEditor.value = warehouseSigning.closedAt;
-}
-
 function close(id) {
-    const finishBtn = document.getElementById('finishBtn');
-    const finishBtnJQ = $(finishBtn);
+    const editBtn = document.getElementById('editBtn');
+    const editBtnJQ = $(editBtn);
 
-    finishBtnJQ.click(async () => {
+    editBtnJQ.click(async () => {
         showLoading();
 
-        axios.patch('/v1/signings/warehouse/' + id, {})
-            .then(async response => {
-                const warehouseId = response.data.data.id;
-                warehouseSigning = await getWarehouse(warehouseId);
-                setEndDate();
-                dTable.ajax.reload();
-                const successMessage = messages.signings.warehouse.update.success.replace('{0}', id);
-                showNotify(successMessage);
+        const editForm = document.getElementById('editForm');
 
-                if (warehouseSigning.closedAt)
-                {
-                    const createWorkshopBtn = document.getElementById('createWorkshopBtn');
-                    createWorkshopBtn.classList.add('d-none');
-                }
+        axios.patch('/v1/signings/warehouse/' + id, {
+                startedAt: editForm.querySelector('[name="startedAt"]').value
+                , closedAt: editForm.querySelector('[name="closedAt"]').value})
+            .then(async response => {
+                  const warehouseId = response.data.data.id;
+                  warehouseSigning = await getWarehouse(warehouseId);
+                  update(warehouseSigning);
+                  dTable.ajax.reload();
+                  const successMessage = messages.signings.warehouse.update.success.replace('{0}', id);
+                  showNotify(successMessage);
             })
             .catch(error => showNotify(error.response.data.detail, 'danger'))
             .finally(() => {
                 hideLoading();
             });
     });
+}
+
+function update(warehouseSigning) {
+
+    const editForm = document.getElementById('editForm');
+
+    const startDatePicker = editForm.querySelector('[name="startedAt"]');
+    const closedAtPicker = editForm.querySelector('[name="closedAt"]');
+
+    if (startDatePicker)
+        startDatePicker.value = warehouseSigning.startedAt;
+
+    if (closedAtPicker)
+        closedAtPicker.value = warehouseSigning.closedAt;
+
+    if (canUpdate) {
+        const fieldsToEnable = ['startedAt', 'closedAt'];
+
+        fieldsToEnable.forEach(name => {
+            const field = editForm.querySelector('[name="' + name + '"]');
+            if (field) field.disabled = false;
+        });
+    }
+
+    if (warehouseSigning.closedAt)
+    {
+        const createWorkshopBtn = document.getElementById('createWorkshopBtn');
+        createWorkshopBtn.classList.add('d-none');
+    }
+
 }
 
 function loadDataTables() {

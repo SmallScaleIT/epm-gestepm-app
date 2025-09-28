@@ -19,6 +19,7 @@ import com.epm.gestepm.model.shares.construction.dao.entity.finder.ConstructionS
 import com.epm.gestepm.model.shares.construction.dao.entity.updater.ConstructionShareUpdate;
 import com.epm.gestepm.model.shares.construction.service.mapper.*;
 import com.epm.gestepm.model.signings.checker.HasActiveSigningChecker;
+import com.epm.gestepm.model.signings.checker.SigningUpdateChecker;
 import com.epm.gestepm.model.user.utils.UserUtils;
 import com.epm.gestepm.modelapi.common.utils.Utiles;
 import com.epm.gestepm.modelapi.customer.dto.CustomerDto;
@@ -82,6 +83,8 @@ public class ConstructionShareServiceImpl implements ConstructionShareService {
     private final UserUtils userUtils;
 
     private final HasActiveSigningChecker activeChecker;
+
+    private final SigningUpdateChecker signingUpdateChecker;
 
     @Override
     @RequirePermits(value = PRMT_READ_CS, action = "List construction shares")
@@ -175,13 +178,19 @@ public class ConstructionShareServiceImpl implements ConstructionShareService {
 
         final ConstructionShareDto constructionShareDto = findOrNotFound(finderDto);
 
+        this.signingUpdateChecker.checker(constructionShareDto.getUserId()
+                , constructionShareDto.getProjectId());
+
         final ConstructionShareUpdate update = getMapper(MapCSToConstructionShareUpdate.class).from(updateDto,
                 getMapper(MapCSToConstructionShareUpdate.class).from(constructionShareDto));
 
-        final LocalDateTime endDate = this.shareDateChecker.checkMaxHours(update.getStartDate(), update.getEndDate() != null
-                ? update.getEndDate()
-                : LocalDateTime.now());
-        update.setEndDate(endDate);
+        if (updateDto.getEndDate() == null && constructionShareDto.getEndDate() == null)
+        {
+            final LocalDateTime endDate = this.shareDateChecker.checkMaxHours(update.getStartDate(), update.getEndDate() != null
+                    ? update.getEndDate()
+                    : LocalDateTime.now());
+            update.setEndDate(endDate);
+        }
 
         this.shareDateChecker.checkStartBeforeEndDate(update.getStartDate(), update.getEndDate());
 

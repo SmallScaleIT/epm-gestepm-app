@@ -39,6 +39,7 @@
     let locale = '${locale}';
     let workshop;
     let canUpdate = ${canUpdate};
+    let isSigningFinished = ${ workshopSigning.closedAt != null };
 
     async function getWorkshop() {
         await axios.get('/v1' + window.location.pathname, {})
@@ -57,7 +58,7 @@
     }
 
     $(document).ready(async function () {
-        await initialize(canUpdate);
+        await initialize(canUpdate, isSigningFinished);
         await getWorkshop();
         loadHeader();
         save();

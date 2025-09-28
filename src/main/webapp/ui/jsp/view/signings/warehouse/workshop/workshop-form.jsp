@@ -28,7 +28,7 @@
             <div class="form-group mb-1">
                 <label class="col-form-label w-100"><spring:message code="start.date"/>
                     <input type="datetime-local" name="startedAt" class="form-control mt-1"
-                           value="${workshopSigning.startedAt}" disabled/>
+                           value="${workshopSigning.startedAt}" />
                 </label>
             </div>
         </div>
@@ -36,25 +36,27 @@
             <div class="form-group mb-1">
                 <label class="col-form-label w-100"><spring:message code="end.date"/>
                     <input type="datetime-local" name="closedAt" class="form-control mt-1"
-                           value="${workshopSigning.closedAt}" disabled/>
+                           value="${workshopSigning.closedAt}" />
                 </label>
             </div>
         </div>
     </div>
     <div class="row">
         <div class="col text-right">
-            <button id="editBtn" type="button" class="btn btn-danger btn-sm movile-full">
-                <spring:message code="finish"/>
+            <button id="editBtn" type="button" class="btn btn-standard btn-sm movile-full">
+                <spring:message code="save"/>
             </button>
         </div>
     </div>
 </form>
 
 <script>
-    async function actionSave(finalize) {
+    async function actionSave() {
         showLoading();
 
-        const descriptionField = document.querySelector('[name="description"]');
+        const editForm = document.getElementById('editForm');
+
+        const descriptionField = editForm.querySelector('[name="description"]');
         let description = null;
 
         if (descriptionField !== null && descriptionField !== undefined)
@@ -62,15 +64,12 @@
 
         axios.patch('/v1' + window.location.pathname, {
             'description': description
-            , 'finalize': finalize
+            , 'startedAt': editForm.querySelector('[name="startedAt"]')?.value
+            , 'closedAt': editForm.querySelector('[name="closedAt"]')?.value
         })
             .then((response) => {
                 const workshop = response.data.data;
-
-                if (finalize)
-                    window.location.replace('/signings/warehouse/' + workshop.warehouse.id);
-                else
-                    update(workshop);
+                window.location.replace('/signings/warehouse/' + workshop.warehouse.id);
             })
             .catch(error => showNotify(error.response.data.detail, 'danger'))
             .finally(() => hideLoading());
@@ -80,7 +79,7 @@
         const editBtn = document.getElementById('editBtn');
         const editBtnJQ = $(editBtn);
 
-        editBtnJQ.click(async () => await actionSave(true));
+        editBtnJQ.click(async () => await actionSave());
     }
 
     function update(workshop) {
@@ -98,24 +97,15 @@
             closedAtField.value = workshop.closedAt;
     }
 
-    async function initialize(canUpdate) {
-        const closedAtField = document.querySelector('[name="closedAt"]');
+    async function initialize(canUpdate, isSigningFinished) {
+        const editForm = document.getElementById('editForm');
 
-        if (closedAtField && closedAtField.value) {
-            const editBtn = document.getElementById('editBtn');
+        if (!canUpdate) {
+            editForm.querySelector('.actionable').style.display = 'none';
 
-            editBtn.classList.add('d-none');
-
-            disableForm('#editForm');
-        }
-
-        if (canUpdate) {
-            const editForm = document.querySelector('#editForm');
-
-            //editForm.querySelector('.actionable').classList.remove('d-none');
-
-            editForm.querySelector('[name="startedAt"]').disabled = false;
-            editForm.querySelector('[name="closedAt"]').disabled = false;
+            editForm.querySelectorAll('input, select, textarea, button').forEach(el => {
+                el.disabled = true;
+            });
         }
     }
 </script>
