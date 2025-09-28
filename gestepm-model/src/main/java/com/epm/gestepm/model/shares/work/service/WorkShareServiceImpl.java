@@ -185,13 +185,10 @@ public class WorkShareServiceImpl implements WorkShareService {
         final WorkShareUpdate update = getMapper(MapWSToWorkShareUpdate.class).from(updateDto,
                 getMapper(MapWSToWorkShareUpdate.class).from(workShareDto));
 
-        if (update.getEndDate() == null && updateDto.getEndDate() == null)
-        {
-            final LocalDateTime endDate = this.shareDateChecker.checkMaxHours(update.getStartDate(), update.getEndDate() != null
-                    ? update.getEndDate()
-                    : LocalDateTime.now());
-            update.setEndDate(endDate);
-        }
+        final LocalDateTime endDate = this.shareDateChecker.checkMaxHours(update.getStartDate(), update.getEndDate() != null
+                ? update.getEndDate()
+                : LocalDateTime.now());
+        update.setEndDate(endDate);
 
         this.shareDateChecker.checkStartBeforeEndDate(updateDto.getStartDate(), updateDto.getEndDate());
 

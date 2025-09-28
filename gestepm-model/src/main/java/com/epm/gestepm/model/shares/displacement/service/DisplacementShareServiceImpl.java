@@ -154,9 +154,6 @@ public class DisplacementShareServiceImpl implements DisplacementShareService {
 
         final DisplacementShareUpdate update = getMapper(MapDSToDisplacementShareUpdate.class).from(updateDto);
 
-        if (updateDto.getEndDate() == null && displacementShareDto.getEndDate() == null)
-            update.setEndDate(LocalDateTime.now());
-
         this.auditProvider.auditUpdate(update);
 
         this.signingUpdateChecker.checker(displacementShareDto.getUserId(), update.getProjectId());

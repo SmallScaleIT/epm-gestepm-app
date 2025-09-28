@@ -538,6 +538,11 @@
             });
         }
 
+        const finishBtn = document.getElementById('finishBtn');
+
+        if (finishBtn)
+            finishBtn.classList.add('d-none');
+
         showFiles();
     }
 

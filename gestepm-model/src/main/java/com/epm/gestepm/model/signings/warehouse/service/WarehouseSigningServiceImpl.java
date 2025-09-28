@@ -144,7 +144,7 @@ public class WarehouseSigningServiceImpl implements WarehouseSigningService {
         this.auditProvider.auditUpdate(update);
 
         //If first time for update then close signing today
-        if (warehouseSigningDto.getClosedAt() == null && updateDto.getClosedAt() == null)
+        if (warehouseSigningDto.getClosedAt() == null)
             update.setClosedAt(LocalDateTime.now());
 
         return getMapper(MapWHSToWarehouseSigningDto.class)
