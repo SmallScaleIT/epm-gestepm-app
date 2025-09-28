@@ -6,6 +6,7 @@ import com.epm.gestepm.lib.types.Page;
 import com.epm.gestepm.modelapi.common.utils.ModelUtil;
 import com.epm.gestepm.modelapi.common.utils.classes.Constants;
 import com.epm.gestepm.modelapi.common.utils.datatables.SortOrder;
+import com.epm.gestepm.modelapi.deprecated.project.dto.Project;
 import com.epm.gestepm.modelapi.project.dto.ProjectDto;
 import com.epm.gestepm.modelapi.project.dto.filter.ProjectFilterDto;
 import com.epm.gestepm.modelapi.project.service.ProjectService;
@@ -101,10 +102,7 @@ public class ConstructionShareViewController {
         final List<ProjectDto> projects = this.projectService.list(projectFilterDto);
         model.addAttribute("projects", projects);
 
-        boolean canUpdate = Constants.ROLE_ADMIN.equals(user.getRole().getRoleName())
-                || constructionShare.getUserId().equals(user.getId().intValue());
-
-        model.addAttribute("canUpdate", canUpdate);
+        this.loadPermissions(user, constructionShare.getProjectId(), model, constructionShare);
 
         final ConstructionShareFileFilterDto filterDto = new ConstructionShareFileFilterDto();
         filterDto.setShareId(id);
@@ -124,5 +122,16 @@ public class ConstructionShareViewController {
         }
 
         return "construction-share-detail";
+    }
+
+    private void loadPermissions(final User user, final Integer projectId, final Model model
+            , final ConstructionShareDto constructionShare) {
+        final Boolean isAdmin = Constants.ROLE_ADMIN.equals(user.getRole().getRoleName());
+        final Boolean isProjectTL = Constants.ROLE_PL.equals(user.getRole().getRoleName())
+                && user.getBossProjects().stream().map(Project::getId).collect(Collectors.toList()).contains(projectId.longValue());
+        final Boolean isCurrentUser = constructionShare.getUserId().equals(user.getId().intValue());
+
+        model.addAttribute("canUpdate"
+                , isAdmin || isProjectTL || isCurrentUser);
     }
 }
