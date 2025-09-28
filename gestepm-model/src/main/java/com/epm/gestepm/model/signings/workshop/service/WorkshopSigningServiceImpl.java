@@ -172,7 +172,7 @@ public class WorkshopSigningServiceImpl implements WorkshopSigningService {
         final WorkshopSigningUpdate update = getMapper(MapWSSToWorkshopSigningUpdate.class)
                 .from(updateDto, getMapper(MapWSSToWorkshopSigningUpdate.class).from(workShopSigningDto));
 
-        this.signingUpdateChecker.checker(this.userUtils.getCurrentUserId(), workShopSigningDto.getProjectId());
+        this.signingUpdateChecker.checker(workShopSigningDto.getUserId(), workShopSigningDto.getProjectId());
 
         if (update.getClosedAt() == null) {
             update.setClosedAt(LocalDateTime.now());

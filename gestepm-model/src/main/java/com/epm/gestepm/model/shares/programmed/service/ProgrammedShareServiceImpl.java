@@ -187,7 +187,7 @@ public class ProgrammedShareServiceImpl implements ProgrammedShareService {
         final ProgrammedShareUpdate update = getMapper(MapPSToProgrammedShareUpdate.class).from(updateDto,
                 getMapper(MapPSToProgrammedShareUpdate.class).from(programmedShareDto));
 
-        this.signingUpdateChecker.checker(this.userUtils.getCurrentUserId(), update.getProjectId());
+        this.signingUpdateChecker.checker(programmedShareDto.getUserId(), update.getProjectId());
 
         final LocalDateTime endDate = this.shareDateChecker.checkMaxHours(update.getStartDate(), update.getEndDate() != null
                 ? update.getEndDate()

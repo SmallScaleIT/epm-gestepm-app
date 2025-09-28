@@ -182,7 +182,7 @@ public class NoProgrammedShareServiceImpl implements NoProgrammedShareService {
         final NoProgrammedShareUpdate update = getMapper(MapNPSToNoProgrammedShareUpdate.class).from(updateDto,
                 getMapper(MapNPSToNoProgrammedShareUpdate.class).from(noProgrammedShareDto));
 
-        this.signingUpdateChecker.checker(this.userUtils.getCurrentUserId(), noProgrammedShareDto.getProjectId());
+        this.signingUpdateChecker.checker(noProgrammedShareDto.getUserId(), noProgrammedShareDto.getProjectId());
 
         if (NoProgrammedShareStateEnumDto.IN_PROGRESS.equals(noProgrammedShareDto.getState())
                 && NoProgrammedShareStateEnumDto.CLOSED.equals(updateDto.getState())) {

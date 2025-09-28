@@ -161,7 +161,7 @@ public class WarehouseSigningServiceImpl implements WarehouseSigningService {
         final WarehouseSigningUpdate update = getMapper(MapWHSToWarehouseSigningUpdate.class)
                 .from(updateDto, getMapper(MapWHSToWarehouseSigningUpdate.class).from(warehouseSigningDto));
 
-        this.signingUpdateChecker.checker(this.userUtils.getCurrentUserId(), warehouseSigningDto.getProjectId());
+        this.signingUpdateChecker.checker(warehouseSigningDto.getUserId(), warehouseSigningDto.getProjectId());
 
         this.auditProvider.auditUpdate(update);
 

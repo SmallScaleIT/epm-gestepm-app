@@ -163,10 +163,11 @@ public class PersonalSigningServiceImpl implements PersonalSigningService {
             msgOut = "Personal signing updated OK",
             errorMsg = "Failed to update personal signing")
     public PersonalSigningDto update(PersonalSigningUpdateDto updateDto) {
+        final PersonalSigningDto personalSigningDto = this.findOrNotFound(new PersonalSigningByIdFinderDto(updateDto.getId()));
 
         final PersonalSigningUpdate update = getMapper(MapPRSToPersonalSigningUpdate.class).from(updateDto);
 
-        this.signingUpdateChecker.checker(this.userUtils.getCurrentUserId(), null);
+        this.signingUpdateChecker.checker(personalSigningDto.getUserId(), null);
 
         this.auditProvider.auditUpdate(update);
 

@@ -77,8 +77,6 @@ public class DisplacementShareServiceImpl implements DisplacementShareService {
 
     private final SigningUpdateChecker signingUpdateChecker;
 
-    private final UserUtils userUtils;
-
     @Override
     @RequirePermits(value = PRMT_READ_DS, action = "List displacement shares")
     @LogExecution(operation = OP_READ,
@@ -171,13 +169,13 @@ public class DisplacementShareServiceImpl implements DisplacementShareService {
             msgOut = "Displacement share updated OK",
             errorMsg = "Failed to update displacement share")
     public DisplacementShareDto update(final DisplacementShareUpdateDto updateDto) {
-        final DisplacementShareByIdFinderDto finderDto = new DisplacementShareByIdFinderDto(updateDto.getId());
+        final DisplacementShareDto displacementShareDto = this.findOrNotFound(new DisplacementShareByIdFinderDto(updateDto.getId()));
 
         final DisplacementShareUpdate update = getMapper(MapDSToDisplacementShareUpdate.class).from(updateDto);
 
         this.auditProvider.auditUpdate(update);
 
-        this.signingUpdateChecker.checker(this.userUtils.getCurrentUserId(), update.getProjectId());
+        this.signingUpdateChecker.checker(displacementShareDto.getUserId(), update.getProjectId());
 
         final DisplacementShare updated = this.displacementShareDao.update(update);
 
