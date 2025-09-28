@@ -4,6 +4,7 @@ import com.epm.gestepm.lib.logging.annotation.EnableExecutionLog;
 import com.epm.gestepm.lib.logging.annotation.LogExecution;
 import com.epm.gestepm.modelapi.common.utils.ModelUtil;
 import com.epm.gestepm.modelapi.common.utils.classes.Constants;
+import com.epm.gestepm.modelapi.deprecated.project.dto.Project;
 import com.epm.gestepm.modelapi.project.dto.ProjectDto;
 import com.epm.gestepm.modelapi.project.dto.filter.ProjectFilterDto;
 import com.epm.gestepm.modelapi.project.service.ProjectService;
@@ -24,6 +25,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import static com.epm.gestepm.lib.logging.constants.LogLayerMarkers.VIEW;
 import static com.epm.gestepm.lib.logging.constants.LogOperations.OP_VIEW;
@@ -70,12 +72,20 @@ public class DisplacementShareViewController {
         final List<ProjectDto> projects = this.filterProjects();
         model.addAttribute("projects", projects);
 
-        boolean canUpdate = Constants.ROLE_ADMIN.equals(user.getRole().getRoleName())
-                || displacementShare.getUserId().equals(user.getId().intValue());
-
-        model.addAttribute("canUpdate", canUpdate);
+        this.loadPermissions(user, displacementShare.getProjectId(), model, displacementShare);
 
         return "displacement-share-detail";
+    }
+
+    private void loadPermissions(final User user, final Integer projectId, final Model model
+            , final DisplacementShareDto displacementShare) {
+        final Boolean isAdmin = Constants.ROLE_ADMIN.equals(user.getRole().getRoleName());
+        final Boolean isProjectTL = Constants.ROLE_PL.equals(user.getRole().getRoleName())
+                && user.getBossProjects().stream().map(Project::getId).collect(Collectors.toList()).contains(projectId.longValue());
+        final Boolean isCurrentUser = displacementShare.getUserId().equals(user.getId().intValue());
+
+        model.addAttribute("canUpdate"
+                , isAdmin || isProjectTL || isCurrentUser);
     }
 
     private List<ProjectDto> filterProjects() {

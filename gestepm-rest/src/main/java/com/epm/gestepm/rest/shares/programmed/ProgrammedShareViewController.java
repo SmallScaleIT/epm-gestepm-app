@@ -6,6 +6,7 @@ import com.epm.gestepm.lib.types.Page;
 import com.epm.gestepm.modelapi.common.utils.ModelUtil;
 import com.epm.gestepm.modelapi.common.utils.classes.Constants;
 import com.epm.gestepm.modelapi.common.utils.datatables.SortOrder;
+import com.epm.gestepm.modelapi.deprecated.project.dto.Project;
 import com.epm.gestepm.modelapi.deprecated.user.dto.User;
 import com.epm.gestepm.modelapi.project.dto.ProjectDto;
 import com.epm.gestepm.modelapi.project.dto.filter.ProjectFilterDto;
@@ -108,9 +109,7 @@ public class ProgrammedShareViewController {
         final List<UserDto> users = this.userService.list(userFilterDto);
         model.addAttribute("users", users);
 
-        boolean canUpdate = Constants.ROLE_ADMIN.equals(user.getRole().getRoleName())
-                || programmedShare.getUserId().equals(user.getId().intValue());
-        model.addAttribute("canUpdate", canUpdate);
+        this.loadPermissions(user, programmedShare.getProjectId(), model, programmedShare);
 
         final ProgrammedShareFileFilterDto filterDto = new ProgrammedShareFileFilterDto();
         filterDto.setShareId(id);
@@ -130,5 +129,16 @@ public class ProgrammedShareViewController {
         }
 
         return "programmed-share-detail";
+    }
+
+    private void loadPermissions(final User user, final Integer projectId, final Model model
+            , final ProgrammedShareDto programmedShare) {
+        final Boolean isAdmin = Constants.ROLE_ADMIN.equals(user.getRole().getRoleName());
+        final Boolean isProjectTL = Constants.ROLE_PL.equals(user.getRole().getRoleName())
+                && user.getBossProjects().stream().map(Project::getId).collect(Collectors.toList()).contains(projectId.longValue());
+        final Boolean isCurrentUser = programmedShare.getUserId().equals(user.getId().intValue());
+
+        model.addAttribute("canUpdate"
+                , isAdmin || isProjectTL || isCurrentUser);
     }
 }
