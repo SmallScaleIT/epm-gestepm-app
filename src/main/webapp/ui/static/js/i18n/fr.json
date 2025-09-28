@@ -293,5 +293,6 @@
     },
     "projectId": {
         "mandatory": "Le projet est obligatoire, veuillez en sélectionner un."
-    }
+    },
+    "save": "Enregistrer"
 }

@@ -88,7 +88,7 @@ public class WarehouseSigningViewController {
     }
 
     private void loadPermissions(final User user, final Integer projectId, final Model model
-            , WarehouseSigningDto warehouseSigning) {
+            , final WarehouseSigningDto warehouseSigning) {
         final Boolean isAdmin = Constants.ROLE_ADMIN.equals(user.getRole().getRoleName());
 
         final Boolean isProjectTl = Constants.ROLE_PL.equals(user.getRole().getRoleName())

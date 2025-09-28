@@ -8,6 +8,7 @@ import com.epm.gestepm.lib.logging.annotation.EnableExecutionLog;
 import com.epm.gestepm.lib.logging.annotation.LogExecution;
 import com.epm.gestepm.lib.security.annotation.RequirePermits;
 import com.epm.gestepm.lib.types.Page;
+import com.epm.gestepm.model.signings.checker.SigningUpdateChecker;
 import com.epm.gestepm.model.signings.workshop.dao.WorkshopSigningDao;
 import com.epm.gestepm.model.signings.workshop.dao.entity.creator.WorkshopSigningCreate;
 import com.epm.gestepm.model.signings.workshop.dao.entity.deleter.WorkshopSigningDelete;
@@ -30,7 +31,6 @@ import com.epm.gestepm.modelapi.signings.workshop.dto.deleter.WorkshopSigningDel
 import com.epm.gestepm.modelapi.signings.workshop.dto.filter.WorkshopSigningFilterDto;
 import com.epm.gestepm.modelapi.signings.workshop.dto.finder.WorkshopSigningByIdFinderDto;
 import com.epm.gestepm.modelapi.signings.workshop.dto.updater.WorkshopSigningUpdateDto;
-import com.epm.gestepm.modelapi.signings.workshop.exception.WorkshopSigningFinalizedException;
 import com.epm.gestepm.modelapi.signings.workshop.exception.WorkshopSigningNotFoundException;
 import com.epm.gestepm.modelapi.signings.workshop.service.WorkshopSigningService;
 import lombok.AllArgsConstructor;
@@ -70,6 +70,8 @@ public class WorkshopSigningServiceImpl implements WorkshopSigningService {
 
     @Value("${mail.user.notify}")
     private List<String> emailsTo;
+
+    private final SigningUpdateChecker signingUpdateChecker;
 
     @Override
     @RequirePermits(value = PRMT_READ_WSS, action = "List workshop signings")
@@ -173,30 +175,23 @@ public class WorkshopSigningServiceImpl implements WorkshopSigningService {
             errorMsg = "Failed to update workshop signing")
     public WorkShopSigningDto update(WorkshopSigningUpdateDto updateDto) {
 
-        WorkshopSigningByIdFinder finder = new WorkshopSigningByIdFinder();
-        finder.setId(updateDto.getId());
+        final WorkshopSigningByIdFinderDto finderDto = new WorkshopSigningByIdFinderDto(updateDto.getId());
 
-        //Find workshop signing from database
-        WorkshopSigningUpdate signing = repository.findUpdateSigning(finder)
-                .orElseThrow(() -> new WorkshopSigningNotFoundException(finder.getId()));
+        final WorkShopSigningDto workShopSigningDto = findOrNotFound(finderDto);
 
-        if (signing.getClosedAt() != null)
-            throw new WorkshopSigningFinalizedException(signing.getId());
+        this.signingUpdateChecker.checker(workShopSigningDto.getUserId()
+                , workShopSigningDto.getProjectId());
 
-        //Update entity with non null values
-        getMapper(MapWSSToWorkshopSigningUpdate.class)
-                .from(updateDto, signing);
+        final WorkshopSigningUpdate update = getMapper(MapWSSToWorkshopSigningUpdate.class)
+                .from(updateDto, getMapper(MapWSSToWorkshopSigningUpdate.class).from(workShopSigningDto));
 
-        boolean finalize = Optional.ofNullable(updateDto.getFinalize())
-                .orElse(false);
+        if (updateDto.getClosedAt() == null && workShopSigningDto.getClosedAt() == null)
+            update.setClosedAt(LocalDateTime.now());
 
-        if (finalize)
-            signing.setClosedAt(LocalDateTime.now());
-
-        this.auditProvider.auditUpdate(signing);
+        this.auditProvider.auditUpdate(update);
 
         final WorkShopSigningDto result = getMapper(MapWSSToWorkshopSigningDto.class)
-                .from(repository.update(signing));
+                .from(repository.update(update));
 
         this.sendUpdateEmail(result);
 

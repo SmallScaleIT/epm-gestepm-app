@@ -20,6 +20,7 @@ import com.epm.gestepm.model.shares.programmed.dao.entity.finder.ProgrammedShare
 import com.epm.gestepm.model.shares.programmed.dao.entity.updater.ProgrammedShareUpdate;
 import com.epm.gestepm.model.shares.programmed.service.mapper.*;
 import com.epm.gestepm.model.signings.checker.HasActiveSigningChecker;
+import com.epm.gestepm.model.signings.checker.SigningUpdateChecker;
 import com.epm.gestepm.model.user.utils.UserUtils;
 import com.epm.gestepm.modelapi.common.utils.Utiles;
 import com.epm.gestepm.modelapi.customer.dto.CustomerDto;
@@ -87,6 +88,8 @@ public class ProgrammedShareServiceImpl implements ProgrammedShareService {
 
     @Value("${mail.user.notify}")
     private List<String> emailsTo;
+
+    private final SigningUpdateChecker signingUpdateChecker;
 
     @Override
     @RequirePermits(value = PRMT_READ_PS, action = "List programmed shares")
@@ -180,6 +183,9 @@ public class ProgrammedShareServiceImpl implements ProgrammedShareService {
         final ProgrammedShareByIdFinderDto finderDto = new ProgrammedShareByIdFinderDto(updateDto.getId());
 
         final ProgrammedShareDto programmedShareDto = findOrNotFound(finderDto);
+
+        this.signingUpdateChecker.checker(programmedShareDto.getUserId()
+                , programmedShareDto.getProjectId());
 
         final ProgrammedShareUpdate update = getMapper(MapPSToProgrammedShareUpdate.class).from(updateDto,
                 getMapper(MapPSToProgrammedShareUpdate.class).from(programmedShareDto));

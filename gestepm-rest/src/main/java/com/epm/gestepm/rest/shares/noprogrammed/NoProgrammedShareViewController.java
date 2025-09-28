@@ -115,6 +115,7 @@ public class NoProgrammedShareViewController {
         boolean canUpdate = Constants.ROLE_ADMIN.equals(user.getRole().getRoleName())
                 || share.getUserId().equals(user.getId().intValue());
 
+        model.addAttribute("share", share);
         model.addAttribute("canUpdate", canUpdate);
         model.addAttribute("families", families);
         model.addAttribute("usersTeam", usersTeam);

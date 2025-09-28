@@ -10,6 +10,7 @@ import com.epm.gestepm.lib.security.annotation.RequirePermits;
 import com.epm.gestepm.lib.types.Page;
 import com.epm.gestepm.model.shares.common.checker.ShareDateChecker;
 import com.epm.gestepm.model.signings.checker.HasActiveSigningChecker;
+import com.epm.gestepm.model.signings.checker.SigningUpdateChecker;
 import com.epm.gestepm.model.signings.personal.dao.PersonalSigningDao;
 import com.epm.gestepm.model.signings.personal.dao.entity.PersonalSigning;
 import com.epm.gestepm.model.signings.personal.dao.entity.creator.PersonalSigningCreate;
@@ -18,17 +19,9 @@ import com.epm.gestepm.model.signings.personal.dao.entity.filter.PersonalSigning
 import com.epm.gestepm.model.signings.personal.dao.entity.finder.PersonalSigningByIdFinder;
 import com.epm.gestepm.model.signings.personal.dao.entity.updater.PersonalSigningUpdate;
 import com.epm.gestepm.model.signings.personal.service.mapper.*;
-import com.epm.gestepm.model.signings.teleworking.dao.entity.TeleworkingSigning;
-import com.epm.gestepm.model.signings.teleworking.dao.entity.filter.TeleworkingSigningFilter;
-import com.epm.gestepm.model.signings.teleworking.dao.entity.finder.TeleworkingSigningByIdFinder;
-import com.epm.gestepm.model.signings.teleworking.service.mapper.MapTSToTeleworkingSigningByIdFinder;
-import com.epm.gestepm.model.signings.teleworking.service.mapper.MapTSToTeleworkingSigningDto;
-import com.epm.gestepm.model.signings.teleworking.service.mapper.MapTSToTeleworkingSigningFilter;
 import com.epm.gestepm.model.user.utils.UserUtils;
 import com.epm.gestepm.modelapi.common.utils.Utiles;
 import com.epm.gestepm.modelapi.deprecated.user.dto.User;
-import com.epm.gestepm.modelapi.project.dto.ProjectDto;
-import com.epm.gestepm.modelapi.project.dto.finder.ProjectByIdFinderDto;
 import com.epm.gestepm.modelapi.project.service.ProjectService;
 import com.epm.gestepm.modelapi.signings.personal.dto.PersonalSigningDto;
 import com.epm.gestepm.modelapi.signings.personal.dto.creator.PersonalSigningCreateDto;
@@ -38,15 +31,12 @@ import com.epm.gestepm.modelapi.signings.personal.dto.finder.PersonalSigningById
 import com.epm.gestepm.modelapi.signings.personal.dto.updater.PersonalSigningUpdateDto;
 import com.epm.gestepm.modelapi.signings.personal.exception.PersonalSigningNotFoundException;
 import com.epm.gestepm.modelapi.signings.personal.service.PersonalSigningService;
-import com.epm.gestepm.modelapi.signings.teleworking.dto.TeleworkingSigningDto;
-import com.epm.gestepm.modelapi.signings.teleworking.exception.TeleworkingSigningNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Supplier;
 
@@ -82,6 +72,8 @@ public class PersonalSigningServiceImpl implements PersonalSigningService {
 
     @Value("${mail.user.notify}")
     private List<String> emailsTo;
+
+    private final SigningUpdateChecker signingUpdateChecker;
 
     @Override
     @RequirePermits(value = PRMT_READ_PRS, action = "List personal signings")
@@ -171,9 +163,12 @@ public class PersonalSigningServiceImpl implements PersonalSigningService {
             errorMsg = "Failed to update personal signing")
     public PersonalSigningDto update(PersonalSigningUpdateDto updateDto) {
 
-        this.findOrNotFound(new PersonalSigningByIdFinderDto(updateDto.getId()));
+        final PersonalSigningDto personalSigningDto = this.findOrNotFound(new PersonalSigningByIdFinderDto(updateDto.getId()));
 
         final PersonalSigningUpdate update = getMapper(MapPRSToPersonalSigningUpdate.class).from(updateDto);
+
+        this.signingUpdateChecker.checker(personalSigningDto.getUserId()
+                , null);
 
         this.auditProvider.auditUpdate(update);
 

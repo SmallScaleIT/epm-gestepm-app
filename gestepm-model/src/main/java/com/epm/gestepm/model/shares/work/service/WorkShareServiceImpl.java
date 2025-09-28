@@ -20,6 +20,7 @@ import com.epm.gestepm.model.shares.work.dao.entity.finder.WorkShareByIdFinder;
 import com.epm.gestepm.model.shares.work.dao.entity.updater.WorkShareUpdate;
 import com.epm.gestepm.model.shares.work.service.mapper.*;
 import com.epm.gestepm.model.signings.checker.HasActiveSigningChecker;
+import com.epm.gestepm.model.signings.checker.SigningUpdateChecker;
 import com.epm.gestepm.model.user.utils.UserUtils;
 import com.epm.gestepm.modelapi.common.utils.Utiles;
 import com.epm.gestepm.modelapi.customer.dto.CustomerDto;
@@ -87,6 +88,8 @@ public class WorkShareServiceImpl implements WorkShareService {
 
     @Value("${mail.user.notify}")
     private List<String> emailsTo;
+
+    private final SigningUpdateChecker signingUpdateChecker;
 
     @Override
     @RequirePermits(value = PRMT_READ_WS, action = "List work shares")
@@ -180,6 +183,9 @@ public class WorkShareServiceImpl implements WorkShareService {
         final WorkShareByIdFinderDto finderDto = new WorkShareByIdFinderDto(updateDto.getId());
 
         final WorkShareDto workShareDto = findOrNotFound(finderDto);
+
+        this.signingUpdateChecker.checker(workShareDto.getUserId()
+                , workShareDto.getProjectId());
 
         final WorkShareUpdate update = getMapper(MapWSToWorkShareUpdate.class).from(updateDto,
                 getMapper(MapWSToWorkShareUpdate.class).from(workShareDto));
