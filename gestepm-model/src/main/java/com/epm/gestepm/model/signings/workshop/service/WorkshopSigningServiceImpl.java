@@ -1,6 +1,9 @@
 package com.epm.gestepm.model.signings.workshop.service;
 
+import com.epm.gestepm.emailapi.dto.emailgroup.UpdateWorkshopSigningGroup;
+import com.epm.gestepm.emailapi.service.EmailService;
 import com.epm.gestepm.lib.audit.AuditProvider;
+import com.epm.gestepm.lib.locale.LocaleProvider;
 import com.epm.gestepm.lib.logging.annotation.EnableExecutionLog;
 import com.epm.gestepm.lib.logging.annotation.LogExecution;
 import com.epm.gestepm.lib.security.annotation.RequirePermits;
@@ -13,6 +16,11 @@ import com.epm.gestepm.model.signings.workshop.dao.entity.filter.WorkshopSigning
 import com.epm.gestepm.model.signings.workshop.dao.entity.finder.WorkshopSigningByIdFinder;
 import com.epm.gestepm.model.signings.workshop.dao.entity.updater.WorkshopSigningUpdate;
 import com.epm.gestepm.model.signings.workshop.service.mapper.*;
+import com.epm.gestepm.modelapi.common.utils.Utiles;
+import com.epm.gestepm.modelapi.deprecated.user.dto.User;
+import com.epm.gestepm.modelapi.project.dto.ProjectDto;
+import com.epm.gestepm.modelapi.project.dto.finder.ProjectByIdFinderDto;
+import com.epm.gestepm.modelapi.project.service.ProjectService;
 import com.epm.gestepm.model.user.utils.UserUtils;
 import com.epm.gestepm.modelapi.signings.warehouse.dto.WarehouseSigningDto;
 import com.epm.gestepm.modelapi.signings.warehouse.dto.finder.WarehouseSigningByIdFinderDto;
@@ -24,16 +32,16 @@ import com.epm.gestepm.modelapi.signings.workshop.dto.deleter.WorkshopSigningDel
 import com.epm.gestepm.modelapi.signings.workshop.dto.filter.WorkshopSigningFilterDto;
 import com.epm.gestepm.modelapi.signings.workshop.dto.finder.WorkshopSigningByIdFinderDto;
 import com.epm.gestepm.modelapi.signings.workshop.dto.updater.WorkshopSigningUpdateDto;
-import com.epm.gestepm.modelapi.signings.workshop.exception.WorkshopSigningFinalizedException;
 import com.epm.gestepm.modelapi.signings.workshop.exception.WorkshopSigningNotFoundException;
 import com.epm.gestepm.modelapi.signings.workshop.service.WorkshopSigningService;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.epm.gestepm.lib.logging.constants.LogLayerMarkers.SERVICE;
 import static com.epm.gestepm.lib.logging.constants.LogOperations.*;
@@ -47,11 +55,22 @@ import static com.epm.gestepm.modelapi.signings.workshop.security.WorkshopSignin
 @EnableExecutionLog(layerMarker = SERVICE)
 public class WorkshopSigningServiceImpl implements WorkshopSigningService {
 
+    @Value("${gestepm.mails.notify}")
+    private List<String> emailsTo;
+  
     private final WorkshopSigningDao repository;
 
     private final WarehouseSigningService warehouseService;
 
     private final AuditProvider auditProvider;
+
+    private final EmailService emailService;
+
+    private final LocaleProvider localeProvider;
+
+    private final MessageSource messageSource;
+
+    private final ProjectService projectService;
 
     private final SigningUpdateChecker signingUpdateChecker;
 
@@ -161,8 +180,12 @@ public class WorkshopSigningServiceImpl implements WorkshopSigningService {
 
         this.auditProvider.auditUpdate(update);
 
-        return getMapper(MapWSSToWorkshopSigningDto.class)
+        final WorkShopSigningDto result = getMapper(MapWSSToWorkshopSigningDto.class)
                 .from(repository.update(update));
+
+        this.sendUpdateEmail(result);
+
+        return result;
     }
 
     @Override
@@ -197,5 +220,34 @@ public class WorkshopSigningServiceImpl implements WorkshopSigningService {
         if (warehouse.getClosedAt() != null) {
             throw new WarehouseFinalizedException(warehouse.getId());
         }
+    }
+
+    private void sendUpdateEmail(final WorkShopSigningDto workshopSigning) {
+        final User user = Utiles.getCurrentUser();
+
+        if (!workshopSigning.getUserId().equals(user.getId().intValue()))
+            return ;
+
+        final Locale locale = new Locale(this.localeProvider.getLocale().orElse("es"));
+
+        final String subject = messageSource.getMessage("email.workshopsigning.update.subject", new Object[]{
+                workshopSigning.getId()
+        }, locale);
+
+        final Set<String> emails = new HashSet<>(emailsTo);
+
+        final ProjectDto project = this.projectService.findOrNotFound(new ProjectByIdFinderDto(workshopSigning.getProjectId()));
+
+        final UpdateWorkshopSigningGroup updateGroup = new UpdateWorkshopSigningGroup();
+        updateGroup.setEmails(new ArrayList<>(emails));
+        updateGroup.setSubject(subject);
+        updateGroup.setLocale(locale);
+        updateGroup.setWorkshopSigningId(workshopSigning.getId());
+        updateGroup.setFullName(user.getFullName());
+        updateGroup.setProjectName(project.getName());
+        updateGroup.setCreatedAt(workshopSigning.getStartedAt());
+        updateGroup.setClosedAt(workshopSigning.getClosedAt());
+
+        this.emailService.sendEmail(updateGroup);
     }
 }

@@ -34,6 +34,7 @@ gestepm:
   mails:
     admin: # by environment
     rrhh: # by environment
+    notify: #by environment
   signing:
     ftp:
       server: # by environment

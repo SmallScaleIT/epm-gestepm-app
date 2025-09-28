@@ -1,10 +1,15 @@
 package com.epm.gestepm.model.signings.personal.service;
 
+import com.epm.gestepm.emailapi.dto.emailgroup.UpdatePersonalSigningGroup;
+import com.epm.gestepm.emailapi.service.EmailService;
 import com.epm.gestepm.lib.audit.AuditProvider;
+import com.epm.gestepm.lib.locale.LocaleProvider;
 import com.epm.gestepm.lib.logging.annotation.EnableExecutionLog;
 import com.epm.gestepm.lib.logging.annotation.LogExecution;
 import com.epm.gestepm.lib.security.annotation.RequirePermits;
 import com.epm.gestepm.lib.types.Page;
+import com.epm.gestepm.model.shares.common.checker.ShareDateChecker;
+import com.epm.gestepm.model.signings.checker.HasActiveSigningChecker;
 import com.epm.gestepm.model.signings.checker.SigningUpdateChecker;
 import com.epm.gestepm.model.signings.personal.dao.PersonalSigningDao;
 import com.epm.gestepm.model.signings.personal.dao.entity.PersonalSigning;
@@ -21,6 +26,9 @@ import com.epm.gestepm.model.signings.teleworking.service.mapper.MapTSToTelework
 import com.epm.gestepm.model.signings.teleworking.service.mapper.MapTSToTeleworkingSigningDto;
 import com.epm.gestepm.model.signings.teleworking.service.mapper.MapTSToTeleworkingSigningFilter;
 import com.epm.gestepm.model.user.utils.UserUtils;
+import com.epm.gestepm.modelapi.common.utils.Utiles;
+import com.epm.gestepm.modelapi.deprecated.user.dto.User;
+import com.epm.gestepm.modelapi.project.service.ProjectService;
 import com.epm.gestepm.modelapi.signings.personal.dto.PersonalSigningDto;
 import com.epm.gestepm.modelapi.signings.personal.dto.creator.PersonalSigningCreateDto;
 import com.epm.gestepm.modelapi.signings.personal.dto.deleter.PersonalSigningDeleteDto;
@@ -29,15 +37,13 @@ import com.epm.gestepm.modelapi.signings.personal.dto.finder.PersonalSigningById
 import com.epm.gestepm.modelapi.signings.personal.dto.updater.PersonalSigningUpdateDto;
 import com.epm.gestepm.modelapi.signings.personal.exception.PersonalSigningNotFoundException;
 import com.epm.gestepm.modelapi.signings.personal.service.PersonalSigningService;
-import com.epm.gestepm.modelapi.signings.teleworking.dto.TeleworkingSigningDto;
-import com.epm.gestepm.modelapi.signings.teleworking.exception.TeleworkingSigningNotFoundException;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Supplier;
 
 import static com.epm.gestepm.lib.logging.constants.LogLayerMarkers.SERVICE;
@@ -52,13 +58,23 @@ import static org.mapstruct.factory.Mappers.getMapper;
 @EnableExecutionLog(layerMarker = SERVICE)
 public class PersonalSigningServiceImpl implements PersonalSigningService {
 
+    @Value("${gestepm.mails.notify}")
+    private List<String> emailsTo;
+  
     private final PersonalSigningDao personalSigningDao;
 
     private final AuditProvider auditProvider;
+  
+    private final EmailService emailService;
+
+    private final LocaleProvider localeProvider;
+
+    private final MessageSource messageSource;
+
+    private final UserUtils userUtils;
 
     private final SigningUpdateChecker signingUpdateChecker;
 
-    private final UserUtils userUtils;
 
     @Override
     @RequirePermits(value = PRMT_READ_PRS, action = "List personal signings")
@@ -156,7 +172,11 @@ public class PersonalSigningServiceImpl implements PersonalSigningService {
 
         final PersonalSigning updated = this.personalSigningDao.update(update);
 
-        return getMapper(MapPRSToPersonalSigningDto.class).from(updated);
+        final PersonalSigningDto result = getMapper(MapPRSToPersonalSigningDto.class).from(updated);
+
+        this.sendUpdateEmail(result);
+
+        return result;
     }
 
     @Override
@@ -173,5 +193,31 @@ public class PersonalSigningServiceImpl implements PersonalSigningService {
         final PersonalSigningDelete delete = getMapper(MapPRSToPersonalSigningDelete.class).from(deleteDto);
 
         this.personalSigningDao.delete(delete);
+    }
+  
+    private void sendUpdateEmail(final PersonalSigningDto personalSigning) {
+        final User user = Utiles.getCurrentUser();
+
+        if (!personalSigning.getUserId().equals(user.getId().intValue()))
+            return ;
+
+        final Locale locale = new Locale(this.localeProvider.getLocale().orElse("es"));
+
+        final String subject = messageSource.getMessage("email.personalsigning.update.subject", new Object[]{
+                personalSigning.getId()
+        }, locale);
+
+        final Set<String> emails = new HashSet<>(emailsTo);
+
+        final UpdatePersonalSigningGroup updateGroup = new UpdatePersonalSigningGroup();
+        updateGroup.setEmails(new ArrayList<>(emails));
+        updateGroup.setSubject(subject);
+        updateGroup.setLocale(locale);
+        updateGroup.setPersonalSigningId(personalSigning.getId());
+        updateGroup.setFullName(user.getFullName());
+        updateGroup.setCreatedAt(personalSigning.getStartDate());
+        updateGroup.setClosedAt(personalSigning.getEndDate());
+
+        this.emailService.sendEmail(updateGroup);
     }
 }

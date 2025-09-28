@@ -20,6 +20,7 @@ gestepm:
   mails:
     admin: cardepe@cyxtec.com
     rrhh: cardepe@cyxtec.com
+    notify: contact@smallscale.es
   signing:
     ftp:
       server: 92.54.16.80
