@@ -41,7 +41,7 @@
             </div>
         </div>
     </div>
-    <div class="row">
+    <div class="row actionable">
         <div class="col text-right">
             <button id="editBtn" type="button" class="btn btn-standard btn-sm movile-full">
                 <spring:message code="save"/>

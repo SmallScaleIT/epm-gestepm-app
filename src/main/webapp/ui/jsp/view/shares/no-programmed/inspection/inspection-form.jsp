@@ -385,6 +385,15 @@
 
         $('.customer-signature .clearSignatureButton').click(function () { signatures.customer.clear(); });
         $('.operator-signature .clearSignatureButton').click(function () { signatures.operator.clear(); });
+
+        if (!canUpdate)
+        {
+            if (signatures.customer)
+                signatures.customer.off();
+
+            if (signatures.operator)
+                signatures.operator.off();
+        }
     }
 
     function loadMaterialsDataTable() {
