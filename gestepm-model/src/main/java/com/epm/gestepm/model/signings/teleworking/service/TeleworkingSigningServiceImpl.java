@@ -176,7 +176,7 @@ public class TeleworkingSigningServiceImpl implements TeleworkingSigningService 
 
         this.auditProvider.auditUpdate(update);
 
-        if (teleworkingSigning.getClosedAt() == null) {
+        if (update.getClosedAt() == null) {
             update.setClosedAt(LocalDateTime.now());
         }
 
