@@ -17,7 +17,8 @@ function initializeDataTables() {
 
     const expand = ['project'];
 
-    const filters = [{'userIds': userId}];
+    //const filters = [{'userIds': userId}];
+    const filters = [{}];
 
     const columnDefs = [
         {
