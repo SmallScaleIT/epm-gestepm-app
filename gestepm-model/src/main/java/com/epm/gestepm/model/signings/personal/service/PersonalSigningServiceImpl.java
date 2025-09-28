@@ -8,6 +8,8 @@ import com.epm.gestepm.lib.logging.annotation.EnableExecutionLog;
 import com.epm.gestepm.lib.logging.annotation.LogExecution;
 import com.epm.gestepm.lib.security.annotation.RequirePermits;
 import com.epm.gestepm.lib.types.Page;
+import com.epm.gestepm.model.shares.common.checker.ShareDateChecker;
+import com.epm.gestepm.model.signings.checker.HasActiveSigningChecker;
 import com.epm.gestepm.model.signings.checker.SigningUpdateChecker;
 import com.epm.gestepm.model.signings.personal.dao.PersonalSigningDao;
 import com.epm.gestepm.model.signings.personal.dao.entity.PersonalSigning;
@@ -24,6 +26,9 @@ import com.epm.gestepm.model.signings.teleworking.service.mapper.MapTSToTelework
 import com.epm.gestepm.model.signings.teleworking.service.mapper.MapTSToTeleworkingSigningDto;
 import com.epm.gestepm.model.signings.teleworking.service.mapper.MapTSToTeleworkingSigningFilter;
 import com.epm.gestepm.model.user.utils.UserUtils;
+import com.epm.gestepm.modelapi.common.utils.Utiles;
+import com.epm.gestepm.modelapi.deprecated.user.dto.User;
+import com.epm.gestepm.modelapi.project.service.ProjectService;
 import com.epm.gestepm.modelapi.signings.personal.dto.PersonalSigningDto;
 import com.epm.gestepm.modelapi.signings.personal.dto.creator.PersonalSigningCreateDto;
 import com.epm.gestepm.modelapi.signings.personal.dto.deleter.PersonalSigningDeleteDto;
@@ -53,7 +58,7 @@ import static org.mapstruct.factory.Mappers.getMapper;
 @EnableExecutionLog(layerMarker = SERVICE)
 public class PersonalSigningServiceImpl implements PersonalSigningService {
 
-    @Value("${mail.user.notify}")
+    @Value("${gestepm.mails.notify}")
     private List<String> emailsTo;
   
     private final PersonalSigningDao personalSigningDao;
@@ -66,17 +71,10 @@ public class PersonalSigningServiceImpl implements PersonalSigningService {
 
     private final MessageSource messageSource;
 
-    private final ProjectService projectService;
-
-    private final ShareDateChecker shareDateChecker;
-
     private final UserUtils userUtils;
-
-    private final HasActiveSigningChecker activeChecker;
 
     private final SigningUpdateChecker signingUpdateChecker;
 
-    private final UserUtils userUtils;
 
     @Override
     @RequirePermits(value = PRMT_READ_PRS, action = "List personal signings")

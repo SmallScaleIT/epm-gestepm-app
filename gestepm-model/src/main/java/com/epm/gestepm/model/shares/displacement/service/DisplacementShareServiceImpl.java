@@ -56,7 +56,7 @@ import static org.mapstruct.factory.Mappers.getMapper;
 @EnableExecutionLog(layerMarker = SERVICE)
 public class DisplacementShareServiceImpl implements DisplacementShareService {
 
-    @Value("${mail.user.notify}")
+    @Value("${gestepm.mails.notify}")
     private List<String> emailsTo;
   
     private final AuditProvider auditProvider;
@@ -172,8 +172,6 @@ public class DisplacementShareServiceImpl implements DisplacementShareService {
             errorMsg = "Failed to update displacement share")
     public DisplacementShareDto update(final DisplacementShareUpdateDto updateDto) {
         final DisplacementShareByIdFinderDto finderDto = new DisplacementShareByIdFinderDto(updateDto.getId());
-
-        final DisplacementShareDto displacementShareDto = findOrNotFound(finderDto);
 
         final DisplacementShareUpdate update = getMapper(MapDSToDisplacementShareUpdate.class).from(updateDto);
 

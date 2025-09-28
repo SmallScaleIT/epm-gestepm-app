@@ -64,7 +64,7 @@ import static org.mapstruct.factory.Mappers.getMapper;
 @EnableExecutionLog(layerMarker = SERVICE)
 public class ProgrammedShareServiceImpl implements ProgrammedShareService {
 
-    @Value("${mail.user.notify}")
+    @Value("${gestepm.mails.notify}")
     private List<String> emailsTo;
   
     private final AuditProvider auditProvider;
@@ -183,9 +183,6 @@ public class ProgrammedShareServiceImpl implements ProgrammedShareService {
         final ProgrammedShareByIdFinderDto finderDto = new ProgrammedShareByIdFinderDto(updateDto.getId());
 
         final ProgrammedShareDto programmedShareDto = findOrNotFound(finderDto);
-
-        this.signingUpdateChecker.checker(programmedShareDto.getUserId()
-                , programmedShareDto.getProjectId());
 
         final ProgrammedShareUpdate update = getMapper(MapPSToProgrammedShareUpdate.class).from(updateDto,
                 getMapper(MapPSToProgrammedShareUpdate.class).from(programmedShareDto));

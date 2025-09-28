@@ -55,7 +55,7 @@ import static com.epm.gestepm.modelapi.signings.workshop.security.WorkshopSignin
 @EnableExecutionLog(layerMarker = SERVICE)
 public class WorkshopSigningServiceImpl implements WorkshopSigningService {
 
-    @Value("${mail.user.notify}")
+    @Value("${gestepm.mails.notify}")
     private List<String> emailsTo;
   
     private final WorkshopSigningDao repository;

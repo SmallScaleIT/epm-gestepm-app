@@ -79,7 +79,7 @@ public class NoProgrammedShareServiceImpl implements NoProgrammedShareService {
 
     private final EmailService emailService;
 
-    @Value("${mail.user.notify}")
+    @Value("${gestepm.mails.notify}")
     private List<String> emailsTo;
 
     private final SigningUpdateChecker signingUpdateChecker;
@@ -177,12 +177,7 @@ public class NoProgrammedShareServiceImpl implements NoProgrammedShareService {
 
         final NoProgrammedShareDto noProgrammedShareDto = findOrNotFound(finderDto);
 
-        final NoProgrammedShareUpdate update = getMapper(MapNPSToNoProgrammedShareUpdate.class).from(updateDto,
-                getMapper(MapNPSToNoProgrammedShareUpdate.class).from(noProgrammedShareDto));
-
         this.noProgrammedShareChecker.checker(updateDto, noProgrammedShareDto);
-        this.signingUpdateChecker.checker(noProgrammedShareDto.getUserId()
-                , noProgrammedShareDto.getProjectId());
 
         final NoProgrammedShareUpdate update = getMapper(MapNPSToNoProgrammedShareUpdate.class).from(updateDto,
                 getMapper(MapNPSToNoProgrammedShareUpdate.class).from(noProgrammedShareDto));

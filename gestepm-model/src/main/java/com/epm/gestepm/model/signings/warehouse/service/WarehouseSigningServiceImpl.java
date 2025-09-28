@@ -18,6 +18,11 @@ import com.epm.gestepm.model.signings.warehouse.dao.entity.finder.WarehouseSigni
 import com.epm.gestepm.model.signings.warehouse.dao.entity.updater.WarehouseSigningUpdate;
 import com.epm.gestepm.model.signings.warehouse.service.mapper.*;
 import com.epm.gestepm.model.user.utils.UserUtils;
+import com.epm.gestepm.modelapi.common.utils.Utiles;
+import com.epm.gestepm.modelapi.deprecated.user.dto.User;
+import com.epm.gestepm.modelapi.project.dto.ProjectDto;
+import com.epm.gestepm.modelapi.project.dto.finder.ProjectByIdFinderDto;
+import com.epm.gestepm.modelapi.project.service.ProjectService;
 import com.epm.gestepm.modelapi.signings.warehouse.dto.WarehouseSigningDto;
 import com.epm.gestepm.modelapi.signings.warehouse.dto.creator.WarehouseSigningCreateDto;
 import com.epm.gestepm.modelapi.signings.warehouse.dto.deleter.WarehouseSigningDeleteDto;
@@ -46,7 +51,7 @@ import static org.mapstruct.factory.Mappers.getMapper;
 @EnableExecutionLog(layerMarker = SERVICE)
 public class WarehouseSigningServiceImpl implements WarehouseSigningService {
 
-    @Value("${mail.user.notify}")
+    @Value("${gestepm.mails.notify}")
     private List<String> emailsTo;
   
     private final WarehouseSigningDao repository;

@@ -64,7 +64,7 @@ import static org.mapstruct.factory.Mappers.getMapper;
 @EnableExecutionLog(layerMarker = SERVICE)
 public class WorkShareServiceImpl implements WorkShareService {
 
-    @Value("${mail.user.notify}")
+    @Value("${gestepm.mails.notify}")
     private List<String> emailsTo;
   
     private final AuditProvider auditProvider;
@@ -183,9 +183,6 @@ public class WorkShareServiceImpl implements WorkShareService {
         final WorkShareByIdFinderDto finderDto = new WorkShareByIdFinderDto(updateDto.getId());
 
         final WorkShareDto workShareDto = findOrNotFound(finderDto);
-
-        this.signingUpdateChecker.checker(workShareDto.getUserId()
-                , workShareDto.getProjectId());
 
         final WorkShareUpdate update = getMapper(MapWSToWorkShareUpdate.class).from(updateDto,
                 getMapper(MapWSToWorkShareUpdate.class).from(workShareDto));

@@ -53,7 +53,7 @@ import static org.mapstruct.factory.Mappers.getMapper;
 @EnableExecutionLog(layerMarker = SERVICE)
 public class TeleworkingSigningServiceImpl implements TeleworkingSigningService {
 
-    @Value("${mail.user.notify}")
+    @Value("${gestepm.mails.notify}")
     private List<String> emailsTo;
   
     private final SigningUpdateChecker signingUpdateChecker;

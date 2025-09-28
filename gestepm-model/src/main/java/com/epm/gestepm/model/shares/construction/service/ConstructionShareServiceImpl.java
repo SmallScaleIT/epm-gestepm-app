@@ -64,7 +64,7 @@ import static org.mapstruct.factory.Mappers.getMapper;
 @EnableExecutionLog(layerMarker = SERVICE)
 public class ConstructionShareServiceImpl implements ConstructionShareService {
 
-    @Value("${mail.user.notify}")
+    @Value("${gestepm.mails.notify}")
     private List<String> emailsTo;
   
     private final AuditProvider auditProvider;
@@ -182,9 +182,6 @@ public class ConstructionShareServiceImpl implements ConstructionShareService {
         final ConstructionShareByIdFinderDto finderDto = new ConstructionShareByIdFinderDto(updateDto.getId());
 
         final ConstructionShareDto constructionShareDto = findOrNotFound(finderDto);
-
-        this.signingUpdateChecker.checker(constructionShareDto.getUserId()
-                , constructionShareDto.getProjectId());
 
         final ConstructionShareUpdate update = getMapper(MapCSToConstructionShareUpdate.class).from(updateDto,
                 getMapper(MapCSToConstructionShareUpdate.class).from(constructionShareDto));
