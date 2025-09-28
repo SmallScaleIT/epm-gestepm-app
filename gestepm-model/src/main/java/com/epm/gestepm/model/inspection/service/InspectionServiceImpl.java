@@ -289,9 +289,9 @@ public class InspectionServiceImpl implements InspectionService {
     }
 
     protected void validateInspection(final NoProgrammedShareDto noProgrammedShare) {
-        final boolean isNoProgrammedShareOpen = !NoProgrammedShareStateEnumDto.CLOSED.equals(noProgrammedShare.getState());
+        final boolean isClosed = NoProgrammedShareStateEnumDto.CLOSED.equals(noProgrammedShare.getState());
 
-        if (isNoProgrammedShareOpen) {
+        if (isClosed) {
             throw new NoProgrammedShareFinalizedException(noProgrammedShare.getId());
         }
 

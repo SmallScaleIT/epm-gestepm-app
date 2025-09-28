@@ -439,6 +439,8 @@
     }
 
     function setInitialMode() {
+        const form = document.getElementById('editForm');
+
         currentMode = 'INITIAL';
 
         document.querySelector('#finishBtn').classList.add('d-none');
