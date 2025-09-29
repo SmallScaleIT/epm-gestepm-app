@@ -525,9 +525,14 @@
         }
 
         const finishBtn = document.getElementById('finishBtn');
+        const createInspectionBtn = document.getElementById('createInspectionBtn');
 
         if (finishBtn) {
             finishBtn.classList.add('d-none');
+        }
+
+        if (createInspectionBtn) {
+            createInspectionBtn.classList.add('d-none');
         }
 
         showFiles();

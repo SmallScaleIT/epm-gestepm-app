@@ -55,6 +55,8 @@ function edit(id) {
         editModal.modal('show');
     });
 
+    saveBtn.off('click');
+
     saveBtn.click(function() {
 
         showLoading();
