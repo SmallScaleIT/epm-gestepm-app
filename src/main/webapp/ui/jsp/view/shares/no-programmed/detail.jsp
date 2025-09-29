@@ -476,15 +476,13 @@
     }
 
     function setInitialMode() {
-        const form = document.getElementById('editForm');
-
         currentMode = 'INITIAL';
 
-        document.querySelector('#finishBtn').classList.add('d-none');
         document.querySelector('#createInspectionBtn').classList.add('d-none');
 
-        const endDate = form.querySelector('[name="endDate"]');
-        endDate.parentElement.remove();
+        const form = document.querySelector('#editForm');
+        form.querySelector('#finishBtn').classList.add('d-none');
+        form.querySelector('[name="endDate"]').parentElement.remove();
     }
 
     function setWorkingMode() {
