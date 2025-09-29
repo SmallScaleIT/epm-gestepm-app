@@ -438,20 +438,19 @@
             forumTitle.target = '_blank';
         }
 
-        if (!canUpdate) {
-            form.querySelector('.actionable').style.display = 'none';
-            document.querySelector('#finishBtn').classList.add('d-none');
-            document.querySelector('#createInspectionBtn').classList.add('d-none');
-
-            form.querySelectorAll('input, select, textarea, button').forEach(el => {
-                el.disabled = true;
-            });
-        } else if (share.state === 'NEW') {
+        if (share.state === 'NEW') {
             setInitialMode();
         } else if (share.state === 'INITIALIZED' || share.state === 'IN_PROGRESS') {
             setWorkingMode();
         } else {
             setCompletedMode();
+        }
+
+        if (!canUpdate) {
+            form.querySelector('.actionable').style.display = 'none';
+            form.querySelectorAll('input, select, textarea, button').forEach(el => {
+                el.disabled = true;
+            });
         }
     }
 
@@ -501,9 +500,7 @@
         }
 
         const form = document.querySelector('#editForm');
-
-        const endDate = form.querySelector('[name="endDate"]');
-        endDate.parentElement.remove();
+        form.querySelector('[name="endDate"]').parentElement.remove();
 
         const files = form.querySelector('[name="files"]');
 

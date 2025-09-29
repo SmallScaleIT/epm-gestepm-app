@@ -284,6 +284,7 @@ public class InspectionServiceImpl implements InspectionService {
         noProgrammedShareUpdateDto.setId(id);
         noProgrammedShareUpdateDto.setUserId(userId);
         noProgrammedShareUpdateDto.setState(state);
+        noProgrammedShareUpdateDto.setCheckPermissions(false);
 
         this.noProgrammedShareService.update(noProgrammedShareUpdateDto);
     }

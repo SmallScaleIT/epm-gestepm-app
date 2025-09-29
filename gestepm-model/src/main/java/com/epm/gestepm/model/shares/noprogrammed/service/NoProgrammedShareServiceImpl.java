@@ -37,6 +37,7 @@ import com.epm.gestepm.modelapi.shares.noprogrammed.dto.updater.NoProgrammedShar
 import com.epm.gestepm.modelapi.shares.noprogrammed.exception.NoProgrammedShareNotFoundException;
 import com.epm.gestepm.modelapi.shares.noprogrammed.service.NoProgrammedShareService;
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
@@ -182,7 +183,9 @@ public class NoProgrammedShareServiceImpl implements NoProgrammedShareService {
         final NoProgrammedShareUpdate update = getMapper(MapNPSToNoProgrammedShareUpdate.class).from(updateDto,
                 getMapper(MapNPSToNoProgrammedShareUpdate.class).from(noProgrammedShareDto));
 
-        this.signingUpdateChecker.checker(noProgrammedShareDto.getUserId(), noProgrammedShareDto.getProjectId());
+        if (BooleanUtils.isTrue(updateDto.getCheckPermissions())) {
+            this.signingUpdateChecker.checker(noProgrammedShareDto.getUserId(), noProgrammedShareDto.getProjectId());
+        }
 
         if (NoProgrammedShareStateEnumDto.CLOSED.equals(updateDto.getState())) {
             final LocalDateTime endDate = this.shareDateChecker.checkMaxHours(noProgrammedShareDto.getStartDate(), update.getEndDate() != null

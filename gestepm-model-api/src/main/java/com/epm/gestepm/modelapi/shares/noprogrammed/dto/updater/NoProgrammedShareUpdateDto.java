@@ -36,4 +36,6 @@ public class NoProgrammedShareUpdateDto {
     @Singular
     private Set<NoProgrammedShareFileCreateDto> files;
 
+    private Boolean checkPermissions = true;
+
 }
