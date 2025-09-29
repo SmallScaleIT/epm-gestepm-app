@@ -68,7 +68,7 @@ public class WarehouseSigningViewController {
         model.addAttribute("projectName", project.getName());
         model.addAttribute("projectId", project.getId());
 
-        this.loadPermissions(user, project.getId(), model);
+        this.loadPermissions(user, project.getId(), model, warehouseSigning);
 
         model.addAttribute("importPath", "warehouse-detail");
         model.addAttribute("loadingPath", "warehouses");
@@ -87,12 +87,15 @@ public class WarehouseSigningViewController {
         model.addAttribute("projects", projects);
     }
 
-    private void loadPermissions(final User user, final Integer projectId, final Model model) {
-        boolean isAdmin = Constants.ROLE_ADMIN.equals(user.getRole().getRoleName());
+    private void loadPermissions(final User user, final Integer projectId, final Model model
+            , final WarehouseSigningDto warehouseSigning) {
+        final Boolean isAdmin = Constants.ROLE_ADMIN.equals(user.getRole().getRoleName());
 
-        boolean isProjectTl = Constants.ROLE_PL.equals(user.getRole().getRoleName())
+        final Boolean isProjectTl = Constants.ROLE_PL.equals(user.getRole().getRoleName())
                 && user.getBossProjects().stream().anyMatch(project -> project.getId().equals(projectId.longValue()));
 
-        model.addAttribute("canUpdate", isAdmin || isProjectTl);
+        final Boolean isCurrentUser = warehouseSigning.getUserId().equals(user.getId().intValue());
+
+        model.addAttribute("canUpdate", isAdmin || isProjectTl || isCurrentUser);
     }
 }

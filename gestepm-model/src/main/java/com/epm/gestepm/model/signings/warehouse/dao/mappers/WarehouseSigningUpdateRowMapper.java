@@ -27,6 +27,8 @@ public class WarehouseSigningUpdateRowMapper extends CommonRowMapper implements 
         warehouseSigning.setStartedAt(nullableLocalDateTime(rs, COL_WS_STARTED_AT));
         warehouseSigning.setClosedAt(nullableLocalDateTime(rs, COL_WS_CLOSED_AT));
 
+        this.setCommonAudit(warehouseSigning, rs);
+
         return warehouseSigning;
     }
 }

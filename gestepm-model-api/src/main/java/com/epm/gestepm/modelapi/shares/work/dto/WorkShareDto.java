@@ -46,4 +46,8 @@ public class WorkShareDto implements Serializable {
 
     private Set<Integer> fileIds;
 
+    private LocalDateTime updatedAt;
+
+    private Integer updatedBy;
+
 }

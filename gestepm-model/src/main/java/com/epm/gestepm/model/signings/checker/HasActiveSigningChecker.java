@@ -15,20 +15,26 @@ public class HasActiveSigningChecker {
 
     private final SigningService signingService;
 
-    public void validateSigningChecker(Integer userId) {
+    public void validateSigningChecker(final Integer userId) {
 
-        if (userId == null)
-            return ;
+        if (userId == null) {
+            return;
+        }
 
-        SigningFilterDto filter = new SigningFilterDto();
+        final SigningFilterDto filter = new SigningFilterDto();
         filter.setUserId(userId);
 
-        List<SigningDto> signingList = signingService.list(filter);
+        final List<SigningDto> signingList = signingService.list(filter);
 
-        if (signingList.isEmpty())
-            return ;
+        if (signingList.isEmpty()) {
+            return;
+        }
 
         final SigningDto signing = signingList.get(0);
+
+        if (signing.getDetailUrl().contains("/shares/no-programmed/")) {
+            return;
+        }
 
         throw new SigningCheckerException(signing.getId(), signing.getStartDate(), signing.getDetailUrl());
     }

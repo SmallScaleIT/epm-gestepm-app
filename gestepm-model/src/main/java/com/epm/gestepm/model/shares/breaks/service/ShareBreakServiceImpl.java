@@ -1,5 +1,6 @@
 package com.epm.gestepm.model.shares.breaks.service;
 
+import com.epm.gestepm.lib.audit.AuditProvider;
 import com.epm.gestepm.lib.logging.annotation.EnableExecutionLog;
 import com.epm.gestepm.lib.logging.annotation.LogExecution;
 import com.epm.gestepm.lib.security.annotation.RequirePermits;
@@ -43,6 +44,8 @@ import static org.mapstruct.factory.Mappers.getMapper;
 public class ShareBreakServiceImpl implements ShareBreakService {
 
     private final ShareBreakDao shareBreakDao;
+
+    private final AuditProvider auditProvider;
 
     @Override
     @RequirePermits(value = PRMT_READ_SB, action = "List share breaks")
@@ -139,6 +142,8 @@ public class ShareBreakServiceImpl implements ShareBreakService {
         if (update.getEndDate() == null) {
             update.setEndDate(LocalDateTime.now());
         }
+
+        this.auditProvider.auditUpdate(update);
 
         final ShareBreak updated = this.shareBreakDao.update(update);
 

@@ -7,8 +7,8 @@ sql:
       SELECT
         cs.construction_share_id AS id,
         cs.user_id,
-        cs.created_at AS start_date,
-        cs.closed_at AS end_date,
+        cs.start_date,
+        cs.end_date,
         null AS description,
         CONCAT('/shares/construction/', cs.construction_share_id) AS detail_url,
         'CONSTRUCTION_SHARES' AS type,
@@ -58,16 +58,16 @@ sql:
       LEFT JOIN ${sch-gestepm}.manual_signing_type mst on ums.MANUAL_SIGNING_TYPE_ID = mst.ID
       UNION
       SELECT
-        id,
-        user_id,
-        start_date,
-        end_date,
+        prs.personal_signing_id AS id,
+        prs.user_id,
+        prs.start_date,
+        prs.end_date,
         null AS description,
         '' AS detail_url,
         'PERSONAL_SIGNINGS' AS type,
         null AS project_id,
         null AS project_name
-      FROM ${sch-gestepm}.personal_signings
+      FROM ${sch-gestepm}.personal_signing prs
       UNION
       SELECT
         ps.programmed_share_id AS id,

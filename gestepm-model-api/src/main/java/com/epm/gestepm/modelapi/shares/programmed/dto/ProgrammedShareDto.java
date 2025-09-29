@@ -52,4 +52,8 @@ public class ProgrammedShareDto implements Serializable {
 
     private Set<Integer> fileIds;
 
+    private LocalDateTime updatedAt;
+
+    private Integer updatedBy;
+
 }

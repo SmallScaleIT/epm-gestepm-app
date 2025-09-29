@@ -21,6 +21,7 @@ public interface MapNPSToNoProgrammedShareResponse {
   @Mapping(source = "subFamilyId", target = "subFamily.id")
   @Mapping(source = "inspectionIds", target = "inspections", qualifiedByName = "mapInspections")
   @Mapping(source = "fileIds", target = "files", qualifiedByName = "mapFiles")
+  @Mapping(source = "updatedBy", target = "updatedBy.id")
   NoProgrammedShare from(NoProgrammedShareDto dto);
 
   List<NoProgrammedShare> from(Page<NoProgrammedShareDto> list);

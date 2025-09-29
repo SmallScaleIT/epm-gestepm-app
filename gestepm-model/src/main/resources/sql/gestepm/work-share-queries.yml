@@ -16,7 +16,9 @@ sql:
       ws.created_by,
       ws.closed_at,
       ws.closed_by,
-      GROUP_CONCAT(wsf.work_share_file_id) AS work_share_file_ids
+      GROUP_CONCAT(wsf.work_share_file_id) AS work_share_file_ids,
+      ws.modified_at,
+      ws.modified_by
     FROM ${sch-gestepm}.work_share ws
     LEFT JOIN ${sch-gestepm}.project pr ON pr.project_id = ws.project_id
     LEFT JOIN ${sch-gestepm}.user us ON ws.user_id = us.user_id
@@ -68,7 +70,9 @@ sql:
       observations = :attr_ws_observations,
       operator_signature = :attr_ws_operator_signature,
       closed_at = :attr_ws_closed_at,
-      closed_by = :attr_ws_closed_by
+      closed_by = :attr_ws_closed_by,
+      modified_at = :attr_ws_modified_at,
+      modified_by = :attr_ws_modified_by
     WHERE
       work_share_id = :attr_ws_id
 

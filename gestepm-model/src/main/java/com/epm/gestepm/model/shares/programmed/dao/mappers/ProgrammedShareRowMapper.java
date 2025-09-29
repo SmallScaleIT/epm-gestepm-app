@@ -1,5 +1,7 @@
 package com.epm.gestepm.model.shares.programmed.dao.mappers;
 
+import com.epm.gestepm.lib.audit.AuditCreateClose;
+import com.epm.gestepm.lib.audit.AuditUpdate;
 import com.epm.gestepm.lib.jdbc.impl.rowmapper.CommonRowMapper;
 import com.epm.gestepm.model.shares.programmed.dao.entity.ProgrammedShare;
 import org.springframework.jdbc.core.RowMapper;
@@ -69,7 +71,8 @@ public class ProgrammedShareRowMapper extends CommonRowMapper implements RowMapp
 
         programmedShare.setFileIds(fileIds);
 
-        this.setCommonAudit(programmedShare, rs);
+        this.setCommonAudit((AuditCreateClose) programmedShare, rs);
+        this.setCommonAudit((AuditUpdate) programmedShare, rs);
 
         return programmedShare;
     }

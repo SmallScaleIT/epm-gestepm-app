@@ -6,6 +6,7 @@ import com.epm.gestepm.lib.types.Page;
 import com.epm.gestepm.modelapi.common.utils.ModelUtil;
 import com.epm.gestepm.modelapi.common.utils.classes.Constants;
 import com.epm.gestepm.modelapi.common.utils.datatables.SortOrder;
+import com.epm.gestepm.modelapi.deprecated.project.dto.Project;
 import com.epm.gestepm.modelapi.deprecated.user.dto.User;
 import com.epm.gestepm.modelapi.project.dto.ProjectDto;
 import com.epm.gestepm.modelapi.project.dto.filter.ProjectFilterDto;
@@ -14,6 +15,7 @@ import com.epm.gestepm.modelapi.shares.breaks.dto.ShareBreakDto;
 import com.epm.gestepm.modelapi.shares.breaks.dto.filter.ShareBreakFilterDto;
 import com.epm.gestepm.modelapi.shares.breaks.service.ShareBreakService;
 import com.epm.gestepm.modelapi.shares.common.dto.ShareStatusDto;
+import com.epm.gestepm.modelapi.shares.programmed.dto.ProgrammedShareDto;
 import com.epm.gestepm.modelapi.shares.work.dto.WorkShareDto;
 import com.epm.gestepm.modelapi.shares.work.dto.WorkShareFileDto;
 import com.epm.gestepm.modelapi.shares.work.dto.filter.WorkShareFileFilterDto;
@@ -101,8 +103,7 @@ public class WorkShareViewController {
         final List<ProjectDto> projects = this.projectService.list(projectFilterDto);
         model.addAttribute("projects", projects);
 
-        boolean canUpdate = Constants.ROLE_ADMIN.equals(user.getRole().getRoleName());
-        model.addAttribute("canUpdate", canUpdate);
+        this.loadPermissions(user, workShare.getProjectId(), model, workShare);
 
         final WorkShareFileFilterDto filterDto = new WorkShareFileFilterDto();
         filterDto.setShareId(id);
@@ -122,5 +123,16 @@ public class WorkShareViewController {
         }
 
         return "work-share-detail";
+    }
+
+    private void loadPermissions(final User user, final Integer projectId, final Model model
+            , final WorkShareDto workShare) {
+        final Boolean isAdmin = Constants.ROLE_ADMIN.equals(user.getRole().getRoleName());
+        final Boolean isProjectTL = Constants.ROLE_PL.equals(user.getRole().getRoleName())
+                && user.getBossProjects().stream().map(Project::getId).collect(Collectors.toList()).contains(projectId.longValue());
+        final Boolean isCurrentUser = workShare.getUserId().equals(user.getId().intValue());
+
+        model.addAttribute("canUpdate"
+                , isAdmin || isProjectTL || isCurrentUser);
     }
 }

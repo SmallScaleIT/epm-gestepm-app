@@ -10,7 +10,9 @@ sql:
       ts.started_at,
       ts.started_location,
       ts.closed_at,
-      ts.closed_location
+      ts.closed_location,
+      ts.modified_at,
+      ts.modified_by
     FROM ${sch-gestepm}.teleworking_signing ts
     LEFT JOIN ${sch-gestepm}.project pr ON ts.project_id = pr.project_id
 
@@ -54,7 +56,9 @@ sql:
     SET
       started_at = :attr_ts_started_at,
       closed_at = :attr_ts_closed_at,
-      closed_location = :attr_ts_closed_location
+      closed_location = :attr_ts_closed_location,
+      modified_at = :attr_ts_modified_at,
+      modified_by = :attr_ts_modified_by
     WHERE
       teleworking_signing_id = :attr_ts_id
 

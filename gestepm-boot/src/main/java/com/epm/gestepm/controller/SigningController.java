@@ -17,13 +17,9 @@ import com.epm.gestepm.modelapi.inspection.dto.updater.InspectionUpdateDto;
 import com.epm.gestepm.modelapi.inspection.service.InspectionService;
 import com.epm.gestepm.modelapi.manualsigningtype.dto.ManualSigningType;
 import com.epm.gestepm.modelapi.manualsigningtype.service.ManualSigningTypeService;
-import com.epm.gestepm.modelapi.modifiedsigning.dto.ModifiedSigning;
-import com.epm.gestepm.modelapi.modifiedsigning.dto.ModifiedSigningTableDTO;
-import com.epm.gestepm.modelapi.modifiedsigning.service.ModifiedSigningService;
 import com.epm.gestepm.modelapi.personalsigning.dto.PersonalSigning;
 import com.epm.gestepm.modelapi.personalsigning.dto.PersonalSigningDTO;
 import com.epm.gestepm.modelapi.personalsigning.service.PersonalSigningService;
-import com.epm.gestepm.modelapi.deprecated.project.dto.Project;
 import com.epm.gestepm.modelapi.shares.common.decorator.ShareDecorator;
 import com.epm.gestepm.modelapi.shares.displacement.dto.DisplacementShareDto;
 import com.epm.gestepm.modelapi.shares.displacement.dto.finder.DisplacementShareByIdFinderDto;
@@ -35,7 +31,6 @@ import com.epm.gestepm.modelapi.user.dto.UserDto;
 import com.epm.gestepm.modelapi.user.dto.finder.UserByIdFinderDto;
 import com.epm.gestepm.modelapi.user.service.UserService;
 import com.epm.gestepm.modelapi.deprecated.user.dto.User;
-import com.epm.gestepm.modelapi.deprecated.user.dto.UserDTO;
 import com.epm.gestepm.modelapi.deprecated.user.exception.InvalidUserSessionException;
 import com.epm.gestepm.modelapi.deprecated.user.service.UserServiceOld;
 import com.epm.gestepm.modelapi.usermanualsigning.dto.UserManualSigning;
@@ -88,9 +83,6 @@ public class SigningController {
 
     @Autowired
     private MessageSource messageSource;
-
-    @Autowired
-    private ModifiedSigningService modifiedSigningService;
 
     @Autowired
     private PersonalSigningService personalSigningService;
@@ -561,169 +553,6 @@ public class SigningController {
         personalSigningDTO.setEndDate(personalSigning.getEndDate());
 
         return personalSigningDTO;
-    }
-
-    @GetMapping("/modified-list")
-    public String modifiedList(Locale locale, Model model, HttpServletRequest request) {
-
-        try {
-
-            ModelUtil.loadConstants(locale, model, request);
-
-            final User user = Utiles.getUsuario();
-            final List<UserDTO> usersDTO = userServiceOld.getAllUserDTOs();
-
-            model.addAttribute("usersDTO", usersDTO);
-            model.addAttribute("tableActionButtons", ModelUtil.getThumbsTableActionButtons());
-
-            log.info("El usuario " + user.getId() + " ha accedido a la vista de fichajes modificados");
-
-            return "modified-list";
-
-        } catch (InvalidUserSessionException e) {
-            log.error(e);
-            return "redirect:/login";
-        }
-    }
-
-    @ResponseBody
-    @GetMapping("/modified-list/dt")
-    public DataTableResults<ModifiedSigningTableDTO> modifiedListDataTable(@RequestParam(required = false) Long userId, HttpServletRequest request) {
-
-        try {
-            final DataTableRequest<ModifiedSigning> dataTableInRQ = new DataTableRequest<>(request);
-            final PaginationCriteria pagination = dataTableInRQ.getPaginationRequest();
-
-            final User user = Utiles.getUsuario();
-
-            List<Long> projectIds = null;
-
-            if (user.getRole().getId() == Constants.ROLE_PL_ID) {
-
-                projectIds = user.getBossProjects().stream().map(Project::getId).collect(Collectors.toList());
-
-                if (projectIds.isEmpty()) {
-                    projectIds.add(-1L); // like empty but need in IN clause
-                }
-            }
-
-            final List<ModifiedSigningTableDTO> modifiedSignings = modifiedSigningService.getModifiedSigningsDataTable(projectIds, userId, pagination);
-            final Long totalRecords = modifiedSigningService.getModifiedSigningsCount(projectIds, userId);
-
-            final DataTableResults<ModifiedSigningTableDTO> dataTableResult = new DataTableResults<>();
-            dataTableResult.setDraw(dataTableInRQ.getDraw());
-            dataTableResult.setData(modifiedSignings);
-            dataTableResult.setRecordsTotal(String.valueOf(totalRecords));
-            dataTableResult.setRecordsFiltered(Long.toString(totalRecords));
-
-            if (!modifiedSignings.isEmpty() && !dataTableInRQ.getPaginationRequest().isFilterByEmpty()) {
-                dataTableResult.setRecordsFiltered(Integer.toString(modifiedSignings.size()));
-            }
-
-            return dataTableResult;
-
-        } catch (InvalidUserSessionException e) {
-            log.error(e);
-            return null;
-        }
-    }
-
-    @ResponseBody
-    @PostMapping("/modified-list/approve/{id}")
-    public ResponseEntity<String> approveModifiedSigning(@PathVariable Long id, Locale locale) {
-
-        try {
-
-            final ModifiedSigning modifiedSigning = this.modifiedSigningService.getById(id);
-
-            final Long signingId = modifiedSigning.getSigningId();
-            final String signingType = modifiedSigning.getTypeId();
-            final LocalDateTime startDate = modifiedSigning.getStartDate();
-            final LocalDateTime endDate = modifiedSigning.getEndDate();
-
-            boolean isValidType = true;
-
-            switch (signingType) {
-
-                case "MANUAL_SIGNINGS":
-
-                    final UserManualSigning userManualSigning = userManualSigningService.getById(signingId);
-                    userManualSigning.setStartDate(startDate);
-                    userManualSigning.setEndDate(endDate);
-
-                    userManualSigningService.save(userManualSigning);
-
-                    break;
-
-                case "PERSONAL_SIGNINGS":
-
-                    final PersonalSigning personalSigning = personalSigningService.getById(signingId);
-                    personalSigning.setStartDate(startDate);
-                    personalSigning.setEndDate(endDate);
-
-                    personalSigningService.save(personalSigning);
-
-                    break;
-
-                default:
-                    isValidType = false;
-                    break;
-            }
-
-            if (isValidType) {
-                this.modifiedSigningService.deleteById(id);
-            }
-
-            return new ResponseEntity<>(messageSource.getMessage("modified.signing.approve.success", new Object[]{}, locale), HttpStatus.OK);
-
-        } catch (Exception e) {
-            log.error(e);
-            return new ResponseEntity<>(messageSource.getMessage("modified.signing.approve.error", new Object[]{}, locale), HttpStatus.NOT_FOUND);
-        }
-    }
-
-    @ResponseBody
-    @PostMapping("/modified-list/decline/{id}")
-    public ResponseEntity<String> declineModifiedSigning(@PathVariable Long id, Locale locale) {
-
-        try {
-
-            this.modifiedSigningService.deleteById(id);
-
-            return new ResponseEntity<>(messageSource.getMessage("modified.signing.decline.success", new Object[]{}, locale), HttpStatus.OK);
-
-        } catch (Exception e) {
-            log.error(e);
-            return new ResponseEntity<>(messageSource.getMessage("modified.signing.decline.error", new Object[]{}, locale), HttpStatus.NOT_FOUND);
-        }
-    }
-
-    @ResponseBody
-    @PostMapping("/share/request-update")
-    public ResponseEntity<String> requestUpdateUserShare(@ModelAttribute UserSigningShareDTO userSigningShareDTO, Locale locale, Model model, HttpServletRequest request) {
-
-        try {
-
-            final User user = Utiles.getUsuario();
-
-            final ModifiedSigning modifiedSigning = new ModifiedSigning();
-            modifiedSigning.setSigningId(userSigningShareDTO.getShareId());
-            modifiedSigning.setTypeId(userSigningShareDTO.getShareType());
-            modifiedSigning.setUser(user);
-            modifiedSigning.setRequestDate(LocalDateTime.now());
-            modifiedSigning.setStartDate(userSigningShareDTO.getStartDate());
-            modifiedSigning.setEndDate(userSigningShareDTO.getEndDate());
-
-            this.modifiedSigningService.save(modifiedSigning);
-
-            log.info("Solicitud de actualización del registro " + userSigningShareDTO.getShareId() + " de tipo " + userSigningShareDTO.getShareType() + " por parte del usuario " + user.getId());
-
-            return new ResponseEntity<>(messageSource.getMessage("user.detail.signing.request.edit.success", new Object[]{}, locale), HttpStatus.OK);
-
-        } catch (Exception e) {
-            log.error(e);
-            return new ResponseEntity<>(messageSource.getMessage("user.detail.signing.request.edit.error", new Object[]{}, locale), HttpStatus.NOT_FOUND);
-        }
     }
 
     @ResponseBody

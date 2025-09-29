@@ -1,0 +1,3 @@
+ALTER TABLE `personal_signings` CHANGE `ID` `personal_signing_id` INT UNSIGNED NOT NULL AUTO_INCREMENT, CHANGE `USER_ID` `signing_id` INT UNSIGNED NOT NULL, CHANGE `START_DATE` `start_date` DATETIME NOT NULL, CHANGE `END_DATE` `end_date` DATETIME NOT NULL;
+RENAME TABLE `bbdd_gestepm`.`personal_signings` TO `bbdd_gestepm`.`personal_signing`;
+ALTER TABLE `personal_signing` CHANGE `signing_id` `user_id` INT UNSIGNED NOT NULL;

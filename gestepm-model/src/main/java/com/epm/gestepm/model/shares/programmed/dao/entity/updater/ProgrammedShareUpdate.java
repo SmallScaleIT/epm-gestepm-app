@@ -1,8 +1,10 @@
 package com.epm.gestepm.model.shares.programmed.dao.entity.updater;
 
 import com.epm.gestepm.lib.audit.AuditClose;
+import com.epm.gestepm.lib.audit.AuditUpdate;
 import com.epm.gestepm.lib.entity.AttributeMap;
 import com.epm.gestepm.lib.entity.CollectableAttributes;
+import com.epm.gestepm.model.shares.noprogrammed.dao.constants.NoProgrammedShareAttributes;
 import com.epm.gestepm.model.shares.programmed.dao.entity.creator.ProgrammedShareFileCreate;
 import lombok.Data;
 import lombok.Singular;
@@ -14,7 +16,7 @@ import java.util.Set;
 import static com.epm.gestepm.model.shares.programmed.dao.constants.ProgrammedShareAttributes.*;
 
 @Data
-public class ProgrammedShareUpdate implements AuditClose, CollectableAttributes {
+public class ProgrammedShareUpdate implements AuditClose, AuditUpdate, CollectableAttributes {
 
     @NotNull
     private Integer id;
@@ -36,6 +38,10 @@ public class ProgrammedShareUpdate implements AuditClose, CollectableAttributes 
     private LocalDateTime closedAt;
 
     private Integer closedBy;
+
+    private LocalDateTime updatedAt;
+
+    private Integer updatedBy;
     
     @Singular
     private Set<ProgrammedShareFileCreate> files;
@@ -55,6 +61,8 @@ public class ProgrammedShareUpdate implements AuditClose, CollectableAttributes 
         map.put(ATTR_PS_OPERATOR_SIGNATURE, this.operatorSignature);
         map.putTimestamp(ATTR_PS_CLOSED_AT, this.closedAt);
         map.put(ATTR_PS_CLOSED_BY, this.closedBy);
+        map.put(ATTR_PS_MODIFIED_AT, this.updatedAt);
+        map.put(ATTR_PS_MODIFIED_BY, this.updatedBy);
 
         return map;
     }

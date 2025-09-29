@@ -3,6 +3,7 @@ package com.epm.gestepm.model.signings.warehouse.dao.entity.updater;
 import com.epm.gestepm.lib.audit.AuditUpdate;
 import com.epm.gestepm.lib.entity.AttributeMap;
 import com.epm.gestepm.lib.entity.CollectableAttributes;
+
 import static com.epm.gestepm.model.signings.warehouse.dao.constants.WarehouseSigningAttributes.*;
 import lombok.Data;
 
@@ -20,6 +21,10 @@ public class WarehouseSigningUpdate implements AuditUpdate, CollectableAttribute
     @NotNull
     private LocalDateTime closedAt;
 
+    private LocalDateTime updatedAt;
+
+    private Integer updatedBy;
+
     @Override
     public AttributeMap collectAttributes() {
 
@@ -28,6 +33,8 @@ public class WarehouseSigningUpdate implements AuditUpdate, CollectableAttribute
         attrs.put(ATTR_WHS_ID, this.id);
         attrs.putTimestamp(ATTR_WHS_STARTED_AT, this.startedAt);
         attrs.putTimestamp(ATTR_WHS_CLOSED_AT, this.closedAt);
+        attrs.put(ATTR_WHS_MODIFIED_AT, this.updatedAt);
+        attrs.put(ATTR_WHS_MODIFIED_BY, this.updatedBy);
 
         return attrs;
     }

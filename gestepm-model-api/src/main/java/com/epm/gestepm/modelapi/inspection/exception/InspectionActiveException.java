@@ -12,10 +12,4 @@ import java.util.List;
 public class InspectionActiveException extends RuntimeException {
 
     private Integer id;
-
-    private LocalDateTime startDate;
-
-    private String projectName;
-
-    private String detailUrl;
 }

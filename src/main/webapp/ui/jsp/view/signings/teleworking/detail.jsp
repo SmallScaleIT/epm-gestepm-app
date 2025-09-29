@@ -48,7 +48,7 @@
                     <div class="col-sm-12 col-md-4">
                         <div class="form-group mb-1">
                             <label class="col-form-label w-100"><spring:message code="project"/>
-                                <input type="text" class="form-control mt-1" value="${projectName}" disabled />
+                                <input type="text" class="form-control mt-1" value="${projectName}" disabled/>
                             </label>
                         </div>
                     </div>
@@ -56,7 +56,7 @@
                     <div class="col-sm-12 col-md-4">
                         <div class="form-group mb-1">
                             <label class="col-form-label w-100"><spring:message code="start.date"/>
-                                <input type="datetime-local" name="startedAt" class="form-control mt-1" value="${teleworkingSigning.startedAt}" disabled />
+                                <input type="datetime-local" name="startedAt" class="form-control mt-1" value="${teleworkingSigning.startedAt}" />
                             </label>
                         </div>
                     </div>
@@ -64,7 +64,7 @@
                     <div class="col-sm-12 col-md-4">
                         <div class="form-group mb-1">
                             <label class="col-form-label w-100"><spring:message code="end.date"/>
-                                <input type="datetime-local" name="closedAt" class="form-control mt-1" value="${teleworkingSigning.closedAt}" disabled />
+                                <input type="datetime-local" name="closedAt" class="form-control mt-1" value="${teleworkingSigning.closedAt}" />
                             </label>
                         </div>
                     </div>
@@ -95,7 +95,7 @@
                     </div>
                 </div>
 
-                <div class="row actionable d-none">
+                <div class="row actionable">
                     <div class="col text-right">
                         <button id="editBtn" type="button" class="btn btn-standard btn-sm movile-full"><spring:message code="save"/></button>
                     </div>
@@ -109,6 +109,7 @@
 
     let locale = '${locale}';
     let canUpdate = ${canUpdate};
+    let isSigningFinished = ${ teleworkingSigning.closedAt != null };
 
     $(document).ready(function() {
         initialize();
@@ -116,13 +117,14 @@
     });
 
     function initialize() {
-        if (canUpdate) {
-            const editForm = document.querySelector('#editForm');
+        const editForm = document.getElementById('editForm');
 
-            editForm.querySelector('.actionable').classList.remove('d-none');
+        if (!canUpdate) {
+            editForm.querySelector('.actionable').style.display = 'none';
 
-            editForm.querySelector('[name="startedAt"]').disabled = false;
-            editForm.querySelector('[name="closedAt"]').disabled = false;
+            editForm.querySelectorAll('input, select, textarea, button').forEach(el => {
+                el.disabled = true;
+            });
         }
     }
 

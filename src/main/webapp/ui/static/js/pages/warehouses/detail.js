@@ -6,7 +6,6 @@ let warehouseSigning;
 $(document).ready(async () => {
     await init();
     close(warehouseSigning.id);
-    setMode();
     loadDataTables();
     setReturnButtonUrl();
 });
@@ -15,6 +14,29 @@ async function init() {
     const warehouseId = getWarehouseId();
 
     warehouseSigning = await getWarehouse(warehouseId);
+    const editForm = document.querySelector('#editForm');
+
+    if (!canUpdate) {
+        editForm.querySelector('.actionable').style.display = 'none';
+
+        editForm.querySelectorAll('input, select, textarea, button').forEach(el => {
+            el.disabled = true;
+        });
+    }
+    else if (!isSigningFinished) {
+        const fieldsToDisable = ['projectId', 'startedAt', 'closedAt'];
+
+        fieldsToDisable.forEach(name => {
+            const field = editForm.querySelector('[name="' + name + '"]');
+            if (field) field.disabled = true;
+        });
+    }
+
+    if (isSigningFinished)
+    {
+        const createWorkshopBtn = document.getElementById('createWorkshopBtn');
+        createWorkshopBtn.classList.add('d-none');
+    }
 
     initializeSelects();
 }
@@ -28,29 +50,25 @@ function initializeSelects() {
     });
 }
 
-function setEndDate() {
-    const endDateEditor = document.querySelector('[name="closedAt"]');
-
-    if (endDateEditor && warehouseSigning && warehouseSigning.closedAt)
-        endDateEditor.value = warehouseSigning.closedAt;
-}
-
 function close(id) {
-    const finishBtn = document.getElementById('finishBtn');
-    const finishBtnJQ = $(finishBtn);
+    const editBtn = document.getElementById('editBtn');
+    const editBtnJQ = $(editBtn);
 
-    finishBtnJQ.click(async () => {
+    editBtnJQ.click(async () => {
         showLoading();
 
-        axios.patch('/v1/signings/warehouse/' + id, {})
+        const editForm = document.getElementById('editForm');
+
+        axios.patch('/v1/signings/warehouse/' + id, {
+                startedAt: editForm.querySelector('[name="startedAt"]').value
+                , closedAt: editForm.querySelector('[name="closedAt"]').value})
             .then(async response => {
-                const warehouseId = response.data.data.id;
-                warehouseSigning = await getWarehouse(warehouseId);
-                setEndDate();
-                setMode();
-                dTable.ajax.reload();
-                const successMessage = messages.signings.warehouse.update.success.replace('{0}', id);
-                showNotify(successMessage);
+                  const warehouseId = response.data.data.id;
+                  warehouseSigning = await getWarehouse(warehouseId);
+                  update(warehouseSigning);
+                  dTable.ajax.reload();
+                  const successMessage = messages.signings.warehouse.update.success.replace('{0}', id);
+                  showNotify(successMessage);
             })
             .catch(error => showNotify(error.response.data.detail, 'danger'))
             .finally(() => {
@@ -59,26 +77,34 @@ function close(id) {
     });
 }
 
-function setWorkingMode() {
-    const createWorkshopBtn = document.getElementById('createWorkshopBtn');
+function update(warehouseSigning) {
 
-    if (createWorkshopBtn)
-        createWorkshopBtn.classList.remove('d-none');
+    const editForm = document.getElementById('editForm');
 
-    disableForm('#editForm');
-}
+    const startDatePicker = editForm.querySelector('[name="startedAt"]');
+    const closedAtPicker = editForm.querySelector('[name="closedAt"]');
 
-function setCompletedMode() {
-    const createWorkshopBtn = document.getElementById('createWorkshopBtn');
-    const finishBtn = document.querySelector('.actionable');
+    if (startDatePicker)
+        startDatePicker.value = warehouseSigning.startedAt;
 
-    if (finishBtn)
-        finishBtn.classList.add('d-none');
+    if (closedAtPicker)
+        closedAtPicker.value = warehouseSigning.closedAt;
 
-    if (createWorkshopBtn)
+    if (canUpdate) {
+        const fieldsToEnable = ['startedAt', 'closedAt'];
+
+        fieldsToEnable.forEach(name => {
+            const field = editForm.querySelector('[name="' + name + '"]');
+            if (field) field.disabled = false;
+        });
+    }
+
+    if (warehouseSigning.closedAt)
+    {
+        const createWorkshopBtn = document.getElementById('createWorkshopBtn');
         createWorkshopBtn.classList.add('d-none');
+    }
 
-    disableForm('#editForm');
 }
 
 function loadDataTables() {
@@ -173,13 +199,6 @@ function getWarehouseId() {
         return "0";
 
     return elements[elements.length - 1];
-}
-
-function setMode() {
-    if (warehouseSigning.closedAt !== null && warehouseSigning.closedAt !== undefined)
-        setCompletedMode();
-    else
-        setWorkingMode();
 }
 
 function setReturnButtonUrl() {

@@ -28,4 +28,8 @@ public class ShareBreakAttributes {
 
     public static final String ATTR_SB_STATUS = "attr_sb_status";
 
+    public static final String ATTR_SB_MODIFIED_AT = "attr_sb_modified_at";
+
+    public static final String ATTR_SB_MODIFIED_BY = "attr_sb_modified_by";
+
 }

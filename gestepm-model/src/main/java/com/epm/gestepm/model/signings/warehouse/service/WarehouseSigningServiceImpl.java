@@ -1,5 +1,9 @@
 package com.epm.gestepm.model.signings.warehouse.service;
 
+import com.epm.gestepm.emailapi.dto.emailgroup.UpdateWarehouseSigningGroup;
+import com.epm.gestepm.emailapi.service.EmailService;
+import com.epm.gestepm.lib.audit.AuditProvider;
+import com.epm.gestepm.lib.locale.LocaleProvider;
 import com.epm.gestepm.lib.logging.annotation.EnableExecutionLog;
 import com.epm.gestepm.lib.logging.annotation.LogExecution;
 import com.epm.gestepm.lib.security.annotation.RequirePermits;
@@ -13,6 +17,12 @@ import com.epm.gestepm.model.signings.warehouse.dao.entity.filter.WarehouseSigni
 import com.epm.gestepm.model.signings.warehouse.dao.entity.finder.WarehouseSigningByIdFinder;
 import com.epm.gestepm.model.signings.warehouse.dao.entity.updater.WarehouseSigningUpdate;
 import com.epm.gestepm.model.signings.warehouse.service.mapper.*;
+import com.epm.gestepm.model.user.utils.UserUtils;
+import com.epm.gestepm.modelapi.common.utils.Utiles;
+import com.epm.gestepm.modelapi.deprecated.user.dto.User;
+import com.epm.gestepm.modelapi.project.dto.ProjectDto;
+import com.epm.gestepm.modelapi.project.dto.finder.ProjectByIdFinderDto;
+import com.epm.gestepm.modelapi.project.service.ProjectService;
 import com.epm.gestepm.modelapi.signings.warehouse.dto.WarehouseSigningDto;
 import com.epm.gestepm.modelapi.signings.warehouse.dto.creator.WarehouseSigningCreateDto;
 import com.epm.gestepm.modelapi.signings.warehouse.dto.deleter.WarehouseSigningDeleteDto;
@@ -22,12 +32,13 @@ import com.epm.gestepm.modelapi.signings.warehouse.dto.updater.WarehouseSigningU
 import com.epm.gestepm.modelapi.signings.warehouse.exception.WarehouseSigningNotFoundException;
 import com.epm.gestepm.modelapi.signings.warehouse.service.WarehouseSigningService;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.epm.gestepm.lib.logging.constants.LogLayerMarkers.SERVICE;
 import static com.epm.gestepm.lib.logging.constants.LogOperations.*;
@@ -40,12 +51,27 @@ import static org.mapstruct.factory.Mappers.getMapper;
 @EnableExecutionLog(layerMarker = SERVICE)
 public class WarehouseSigningServiceImpl implements WarehouseSigningService {
 
-    private final SigningUpdateChecker checker;
-
+    @Value("${gestepm.mails.notify}")
+    private List<String> emailsTo;
+  
     private final WarehouseSigningDao repository;
 
     private final HasActiveSigningChecker activeChecker;
 
+    private final AuditProvider auditProvider;
+
+    private final EmailService emailService;
+
+    private final LocaleProvider localeProvider;
+
+    private final MessageSource messageSource;
+
+    private final ProjectService projectService;
+
+    private final SigningUpdateChecker signingUpdateChecker;
+
+    private final UserUtils userUtils;
+  
     @Override
     @RequirePermits(value = PRMT_READ_WHS, action = "List warehouse signings")
     @LogExecution(operation = OP_READ,
@@ -128,25 +154,26 @@ public class WarehouseSigningServiceImpl implements WarehouseSigningService {
             errorMsg = "Failed to update warehouse signing")
     public WarehouseSigningDto update(WarehouseSigningUpdateDto updateDto) {
 
-        final WarehouseSigningByIdFinder finder = new WarehouseSigningByIdFinder();
-        finder.setId(updateDto.getId());
+        final WarehouseSigningByIdFinderDto finderDto = new WarehouseSigningByIdFinderDto(updateDto.getId());
 
-        //Get the Warehouse Signing from repository
-        final WarehouseSigningUpdate warehouseSigning = repository.findUpdateSigning(finder)
-                .orElseThrow(() -> new WarehouseSigningNotFoundException(updateDto.getId()));
+        final WarehouseSigningDto warehouseSigningDto = findOrNotFound(finderDto);
 
-        final boolean firstClosed = warehouseSigning.getClosedAt() == null;
+        final WarehouseSigningUpdate update = getMapper(MapWHSToWarehouseSigningUpdate.class)
+                .from(updateDto, getMapper(MapWHSToWarehouseSigningUpdate.class).from(warehouseSigningDto));
 
-        //Update non null values from request dto
-        getMapper(MapWHSToWarehouseSigningUpdate.class)
-                .from(updateDto, warehouseSigning);
+        this.signingUpdateChecker.checker(warehouseSigningDto.getUserId(), warehouseSigningDto.getProjectId());
 
-        //If first time for update then close signing today
-        if (firstClosed)
-            warehouseSigning.setClosedAt(LocalDateTime.now());
+        this.auditProvider.auditUpdate(update);
 
-        return getMapper(MapWHSToWarehouseSigningDto.class)
-                .from(repository.update(warehouseSigning));
+        if (update.getClosedAt() == null) {
+            update.setClosedAt(LocalDateTime.now());
+        }
+
+        final WarehouseSigningDto result = getMapper(MapWHSToWarehouseSigningDto.class).from(repository.update(update));
+
+        this.sendUpdateEmail(result);
+
+        return result;
     }
 
     @Override
@@ -166,5 +193,34 @@ public class WarehouseSigningServiceImpl implements WarehouseSigningService {
                 .from(deleteDto);
 
         repository.delete(delete);
+    }
+
+    private void sendUpdateEmail(final WarehouseSigningDto warehouseSigning) {
+        final User user = Utiles.getCurrentUser();
+
+        if (!warehouseSigning.getUserId().equals(user.getId().intValue()))
+            return ;
+
+        final Locale locale = new Locale(this.localeProvider.getLocale().orElse("es"));
+
+        final String subject = messageSource.getMessage("email.warehousesigning.update.subject", new Object[]{
+                warehouseSigning.getId()
+        }, locale);
+
+        final Set<String> emails = new HashSet<>(emailsTo);
+
+        final ProjectDto project = this.projectService.findOrNotFound(new ProjectByIdFinderDto(warehouseSigning.getProjectId()));
+
+        final UpdateWarehouseSigningGroup updateGroup = new UpdateWarehouseSigningGroup();
+        updateGroup.setEmails(new ArrayList<>(emails));
+        updateGroup.setSubject(subject);
+        updateGroup.setLocale(locale);
+        updateGroup.setWarehouseSigningId(warehouseSigning.getId());
+        updateGroup.setFullName(user.getFullName());
+        updateGroup.setProjectName(project.getName());
+        updateGroup.setCreatedAt(warehouseSigning.getStartedAt());
+        updateGroup.setClosedAt(warehouseSigning.getClosedAt());
+
+        this.emailService.sendEmail(updateGroup);
     }
 }

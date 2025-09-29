@@ -1,6 +1,9 @@
 package com.epm.gestepm.model.shares.displacement.service;
 
+import com.epm.gestepm.emailapi.dto.emailgroup.UpdateDisplacementShareGroup;
+import com.epm.gestepm.emailapi.service.EmailService;
 import com.epm.gestepm.lib.audit.AuditProvider;
+import com.epm.gestepm.lib.locale.LocaleProvider;
 import com.epm.gestepm.lib.logging.annotation.EnableExecutionLog;
 import com.epm.gestepm.lib.logging.annotation.LogExecution;
 import com.epm.gestepm.lib.security.annotation.RequirePermits;
@@ -15,6 +18,13 @@ import com.epm.gestepm.model.shares.displacement.dao.entity.finder.DisplacementS
 import com.epm.gestepm.model.shares.displacement.dao.entity.updater.DisplacementShareUpdate;
 import com.epm.gestepm.model.shares.displacement.service.mapper.*;
 import com.epm.gestepm.model.signings.checker.HasActiveSigningChecker;
+import com.epm.gestepm.modelapi.common.utils.Utiles;
+import com.epm.gestepm.modelapi.deprecated.user.dto.User;
+import com.epm.gestepm.modelapi.project.dto.ProjectDto;
+import com.epm.gestepm.modelapi.project.dto.finder.ProjectByIdFinderDto;
+import com.epm.gestepm.modelapi.project.service.ProjectService;
+import com.epm.gestepm.model.signings.checker.SigningUpdateChecker;
+import com.epm.gestepm.model.user.utils.UserUtils;
 import com.epm.gestepm.modelapi.shares.displacement.dto.DisplacementShareDto;
 import com.epm.gestepm.modelapi.shares.displacement.dto.creator.DisplacementShareCreateDto;
 import com.epm.gestepm.modelapi.shares.displacement.dto.deleter.DisplacementShareDeleteDto;
@@ -24,13 +34,14 @@ import com.epm.gestepm.modelapi.shares.displacement.dto.updater.DisplacementShar
 import com.epm.gestepm.modelapi.shares.displacement.exception.DisplacementShareNotFoundException;
 import com.epm.gestepm.modelapi.shares.displacement.service.DisplacementShareService;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Supplier;
 
 import static com.epm.gestepm.lib.logging.constants.LogLayerMarkers.SERVICE;
@@ -45,6 +56,9 @@ import static org.mapstruct.factory.Mappers.getMapper;
 @EnableExecutionLog(layerMarker = SERVICE)
 public class DisplacementShareServiceImpl implements DisplacementShareService {
 
+    @Value("${gestepm.mails.notify}")
+    private List<String> emailsTo;
+  
     private final AuditProvider auditProvider;
 
     private final DisplacementShareDao displacementShareDao;
@@ -52,6 +66,16 @@ public class DisplacementShareServiceImpl implements DisplacementShareService {
     private final ShareDateChecker shareDateChecker;
 
     private final HasActiveSigningChecker activeChecker;
+
+    private final MessageSource messageSource;
+
+    private final LocaleProvider localeProvider;
+
+    private final ProjectService projectService;
+
+    private final EmailService emailService;
+
+    private final SigningUpdateChecker signingUpdateChecker;
 
     @Override
     @RequirePermits(value = PRMT_READ_DS, action = "List displacement shares")
@@ -145,13 +169,50 @@ public class DisplacementShareServiceImpl implements DisplacementShareService {
             msgOut = "Displacement share updated OK",
             errorMsg = "Failed to update displacement share")
     public DisplacementShareDto update(final DisplacementShareUpdateDto updateDto) {
+        final DisplacementShareDto displacementShareDto = this.findOrNotFound(new DisplacementShareByIdFinderDto(updateDto.getId()));
+
         final DisplacementShareUpdate update = getMapper(MapDSToDisplacementShareUpdate.class).from(updateDto);
 
         this.auditProvider.auditUpdate(update);
 
+        this.signingUpdateChecker.checker(displacementShareDto.getUserId(), update.getProjectId());
+
         final DisplacementShare updated = this.displacementShareDao.update(update);
 
-        return getMapper(MapDSToDisplacementShareDto.class).from(updated);
+        final DisplacementShareDto result = getMapper(MapDSToDisplacementShareDto.class).from(updated);
+
+        this.sendUpdateEmail(result);
+
+        return result;
+    }
+
+    private void sendUpdateEmail(final DisplacementShareDto displacementShare) {
+        final User user = Utiles.getCurrentUser();
+
+        if (!displacementShare.getUserId().equals(user.getId().intValue()))
+            return ;
+
+        final Locale locale = new Locale(this.localeProvider.getLocale().orElse("es"));
+
+        final String subject = messageSource.getMessage("email.displacementshare.update.subject", new Object[]{
+                displacementShare.getId()
+        }, locale);
+
+        final Set<String> emails = new HashSet<>(emailsTo);
+
+        final ProjectDto project = this.projectService.findOrNotFound(new ProjectByIdFinderDto(displacementShare.getProjectId()));
+
+        final UpdateDisplacementShareGroup updateGroup = new UpdateDisplacementShareGroup();
+        updateGroup.setEmails(new ArrayList<>(emails));
+        updateGroup.setSubject(subject);
+        updateGroup.setLocale(locale);
+        updateGroup.setDisplacementShareId(displacementShare.getId());
+        updateGroup.setFullName(user.getFullName());
+        updateGroup.setProjectName(project.getName());
+        updateGroup.setCreatedAt(displacementShare.getStartDate());
+        updateGroup.setClosedAt(displacementShare.getEndDate());
+
+        this.emailService.sendEmail(updateGroup);
     }
 
     @Override

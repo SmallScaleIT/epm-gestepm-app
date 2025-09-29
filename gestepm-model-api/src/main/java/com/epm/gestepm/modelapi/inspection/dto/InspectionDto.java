@@ -60,4 +60,7 @@ public class InspectionDto implements Serializable {
 
     private List<Integer> fileIds;
 
+    private LocalDateTime updatedAt;
+
+    private Integer updatedBy;
 }
