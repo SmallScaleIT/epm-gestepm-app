@@ -32,6 +32,10 @@ public class HasActiveSigningChecker {
 
         final SigningDto signing = signingList.get(0);
 
+        if (signing.getDetailUrl().contains("/shares/no-programmed/")) {
+            return;
+        }
+
         throw new SigningCheckerException(signing.getId(), signing.getStartDate(), signing.getDetailUrl());
     }
 }
