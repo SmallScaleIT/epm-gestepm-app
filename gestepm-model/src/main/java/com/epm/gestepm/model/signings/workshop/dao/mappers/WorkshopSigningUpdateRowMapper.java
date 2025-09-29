@@ -28,6 +28,8 @@ public class WorkshopSigningUpdateRowMapper extends CommonRowMapper implements R
         workshopSigning.setStartedAt(nullableLocalDateTime(rs, COL_WSS_STARTED_AT));
         workshopSigning.setClosedAt(nullableLocalDateTime(rs, COL_WSS_CLOSED_AT));
 
+        this.setCommonAudit(workshopSigning, rs);
+
         return workshopSigning;
     }
 }

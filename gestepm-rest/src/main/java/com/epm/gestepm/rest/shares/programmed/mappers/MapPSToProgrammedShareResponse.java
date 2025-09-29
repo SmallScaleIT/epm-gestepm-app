@@ -15,6 +15,7 @@ public interface MapPSToProgrammedShareResponse {
   @Mapping(source = "projectId", target = "project.id")
   @Mapping(source = "createdBy", target = "createdBy.id")
   @Mapping(source = "closedBy", target = "closedBy.id")
+  @Mapping(source = "updatedBy", target = "updatedBy.id")
   ProgrammedShare from(ProgrammedShareDto dto);
 
   List<ProgrammedShare> from(Page<ProgrammedShareDto> list);

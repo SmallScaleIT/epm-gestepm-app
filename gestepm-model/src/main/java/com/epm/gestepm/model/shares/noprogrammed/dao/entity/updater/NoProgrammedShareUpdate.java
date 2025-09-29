@@ -1,5 +1,6 @@
 package com.epm.gestepm.model.shares.noprogrammed.dao.entity.updater;
 
+import com.epm.gestepm.lib.audit.AuditUpdate;
 import com.epm.gestepm.lib.entity.AttributeMap;
 import com.epm.gestepm.lib.entity.CollectableAttributes;
 import com.epm.gestepm.model.shares.noprogrammed.dao.constants.NoProgrammedShareAttributes;
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 @Data
-public class NoProgrammedShareUpdate implements CollectableAttributes {
+public class NoProgrammedShareUpdate implements AuditUpdate, CollectableAttributes {
 
     @NotNull
     private Integer id;
@@ -34,6 +35,10 @@ public class NoProgrammedShareUpdate implements CollectableAttributes {
 
     private NoProgrammedShareStateEnum state;
 
+    private LocalDateTime updatedAt;
+
+    private Integer updatedBy;
+
     @Singular
     private Set<NoProgrammedShareFileCreate> files;
 
@@ -51,6 +56,8 @@ public class NoProgrammedShareUpdate implements CollectableAttributes {
         map.put(NoProgrammedShareAttributes.ATTR_NPS_TOPIC_ID, this.topicId);
         map.put(NoProgrammedShareAttributes.ATTR_NPS_FORUM_TITLE, this.forumTitle);
         map.put(NoProgrammedShareAttributes.ATTR_NPS_STATE, this.state.getId());
+        map.put(NoProgrammedShareAttributes.ATTR_NPS_MODIFIED_AT, this.updatedAt);
+        map.put(NoProgrammedShareAttributes.ATTR_NPS_MODIFIED_BY, this.updatedBy);
 
         return map;
     }

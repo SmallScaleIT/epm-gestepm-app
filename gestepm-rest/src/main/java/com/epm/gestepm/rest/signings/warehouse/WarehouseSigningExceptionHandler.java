@@ -4,11 +4,13 @@ import com.epm.gestepm.lib.controller.error.APIError;
 import com.epm.gestepm.lib.controller.error.I18nErrorMessageSource;
 import com.epm.gestepm.lib.controller.exception.BaseRestExceptionHandler;
 import com.epm.gestepm.lib.executiontrace.ExecutionRequestProvider;
+import com.epm.gestepm.modelapi.signings.warehouse.exception.WarehouseFinalizedException;
 import com.epm.gestepm.modelapi.signings.warehouse.exception.WarehouseSigningNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @RestControllerAdvice
@@ -17,6 +19,8 @@ public class WarehouseSigningExceptionHandler extends BaseRestExceptionHandler {
     public static final int WHS_ERROR_CODE = 1300;
 
     public static final String WHS_NOT_FOUND = "warehouse-signing-not-found";
+
+    public static final String WHS_FINALIZED = "warehouse-signing-finalized";
 
     public WarehouseSigningExceptionHandler(ExecutionRequestProvider executionRequestProvider, I18nErrorMessageSource i18nErrorMessageSource) {
         super(executionRequestProvider, i18nErrorMessageSource);
@@ -29,5 +33,14 @@ public class WarehouseSigningExceptionHandler extends BaseRestExceptionHandler {
         final Integer id = ex.getId();
 
         return toAPIError(WHS_ERROR_CODE, WHS_NOT_FOUND, WHS_NOT_FOUND, id);
+    }
+
+    @ExceptionHandler(WarehouseFinalizedException.class)
+    @ResponseStatus(CONFLICT)
+    public APIError handle(WarehouseFinalizedException ex) {
+
+        final Integer id = ex.getId();
+
+        return toAPIError(WHS_ERROR_CODE, WHS_FINALIZED, WHS_FINALIZED, id);
     }
 }

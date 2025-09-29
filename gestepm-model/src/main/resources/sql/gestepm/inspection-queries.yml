@@ -21,6 +21,8 @@ sql:
       i.materials_file_name,
       i.equipment_hours,   
       i.topic_id,
+      i.modified_at,
+      i.modified_by,
       GROUP_CONCAT(ifi.inspection_file_id) AS inspection_file_ids,
       GROUP_CONCAT(CONCAT_WS('|', im.inspection_material_id, im.units, im.description, im.reference)) AS inspection_materials
     FROM ${sch-gestepm}.inspection i
@@ -83,7 +85,9 @@ sql:
       materials_file = :attr_i_materials_file, 
       materials_file_name = :attr_i_materials_file_name,
       equipment_hours = :attr_i_equipment_hours,
-      topic_id = :attr_i_topic_id
+      topic_id = :attr_i_topic_id,
+      modified_at = :attr_i_modified_at,
+      modified_by = :attr_i_modified_by
     WHERE
       inspection_id = :attr_i_id
 
@@ -99,6 +103,7 @@ sql:
       -- ${sql.predicate-for-i-project-id}
       -- ${sql.predicate-for-i-start-date}
       -- ${sql.predicate-for-i-end-date}
+      -- ${sql.predicate-for-i-current}
     -- AND]
 
   filter-i-by-id: |
@@ -130,3 +135,6 @@ sql:
   predicate-for-i-end-date: |
     
     i.end_date > :attr_i_end_date
+
+  predicate-for-i-current: |
+    ((:attr_i_current IS TRUE AND i.end_date IS NULL) OR (:attr_i_current IS FALSE AND i.end_date IS NOT NULL))

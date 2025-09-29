@@ -8,12 +8,14 @@ import com.epm.gestepm.rest.shares.construction.request.ConstructionShareBreakLi
 import com.epm.gestepm.restapi.openapi.model.Share;
 import com.epm.gestepm.restapi.openapi.model.ShareBreak;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 import java.util.List;
 
 @Mapper
 public interface MapSBToShareBreakResponse {
 
+    @Mapping(source = "updatedBy", target = "updatedBy.id")
     ShareBreak from(ShareBreakDto dto);
 
     List<ShareBreak> from(Page<ShareBreakDto> list);

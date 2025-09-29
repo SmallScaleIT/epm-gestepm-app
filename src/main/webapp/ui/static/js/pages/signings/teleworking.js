@@ -19,12 +19,6 @@ function initializeDataTables() {
             render: function (data) {
                 return data ? moment(data).format('DD-MM-YYYY HH:mm') : null;
             }
-        },
-        {
-            targets: 4,
-            render: function (data) {
-                return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(data);
-            }
         }
     ]
 
@@ -110,7 +104,7 @@ function startTeleworking(projectId, location) {
         startedLocation: location
     }).then(() => {
         window.location.reload();
-    }).catch(error => showNotify(error.response.data.detail, 'danger'));
+    }).catch(error => showError(error, 'errorModal'));
 }
 
 function endTeleworking(location) {

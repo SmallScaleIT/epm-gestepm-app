@@ -4,6 +4,7 @@ import com.epm.gestepm.emailapi.dto.Attachment;
 import com.epm.gestepm.emailapi.dto.emailgroup.CloseInspectionGroup;
 import com.epm.gestepm.emailapi.service.EmailService;
 import com.epm.gestepm.forum.model.api.service.TopicService;
+import com.epm.gestepm.lib.audit.AuditProvider;
 import com.epm.gestepm.lib.locale.LocaleProvider;
 import com.epm.gestepm.lib.logging.annotation.EnableExecutionLog;
 import com.epm.gestepm.lib.logging.annotation.LogExecution;
@@ -30,6 +31,7 @@ import com.epm.gestepm.modelapi.inspection.dto.deleter.InspectionDeleteDto;
 import com.epm.gestepm.modelapi.inspection.dto.filter.InspectionFilterDto;
 import com.epm.gestepm.modelapi.inspection.dto.finder.InspectionByIdFinderDto;
 import com.epm.gestepm.modelapi.inspection.dto.updater.InspectionUpdateDto;
+import com.epm.gestepm.modelapi.inspection.exception.InspectionActiveException;
 import com.epm.gestepm.modelapi.inspection.exception.InspectionNotFoundException;
 import com.epm.gestepm.modelapi.inspection.service.InspectionExportService;
 import com.epm.gestepm.modelapi.inspection.service.InspectionService;
@@ -40,6 +42,7 @@ import com.epm.gestepm.modelapi.shares.noprogrammed.dto.NoProgrammedShareDto;
 import com.epm.gestepm.modelapi.shares.noprogrammed.dto.NoProgrammedShareStateEnumDto;
 import com.epm.gestepm.modelapi.shares.noprogrammed.dto.finder.NoProgrammedShareByIdFinderDto;
 import com.epm.gestepm.modelapi.shares.noprogrammed.dto.updater.NoProgrammedShareUpdateDto;
+import com.epm.gestepm.modelapi.shares.noprogrammed.exception.NoProgrammedShareFinalizedException;
 import com.epm.gestepm.modelapi.shares.noprogrammed.service.NoProgrammedShareService;
 import com.epm.gestepm.modelapi.user.dto.UserDto;
 import com.epm.gestepm.modelapi.user.dto.finder.UserByIdFinderDto;
@@ -96,6 +99,8 @@ public class InspectionServiceImpl implements InspectionService {
     private final UserService userService;
 
     private final UserUtils userUtils;
+
+    private final AuditProvider auditProvider;
 
     @Override
     @RequirePermits(value = PRMT_READ_I, action = "List inspections")
@@ -169,6 +174,8 @@ public class InspectionServiceImpl implements InspectionService {
 
         this.inspectionChecker.checker(noProgrammedShare, createDto);
 
+        this.validateInspection(noProgrammedShare);
+
         final InspectionCreate create = getMapper(MapIToInspectionCreate.class).from(createDto);
         create.setStartDate(LocalDateTime.now());
 
@@ -200,6 +207,8 @@ public class InspectionServiceImpl implements InspectionService {
 
         final InspectionUpdate update = getMapper(MapIToInspectionUpdate.class).from(updateDto,
                 getMapper(MapIToInspectionUpdate.class).from(inspection));
+
+        this.auditProvider.auditUpdate(update);
 
         final Inspection updated = this.inspectionDao.update(update);
 
@@ -277,6 +286,32 @@ public class InspectionServiceImpl implements InspectionService {
         noProgrammedShareUpdateDto.setState(state);
 
         this.noProgrammedShareService.update(noProgrammedShareUpdateDto);
+    }
+
+    protected void validateInspection(final NoProgrammedShareDto noProgrammedShare) {
+        final boolean isClosed = NoProgrammedShareStateEnumDto.CLOSED.equals(noProgrammedShare.getState());
+
+        if (isClosed) {
+            throw new NoProgrammedShareFinalizedException(noProgrammedShare.getId());
+        }
+
+        this.validateInspectionActive(noProgrammedShare.getId());
+    }
+
+    protected void validateInspectionActive(final Integer noProgrammedShareId) {
+        final InspectionFilterDto filter = new InspectionFilterDto();
+        filter.setShareId(noProgrammedShareId);
+        filter.setCurrent(true);
+
+        final List<InspectionDto> inspectionList = list(filter);
+
+        if (inspectionList.isEmpty()){
+            return;
+        }
+
+        final InspectionDto inspectionActive = inspectionList.get(0);
+
+        throw new InspectionActiveException(inspectionActive.getShareId());
     }
 
     private void sendMail(final InspectionDto inspection, final Boolean notify) {

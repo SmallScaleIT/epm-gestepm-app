@@ -1,0 +1,41 @@
+package com.epm.gestepm.model.signings.checker;
+
+import com.epm.gestepm.modelapi.signings.dto.SigningDto;
+import com.epm.gestepm.modelapi.signings.dto.filter.SigningFilterDto;
+import com.epm.gestepm.modelapi.signings.exception.SigningCheckerException;
+import com.epm.gestepm.modelapi.signings.service.SigningService;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+
+@Component
+@AllArgsConstructor
+public class HasActiveSigningChecker {
+
+    private final SigningService signingService;
+
+    public void validateSigningChecker(final Integer userId) {
+
+        if (userId == null) {
+            return;
+        }
+
+        final SigningFilterDto filter = new SigningFilterDto();
+        filter.setUserId(userId);
+
+        final List<SigningDto> signingList = signingService.list(filter);
+
+        if (signingList.isEmpty()) {
+            return;
+        }
+
+        final SigningDto signing = signingList.get(0);
+
+        if (signing.getDetailUrl().contains("/shares/no-programmed/")) {
+            return;
+        }
+
+        throw new SigningCheckerException(signing.getId(), signing.getStartDate(), signing.getDetailUrl());
+    }
+}

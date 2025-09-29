@@ -1,11 +1,14 @@
 package com.epm.gestepm.model.signings.workshop.service;
 
+import com.epm.gestepm.emailapi.dto.emailgroup.UpdateWorkshopSigningGroup;
+import com.epm.gestepm.emailapi.service.EmailService;
+import com.epm.gestepm.lib.audit.AuditProvider;
+import com.epm.gestepm.lib.locale.LocaleProvider;
 import com.epm.gestepm.lib.logging.annotation.EnableExecutionLog;
 import com.epm.gestepm.lib.logging.annotation.LogExecution;
 import com.epm.gestepm.lib.security.annotation.RequirePermits;
 import com.epm.gestepm.lib.types.Page;
-import com.epm.gestepm.model.signings.warehouse.dao.WarehouseSigningDao;
-import com.epm.gestepm.model.signings.warehouse.dao.entity.finder.WarehouseSigningByIdFinder;
+import com.epm.gestepm.model.signings.checker.SigningUpdateChecker;
 import com.epm.gestepm.model.signings.workshop.dao.WorkshopSigningDao;
 import com.epm.gestepm.model.signings.workshop.dao.entity.creator.WorkshopSigningCreate;
 import com.epm.gestepm.model.signings.workshop.dao.entity.deleter.WorkshopSigningDelete;
@@ -13,23 +16,32 @@ import com.epm.gestepm.model.signings.workshop.dao.entity.filter.WorkshopSigning
 import com.epm.gestepm.model.signings.workshop.dao.entity.finder.WorkshopSigningByIdFinder;
 import com.epm.gestepm.model.signings.workshop.dao.entity.updater.WorkshopSigningUpdate;
 import com.epm.gestepm.model.signings.workshop.service.mapper.*;
-import com.epm.gestepm.modelapi.signings.warehouse.exception.WarehouseSigningNotFoundException;
+import com.epm.gestepm.modelapi.common.utils.Utiles;
+import com.epm.gestepm.modelapi.deprecated.user.dto.User;
+import com.epm.gestepm.modelapi.project.dto.ProjectDto;
+import com.epm.gestepm.modelapi.project.dto.finder.ProjectByIdFinderDto;
+import com.epm.gestepm.modelapi.project.service.ProjectService;
+import com.epm.gestepm.model.user.utils.UserUtils;
+import com.epm.gestepm.modelapi.signings.warehouse.dto.WarehouseSigningDto;
+import com.epm.gestepm.modelapi.signings.warehouse.dto.finder.WarehouseSigningByIdFinderDto;
+import com.epm.gestepm.modelapi.signings.warehouse.exception.WarehouseFinalizedException;
+import com.epm.gestepm.modelapi.signings.warehouse.service.WarehouseSigningService;
 import com.epm.gestepm.modelapi.signings.workshop.dto.WorkShopSigningDto;
 import com.epm.gestepm.modelapi.signings.workshop.dto.creator.WorkshopSigningCreateDto;
 import com.epm.gestepm.modelapi.signings.workshop.dto.deleter.WorkshopSigningDeleteDto;
 import com.epm.gestepm.modelapi.signings.workshop.dto.filter.WorkshopSigningFilterDto;
 import com.epm.gestepm.modelapi.signings.workshop.dto.finder.WorkshopSigningByIdFinderDto;
 import com.epm.gestepm.modelapi.signings.workshop.dto.updater.WorkshopSigningUpdateDto;
-import com.epm.gestepm.modelapi.signings.workshop.exception.WorkshopSigningFinalizedException;
 import com.epm.gestepm.modelapi.signings.workshop.exception.WorkshopSigningNotFoundException;
 import com.epm.gestepm.modelapi.signings.workshop.service.WorkshopSigningService;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.epm.gestepm.lib.logging.constants.LogLayerMarkers.SERVICE;
 import static com.epm.gestepm.lib.logging.constants.LogOperations.*;
@@ -43,9 +55,26 @@ import static com.epm.gestepm.modelapi.signings.workshop.security.WorkshopSignin
 @EnableExecutionLog(layerMarker = SERVICE)
 public class WorkshopSigningServiceImpl implements WorkshopSigningService {
 
+    @Value("${gestepm.mails.notify}")
+    private List<String> emailsTo;
+  
     private final WorkshopSigningDao repository;
 
-    private final WarehouseSigningDao warehouseRepository;
+    private final WarehouseSigningService warehouseService;
+
+    private final AuditProvider auditProvider;
+
+    private final EmailService emailService;
+
+    private final LocaleProvider localeProvider;
+
+    private final MessageSource messageSource;
+
+    private final ProjectService projectService;
+
+    private final SigningUpdateChecker signingUpdateChecker;
+
+    private final UserUtils userUtils;
 
     @Override
     @RequirePermits(value = PRMT_READ_WSS, action = "List workshop signings")
@@ -54,9 +83,9 @@ public class WorkshopSigningServiceImpl implements WorkshopSigningService {
             msgIn = "Listing workshop signings",
             msgOut = "Listing workshop signings OK",
             errorMsg = "Failed to list workshop signings")
-    public List<WorkShopSigningDto> list(WorkshopSigningFilterDto filterDto) {
+    public List<WorkShopSigningDto> list(final WorkshopSigningFilterDto filterDto) {
 
-        WorkshopSigningFilter filter = getMapper(MapWSSToWorkshopSigningFilter.class)
+        final WorkshopSigningFilter filter = getMapper(MapWSSToWorkshopSigningFilter.class)
                 .from(filterDto);
 
         return getMapper(MapWSSToWorkshopSigningDto.class)
@@ -70,9 +99,9 @@ public class WorkshopSigningServiceImpl implements WorkshopSigningService {
             msgIn = "Paginating workshop signings",
             msgOut = "Paginating workshop signings OK",
             errorMsg = "Failed to paginate workshop signings")
-    public Page<WorkShopSigningDto> page(WorkshopSigningFilterDto filterDto, Long offset, Long limit) {
+    public Page<WorkShopSigningDto> page(final WorkshopSigningFilterDto filterDto, final Long offset, final Long limit) {
 
-        WorkshopSigningFilter filter = getMapper(MapWSSToWorkshopSigningFilter.class)
+        final WorkshopSigningFilter filter = getMapper(MapWSSToWorkshopSigningFilter.class)
                 .from(filterDto);
 
         return getMapper(MapWSSToWorkshopSigningDto.class)
@@ -86,9 +115,9 @@ public class WorkshopSigningServiceImpl implements WorkshopSigningService {
             msgIn = "Finding workshop signing by ID, result can be empty",
             msgOut = "Found workshop signing by ID",
             errorMsg = "Failed to find workshop signing by ID")
-    public Optional<WorkShopSigningDto> find(WorkshopSigningByIdFinderDto finderDto) {
+    public Optional<WorkShopSigningDto> find(final WorkshopSigningByIdFinderDto finderDto) {
 
-        WorkshopSigningByIdFinder finder = getMapper(MapWSSToWorkshopSigningByIdFinder.class)
+        final WorkshopSigningByIdFinder finder = getMapper(MapWSSToWorkshopSigningByIdFinder.class)
                 .from(finderDto);
 
         return repository.find(finder)
@@ -102,7 +131,7 @@ public class WorkshopSigningServiceImpl implements WorkshopSigningService {
             msgIn = "Finding workshop signing by ID, result can be empty",
             msgOut = "Found workshop signing by ID",
             errorMsg = "Failed to find workshop signing by ID")
-    public WorkShopSigningDto findOrNotFound(WorkshopSigningByIdFinderDto finderDto) {
+    public WorkShopSigningDto findOrNotFound(final WorkshopSigningByIdFinderDto finderDto) {
         return find(finderDto)
                 .orElseThrow(() -> new WorkshopSigningNotFoundException(finderDto.getId()));
     }
@@ -114,14 +143,14 @@ public class WorkshopSigningServiceImpl implements WorkshopSigningService {
             msgIn = "Creating new workshop signing",
             msgOut = "New warehouse signing created OK",
             errorMsg = "Failed to create new workshop signing")
-    public WorkShopSigningDto create(WorkshopSigningCreateDto createDto) {
+    public WorkShopSigningDto create(final WorkshopSigningCreateDto createDto) {
+        this.validateWorkshopSigning(createDto);
 
-        WorkshopSigningCreate create = getMapper(MapWSSToWorkshopSigningCreate.class)
+        final WorkshopSigningCreate create = getMapper(MapWSSToWorkshopSigningCreate.class)
                 .from(createDto);
         create.setStartedAt(LocalDateTime.now());
 
-        warehouseRepository.find(new WarehouseSigningByIdFinder(create.getWarehouseId()))
-                .orElseThrow(() -> new WarehouseSigningNotFoundException(create.getWarehouseId()));
+        this.warehouseService.findOrNotFound(new WarehouseSigningByIdFinderDto(create.getWarehouseId()));
 
         return getMapper(MapWSSToWorkshopSigningDto.class)
                 .from(repository.create(create));
@@ -134,30 +163,29 @@ public class WorkshopSigningServiceImpl implements WorkshopSigningService {
             msgIn = "Updating workshop signing",
             msgOut = "Workshop signing updated OK",
             errorMsg = "Failed to update workshop signing")
-    public WorkShopSigningDto update(WorkshopSigningUpdateDto updateDto) {
+    public WorkShopSigningDto update(final WorkshopSigningUpdateDto updateDto) {
 
-        WorkshopSigningByIdFinder finder = new WorkshopSigningByIdFinder();
-        finder.setId(updateDto.getId());
+        final WorkshopSigningByIdFinderDto finderDto = new WorkshopSigningByIdFinderDto(updateDto.getId());
 
-        //Find workshop signing from database
-        WorkshopSigningUpdate signing = repository.findUpdateSigning(finder)
-                .orElseThrow(() -> new WorkshopSigningNotFoundException(finder.getId()));
+        final WorkShopSigningDto workShopSigningDto = findOrNotFound(finderDto);
 
-        if (signing.getClosedAt() != null)
-            throw new WorkshopSigningFinalizedException(signing.getId());
+        final WorkshopSigningUpdate update = getMapper(MapWSSToWorkshopSigningUpdate.class)
+                .from(updateDto, getMapper(MapWSSToWorkshopSigningUpdate.class).from(workShopSigningDto));
 
-        //Update entity with non null values
-        getMapper(MapWSSToWorkshopSigningUpdate.class)
-                .from(updateDto, signing);
+        this.signingUpdateChecker.checker(workShopSigningDto.getUserId(), workShopSigningDto.getProjectId());
 
-        boolean finalize = Optional.ofNullable(updateDto.getFinalize())
-                .orElse(false);
+        if (update.getClosedAt() == null) {
+            update.setClosedAt(LocalDateTime.now());
+        }
 
-        if (finalize)
-            signing.setClosedAt(LocalDateTime.now());
+        this.auditProvider.auditUpdate(update);
 
-        return getMapper(MapWSSToWorkshopSigningDto.class)
-                .from(repository.update(signing));
+        final WorkShopSigningDto result = getMapper(MapWSSToWorkshopSigningDto.class)
+                .from(repository.update(update));
+
+        this.sendUpdateEmail(result);
+
+        return result;
     }
 
     @Override
@@ -167,16 +195,59 @@ public class WorkshopSigningServiceImpl implements WorkshopSigningService {
             msgIn = "Deleting workshop signing",
             msgOut = "Workshop signing deleted OK",
             errorMsg = "Failed to delete workshop signing")
-    public void delete(WorkshopSigningDeleteDto deleteDto) {
+    public void delete(final WorkshopSigningDeleteDto deleteDto) {
 
-        WorkshopSigningByIdFinderDto finderDto = new WorkshopSigningByIdFinderDto();
+        final WorkshopSigningByIdFinderDto finderDto = new WorkshopSigningByIdFinderDto();
         finderDto.setId(deleteDto.getId());
 
-        findOrNotFound(finderDto);
+        this.findOrNotFound(finderDto);
 
-        WorkshopSigningDelete delete = getMapper(MapWSSToWorkshopSigningDelete.class)
+        final WorkshopSigningDelete delete = getMapper(MapWSSToWorkshopSigningDelete.class)
                 .from(deleteDto);
 
         repository.delete(delete);
+    }
+
+    protected void validateWorkshopSigning(final WorkshopSigningCreateDto workshop) {
+        this.validateWarehouseSigningActive(workshop);
+    }
+
+    protected void validateWarehouseSigningActive(final WorkshopSigningCreateDto workshop) {
+        final WarehouseSigningByIdFinderDto finder = new WarehouseSigningByIdFinderDto(workshop.getWarehouseId());
+
+        final WarehouseSigningDto warehouse = warehouseService.findOrNotFound(finder);
+
+        if (warehouse.getClosedAt() != null) {
+            throw new WarehouseFinalizedException(warehouse.getId());
+        }
+    }
+
+    private void sendUpdateEmail(final WorkShopSigningDto workshopSigning) {
+        final User user = Utiles.getCurrentUser();
+
+        if (!workshopSigning.getUserId().equals(user.getId().intValue()))
+            return ;
+
+        final Locale locale = new Locale(this.localeProvider.getLocale().orElse("es"));
+
+        final String subject = messageSource.getMessage("email.workshopsigning.update.subject", new Object[]{
+                workshopSigning.getId()
+        }, locale);
+
+        final Set<String> emails = new HashSet<>(emailsTo);
+
+        final ProjectDto project = this.projectService.findOrNotFound(new ProjectByIdFinderDto(workshopSigning.getProjectId()));
+
+        final UpdateWorkshopSigningGroup updateGroup = new UpdateWorkshopSigningGroup();
+        updateGroup.setEmails(new ArrayList<>(emails));
+        updateGroup.setSubject(subject);
+        updateGroup.setLocale(locale);
+        updateGroup.setWorkshopSigningId(workshopSigning.getId());
+        updateGroup.setFullName(user.getFullName());
+        updateGroup.setProjectName(project.getName());
+        updateGroup.setCreatedAt(workshopSigning.getStartedAt());
+        updateGroup.setClosedAt(workshopSigning.getClosedAt());
+
+        this.emailService.sendEmail(updateGroup);
     }
 }

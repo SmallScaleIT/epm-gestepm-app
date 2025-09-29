@@ -23,7 +23,7 @@ function create() {
 			createFromJQ[0].reset();
 			dTable.ajax.reload(function() { dTable.page(dTable.page()).draw(false); }, false);
 			showNotify(messages.shares.displacement.create.success);
-		}).catch(error => showNotify(error.response.data.detail, 'danger'))
+		}).catch(error => showError(error, 'errorModal'))
 			.finally(() => {
 				hideLoading();
 				createModal.modal('hide');

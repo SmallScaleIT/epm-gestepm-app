@@ -221,7 +221,8 @@
                 el.disabled = true;
             });
 
-            signaturePad.off();
+            if (signatures.operator)
+                signatures.operator.off()
         }
     }
 

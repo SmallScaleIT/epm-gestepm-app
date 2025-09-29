@@ -4,6 +4,7 @@ import com.epm.gestepm.lib.logging.annotation.EnableExecutionLog;
 import com.epm.gestepm.lib.logging.annotation.LogExecution;
 import com.epm.gestepm.lib.types.Page;
 import com.epm.gestepm.modelapi.common.utils.ModelUtil;
+import com.epm.gestepm.modelapi.common.utils.classes.Constants;
 import com.epm.gestepm.modelapi.inspection.dto.InspectionDto;
 import com.epm.gestepm.modelapi.inspection.dto.finder.InspectionByIdFinderDto;
 import com.epm.gestepm.modelapi.inspection.service.InspectionService;
@@ -15,6 +16,7 @@ import com.epm.gestepm.modelapi.shares.common.dto.ShareStatusDto;
 import com.epm.gestepm.modelapi.shares.noprogrammed.dto.NoProgrammedShareDto;
 import com.epm.gestepm.modelapi.shares.noprogrammed.dto.finder.NoProgrammedShareByIdFinderDto;
 import com.epm.gestepm.modelapi.shares.noprogrammed.service.NoProgrammedShareService;
+import com.epm.gestepm.modelapi.signings.warehouse.dto.WarehouseSigningDto;
 import com.epm.gestepm.modelapi.subfamily.service.SubFamilyService;
 import com.epm.gestepm.modelapi.deprecated.user.dto.User;
 import lombok.AllArgsConstructor;
@@ -80,6 +82,20 @@ public class InspectionViewController {
             model.addAttribute("currentShareBreak", list.get(0).get());
         }
 
+        loadPermissions(user, inspection.getProjectId(), model, inspection);
+
         return "inspection-detail";
+    }
+
+    private void loadPermissions(final User user, final Integer projectId, final Model model
+            , final InspectionDto inspection) {
+        final Boolean isAdmin = Constants.ROLE_ADMIN.equals(user.getRole().getRoleName());
+
+        final Boolean isProjectTl = Constants.ROLE_PL.equals(user.getRole().getRoleName())
+                && user.getBossProjects().stream().anyMatch(project -> project.getId().equals(projectId.longValue()));
+
+        final Boolean isCurrentUser = inspection.getFirstTechnicalId().equals(user.getId().intValue());
+
+        model.addAttribute("canUpdate", isAdmin || isProjectTl || isCurrentUser);
     }
 }

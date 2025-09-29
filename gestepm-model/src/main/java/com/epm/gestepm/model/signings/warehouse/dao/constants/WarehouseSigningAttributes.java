@@ -14,4 +14,8 @@ public abstract class WarehouseSigningAttributes {
     public static final String ATTR_WHS_CLOSED_AT = "attr_whs_closed_at";
 
     public static final String ATTR_WHS_CURRENT = "attr_whs_current";
+
+    public static final String ATTR_WHS_MODIFIED_AT = "attr_whs_modified_at";
+
+    public static final String ATTR_WHS_MODIFIED_BY = "attr_whs_modified_by";
 }

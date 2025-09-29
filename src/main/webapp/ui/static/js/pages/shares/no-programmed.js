@@ -119,8 +119,8 @@ function create() {
         }).then((response) => {
             const noprogrammed = response.data.data;
             window.location.replace('/shares/no-programmed/' + noprogrammed.id);
-        }).catch(error => showNotify(error.response.data.detail, 'danger'))
-            .finally(() => hideLoading());
+        }).catch(error => showError(error, 'errorModal'))
+        .finally(() => hideLoading());
     }
 }
 

@@ -36,4 +36,8 @@ public class ProgrammedShareAttributes {
 
     public static final String ATTR_PS_STATUS = "attr_ps_status";
 
+    public static final String ATTR_PS_MODIFIED_AT = "attr_ps_modified_at";
+
+    public static final String ATTR_PS_MODIFIED_BY = "attr_ps_modified_by";
+
 }

@@ -3,7 +3,9 @@ package com.epm.gestepm.rest.shares.noprogrammed;
 import com.epm.gestepm.lib.logging.annotation.EnableExecutionLog;
 import com.epm.gestepm.lib.logging.annotation.LogExecution;
 import com.epm.gestepm.modelapi.common.utils.ModelUtil;
+import com.epm.gestepm.modelapi.common.utils.classes.Constants;
 import com.epm.gestepm.modelapi.common.utils.datatables.SortOrder;
+import com.epm.gestepm.modelapi.deprecated.project.dto.Project;
 import com.epm.gestepm.modelapi.family.dto.FamilyDTO;
 import com.epm.gestepm.modelapi.family.service.FamilyService;
 import com.epm.gestepm.modelapi.inspection.dto.ActionEnumDto;
@@ -36,6 +38,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import static com.epm.gestepm.lib.logging.constants.LogLayerMarkers.VIEW;
 import static com.epm.gestepm.lib.logging.constants.LogOperations.OP_VIEW;
@@ -94,7 +97,7 @@ public class NoProgrammedShareViewController {
     @LogExecution(operation = OP_VIEW)
     public String viewNoProgrammedShareDetailPage(@PathVariable final Integer id, final Locale locale, final Model model) {
 
-        this.loadCommonModelView(locale, model);
+        final User user = this.loadCommonModelView(locale, model);
 
         final NoProgrammedShareDto share = this.noProgrammedShareService.findOrNotFound(new NoProgrammedShareByIdFinderDto(id));
         final ProjectDto project = this.projectService.findOrNotFound(new ProjectByIdFinderDto(share.getProjectId()));
@@ -111,6 +114,9 @@ public class NoProgrammedShareViewController {
         final List<FamilyDTO> families = familyService.getCommonFamilyDTOsByProjectId(share.getProjectId().longValue(), locale);
         final List<UserDTO> usersTeam = userServiceOld.getUserDTOsByProjectId(share.getProjectId().longValue());
 
+        this.loadPermissions(user, share.getProjectId(), model, share);
+
+        model.addAttribute("share", share);
         model.addAttribute("families", families);
         model.addAttribute("usersTeam", usersTeam);
         model.addAttribute("nextAction", ActionEnumDto.getNextAction(lastAction));
@@ -120,5 +126,16 @@ public class NoProgrammedShareViewController {
         }
 
         return "no-programmed-share-detail";
+    }
+
+    private void loadPermissions(final User user, final Integer projectId, final Model model
+            , final NoProgrammedShareDto noProgrammedShare) {
+        final Boolean isAdmin = Constants.ROLE_ADMIN.equals(user.getRole().getRoleName());
+        final Boolean isProjectTL = Constants.ROLE_PL.equals(user.getRole().getRoleName())
+                && user.getBossProjects().stream().map(Project::getId).collect(Collectors.toList()).contains(projectId.longValue());
+        final Boolean isCurrentUser = noProgrammedShare.getUserId().equals(user.getId().intValue());
+
+        model.addAttribute("canUpdate"
+                , isAdmin || isProjectTL || isCurrentUser);
     }
 }

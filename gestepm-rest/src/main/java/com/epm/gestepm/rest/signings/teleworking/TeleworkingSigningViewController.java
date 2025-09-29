@@ -70,7 +70,7 @@ public class TeleworkingSigningViewController {
         final ProjectDto project = this.projectService.findOrNotFound(new ProjectByIdFinderDto(teleworkingSigning.getProjectId()));
         model.addAttribute("projectName", project.getName());
 
-        this.loadPermissions(user, project.getId().intValue(), model);
+        this.loadPermissions(user, project.getId().intValue(), model, teleworkingSigning);
 
         return "teleworking-signing-detail";
     }
@@ -83,11 +83,14 @@ public class TeleworkingSigningViewController {
         model.addAttribute("projects", projects);
     }
 
-    private void loadPermissions(final User user, final Integer projectId, final Model model) {
+    private void loadPermissions(final User user, final Integer projectId, final Model model
+            , final TeleworkingSigningDto teleworkingSigning) {
         final Boolean isAdmin = Constants.ROLE_ADMIN.equals(user.getRole().getRoleName());
         final Boolean isProjectTL = Constants.ROLE_PL.equals(user.getRole().getRoleName())
                 && user.getBossProjects().stream().map(Project::getId).collect(Collectors.toList()).contains(projectId.longValue());
+        final Boolean isCurrentUser = teleworkingSigning.getUserId().equals(user.getId().intValue());
 
-        model.addAttribute("canUpdate", isAdmin || isProjectTL);
+        model.addAttribute("canUpdate"
+                , isAdmin || isProjectTL || isCurrentUser);
     }
 }

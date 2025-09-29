@@ -1,5 +1,7 @@
 package com.epm.gestepm.model.shares.noprogrammed.dao.entity;
 
+import com.epm.gestepm.lib.audit.AuditCreateUpdate;
+import com.epm.gestepm.lib.audit.AuditUpdate;
 import lombok.Data;
 import lombok.Singular;
 
@@ -10,7 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 @Data
-public class NoProgrammedShare implements Serializable {
+public class NoProgrammedShare implements AuditUpdate, Serializable {
 
   @NotNull
   private Integer id;
@@ -42,6 +44,10 @@ public class NoProgrammedShare implements Serializable {
 
   private String forumTitle;
 
+  private LocalDateTime updatedAt;
+
+  private Integer updatedBy;
+
   @NotNull
   private NoProgrammedShareStateEnum state;
 
@@ -50,5 +56,4 @@ public class NoProgrammedShare implements Serializable {
 
   @Singular
   private Set<Integer> fileIds;
-
 }

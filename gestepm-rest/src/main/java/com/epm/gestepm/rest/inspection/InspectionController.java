@@ -87,8 +87,8 @@ public class InspectionController extends BaseController implements InspectionV1
     public ResponseEntity<ListInspectionsV1200Response> listInspectionsV1(final Integer shareId, final List<String> meta,
                                                                           final Boolean links, final Set<String> expand,
                                                                           final Long offset, final Long limit, final String order,
-                                                                          final String orderBy) {
-        final InspectionListRestRequest req = new InspectionListRestRequest(shareId, new ArrayList<>());
+                                                                          final String orderBy, final Boolean current) {
+        final InspectionListRestRequest req = new InspectionListRestRequest(shareId, new ArrayList<>(), current);
 
         this.setCommon(req, meta, links, expand);
         this.setDefaults(req);

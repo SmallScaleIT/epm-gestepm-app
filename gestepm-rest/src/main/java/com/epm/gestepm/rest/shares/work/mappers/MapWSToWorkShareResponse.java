@@ -15,6 +15,7 @@ public interface MapWSToWorkShareResponse {
   @Mapping(source = "projectId", target = "project.id")
   @Mapping(source = "createdBy", target = "createdBy.id")
   @Mapping(source = "closedBy", target = "closedBy.id")
+  @Mapping(source = "updatedBy", target = "updatedBy.id")
   WorkShare from(WorkShareDto dto);
 
   List<WorkShare> from(Page<WorkShareDto> list);

@@ -9,6 +9,8 @@ sql:
       pr.name AS project_name,
       whs.started_at,
       whs.closed_at,
+      whs.modified_at,
+      whs.modified_by,
       GROUP_CONCAT(wss.workshop_signing_id) workshop_signing_ids
     FROM ${sch-gestepm}.warehouse_signing whs
     LEFT JOIN ${sch-gestepm}.workshop_signing wss ON wss.warehouse_signing_id = whs.warehouse_signing_id
@@ -51,7 +53,9 @@ sql:
       ${sch-gestepm}.warehouse_signing
     SET
       started_at = :attr_whs_started_at,
-      closed_at = :attr_whs_closed_at
+      closed_at = :attr_whs_closed_at,
+      modified_at = :attr_whs_modified_at,
+      modified_by = :attr_whs_modified_by
     WHERE
       warehouse_signing_id = :attr_whs_id
 

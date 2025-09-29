@@ -27,4 +27,8 @@ public class TeleworkingSigningDto implements Serializable {
 
     private String closedLocation;
 
+    private LocalDateTime updatedAt;
+
+    private Integer updatedBy;
+
 }

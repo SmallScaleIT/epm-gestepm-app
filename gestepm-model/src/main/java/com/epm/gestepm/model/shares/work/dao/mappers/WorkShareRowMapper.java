@@ -1,5 +1,7 @@
 package com.epm.gestepm.model.shares.work.dao.mappers;
 
+import com.epm.gestepm.lib.audit.AuditCreateClose;
+import com.epm.gestepm.lib.audit.AuditUpdate;
 import com.epm.gestepm.lib.jdbc.impl.rowmapper.CommonRowMapper;
 import com.epm.gestepm.model.shares.work.dao.entity.WorkShare;
 import org.springframework.jdbc.core.RowMapper;
@@ -58,7 +60,8 @@ public class WorkShareRowMapper extends CommonRowMapper implements RowMapper<Wor
 
         workShare.setFileIds(fileIds);
 
-        this.setCommonAudit(workShare, rs);
+        this.setCommonAudit((AuditCreateClose) workShare, rs);
+        this.setCommonAudit((AuditUpdate) workShare, rs);
 
         return workShare;
     }

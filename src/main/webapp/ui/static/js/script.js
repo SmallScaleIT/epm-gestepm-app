@@ -36,6 +36,41 @@ function parseStatus(data) {
 	return '';
 }
 
+function showError(error, modalId) {
+	error = error.response.data;
+
+	if (!error.help || !error.help.url || !modalId)
+	{
+		showNotify(error.detail, 'danger');
+		return ;
+	}
+
+	const modal = document.getElementById(modalId);
+
+	if (!modal)
+	{
+		showNotify(error.detail, 'danger');
+		return ;
+	}
+
+	const modalBody = modal.querySelector('.modal-body');
+
+	if (!modalBody)
+	{
+		showNotify(error.detail, 'danger');
+		return ;
+	}
+
+	const link = modal.querySelector('[data-modal-id="modal-href"]');
+
+	if (link)
+		link.href = error.help.url;
+
+	modalBody.textContent = error.detail;
+
+	$(modal).modal('show');
+}
+
 function showNotify(msg, type) {
 	$.notify({ message: msg }, { type: type });
 }

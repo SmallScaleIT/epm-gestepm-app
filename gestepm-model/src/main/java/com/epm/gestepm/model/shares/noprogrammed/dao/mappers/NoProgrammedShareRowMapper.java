@@ -1,5 +1,6 @@
 package com.epm.gestepm.model.shares.noprogrammed.dao.mappers;
 
+import com.epm.gestepm.lib.jdbc.impl.rowmapper.CommonRowMapper;
 import com.epm.gestepm.model.shares.noprogrammed.dao.entity.NoProgrammedShare;
 import com.epm.gestepm.model.shares.noprogrammed.dao.entity.NoProgrammedShareStateEnum;
 import org.springframework.jdbc.core.RowMapper;
@@ -10,7 +11,7 @@ import java.util.*;
 
 import static com.epm.gestepm.lib.jdbc.utils.ResultSetMappingUtils.*;
 
-public class NoProgrammedShareRowMapper implements RowMapper<NoProgrammedShare> {
+public class NoProgrammedShareRowMapper extends CommonRowMapper implements RowMapper<NoProgrammedShare> {
 
   public static final String COL_NPS_ID = "no_programmed_share_id";
 
@@ -80,6 +81,8 @@ public class NoProgrammedShareRowMapper implements RowMapper<NoProgrammedShare> 
     }
 
     noProgrammedShare.setFileIds(fileIds);
+
+    this.setCommonAudit(noProgrammedShare, rs);
 
     return noProgrammedShare;
   }

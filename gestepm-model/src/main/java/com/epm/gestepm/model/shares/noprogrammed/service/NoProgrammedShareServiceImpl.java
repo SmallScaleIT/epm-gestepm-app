@@ -1,5 +1,9 @@
 package com.epm.gestepm.model.shares.noprogrammed.service;
 
+import com.epm.gestepm.emailapi.dto.emailgroup.UpdateNoProgrammedShareGroup;
+import com.epm.gestepm.emailapi.service.EmailService;
+import com.epm.gestepm.lib.audit.AuditProvider;
+import com.epm.gestepm.lib.locale.LocaleProvider;
 import com.epm.gestepm.lib.logging.annotation.EnableExecutionLog;
 import com.epm.gestepm.lib.logging.annotation.LogExecution;
 import com.epm.gestepm.lib.security.annotation.RequirePermits;
@@ -15,6 +19,14 @@ import com.epm.gestepm.model.shares.noprogrammed.dao.entity.finder.NoProgrammedS
 import com.epm.gestepm.model.shares.noprogrammed.dao.entity.updater.NoProgrammedShareUpdate;
 import com.epm.gestepm.model.shares.noprogrammed.decorator.NoProgrammedSharePostCreationDecorator;
 import com.epm.gestepm.model.shares.noprogrammed.service.mapper.*;
+import com.epm.gestepm.model.signings.checker.HasActiveSigningChecker;
+import com.epm.gestepm.modelapi.common.utils.Utiles;
+import com.epm.gestepm.modelapi.deprecated.user.dto.User;
+import com.epm.gestepm.modelapi.project.dto.ProjectDto;
+import com.epm.gestepm.modelapi.project.dto.finder.ProjectByIdFinderDto;
+import com.epm.gestepm.modelapi.project.service.ProjectService;
+import com.epm.gestepm.model.signings.checker.SigningUpdateChecker;
+import com.epm.gestepm.model.user.utils.UserUtils;
 import com.epm.gestepm.modelapi.shares.noprogrammed.dto.NoProgrammedShareDto;
 import com.epm.gestepm.modelapi.shares.noprogrammed.dto.NoProgrammedShareStateEnumDto;
 import com.epm.gestepm.modelapi.shares.noprogrammed.dto.creator.NoProgrammedShareCreateDto;
@@ -25,13 +37,14 @@ import com.epm.gestepm.modelapi.shares.noprogrammed.dto.updater.NoProgrammedShar
 import com.epm.gestepm.modelapi.shares.noprogrammed.exception.NoProgrammedShareNotFoundException;
 import com.epm.gestepm.modelapi.shares.noprogrammed.service.NoProgrammedShareService;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Supplier;
 
 import static com.epm.gestepm.lib.logging.constants.LogLayerMarkers.SERVICE;
@@ -53,6 +66,25 @@ public class NoProgrammedShareServiceImpl implements NoProgrammedShareService {
     private final NoProgrammedSharePostCreationDecorator noProgrammedSharePostCreationDecorator;
 
     private final ShareDateChecker shareDateChecker;
+
+    private final HasActiveSigningChecker activeChecker;
+
+    private final AuditProvider auditProvider;
+
+    private final MessageSource messageSource;
+
+    private final LocaleProvider localeProvider;
+
+    private final ProjectService projectService;
+
+    private final EmailService emailService;
+
+    @Value("${gestepm.mails.notify}")
+    private List<String> emailsTo;
+
+    private final SigningUpdateChecker signingUpdateChecker;
+
+    private final UserUtils userUtils;
 
     @Override
     @RequirePermits(value = PRMT_READ_NPS, action = "List no programmed shares")
@@ -121,6 +153,7 @@ public class NoProgrammedShareServiceImpl implements NoProgrammedShareService {
             msgOut = "New no programmed share created OK",
             errorMsg = "Failed to create new no programmed share")
     public NoProgrammedShareDto create(NoProgrammedShareCreateDto createDto) {
+        this.activeChecker.validateSigningChecker(createDto.getUserId());
         this.noProgrammedShareChecker.checker(createDto);
 
         final NoProgrammedShareCreate create = getMapper(MapNPSToNoProgrammedShareCreate.class).from(createDto);
@@ -146,15 +179,20 @@ public class NoProgrammedShareServiceImpl implements NoProgrammedShareService {
 
         this.noProgrammedShareChecker.checker(updateDto, noProgrammedShareDto);
 
-        if (NoProgrammedShareStateEnumDto.CLOSED.equals(updateDto.getState())) {
-            final LocalDateTime endDate = this.shareDateChecker.checkMaxHours(noProgrammedShareDto.getStartDate(), LocalDateTime.now());
-            updateDto.setEndDate(endDate);
-        }
-
         final NoProgrammedShareUpdate update = getMapper(MapNPSToNoProgrammedShareUpdate.class).from(updateDto,
                 getMapper(MapNPSToNoProgrammedShareUpdate.class).from(noProgrammedShareDto));
 
+        this.signingUpdateChecker.checker(noProgrammedShareDto.getUserId(), noProgrammedShareDto.getProjectId());
+
+        if (NoProgrammedShareStateEnumDto.CLOSED.equals(updateDto.getState())) {
+            final LocalDateTime endDate = this.shareDateChecker.checkMaxHours(noProgrammedShareDto.getStartDate(), update.getEndDate() != null
+                    ? update.getEndDate() : LocalDateTime.now());
+            update.setEndDate(endDate);
+        }
+
         this.shareDateChecker.checkStartBeforeEndDate(update.getStartDate(), update.getEndDate());
+
+        this.auditProvider.auditUpdate(update);
 
         final NoProgrammedShare updated = this.noProgrammedShareDao.update(update);
 
@@ -168,7 +206,38 @@ public class NoProgrammedShareServiceImpl implements NoProgrammedShareService {
             this.noProgrammedSharePostCreationDecorator.sendCloseEmail(result);
         }
 
+        this.sendUpdateEmail(result);
+
         return result;
+    }
+
+    private void sendUpdateEmail(final NoProgrammedShareDto noProgrammedShare) {
+        final User user = Utiles.getCurrentUser();
+
+        if (!noProgrammedShare.getUserId().equals(user.getId().intValue()))
+            return ;
+
+        final Locale locale = new Locale(this.localeProvider.getLocale().orElse("es"));
+
+        final String subject = messageSource.getMessage("email.noprogrammedshare.update.subject", new Object[]{
+                noProgrammedShare.getId()
+        }, locale);
+
+        final Set<String> emails = new HashSet<>(emailsTo);
+
+        final ProjectDto project = this.projectService.findOrNotFound(new ProjectByIdFinderDto(noProgrammedShare.getProjectId()));
+
+        final UpdateNoProgrammedShareGroup updateGroup = new UpdateNoProgrammedShareGroup();
+        updateGroup.setEmails(new ArrayList<>(emails));
+        updateGroup.setSubject(subject);
+        updateGroup.setLocale(locale);
+        updateGroup.setNoProgrammedShareId(noProgrammedShare.getId());
+        updateGroup.setFullName(user.getFullName());
+        updateGroup.setProjectName(project.getName());
+        updateGroup.setCreatedAt(noProgrammedShare.getStartDate());
+        updateGroup.setClosedAt(noProgrammedShare.getEndDate());
+
+        this.emailService.sendEmail(updateGroup);
     }
 
     @Override

@@ -16,6 +16,7 @@ public interface MapIToInspectionResponse {
   @Mapping(source = "firstTechnicalId", target = "firstTechnical.id")
   @Mapping(source = "secondTechnicalId", target = "secondTechnical.id")
   @Mapping(source = "fileIds", target = "files", qualifiedByName = "mapFiles")
+  @Mapping(source = "updatedBy", target = "updatedBy.id")
   Inspection from(InspectionDto dto);
 
   List<Inspection> from(Page<InspectionDto> list);
