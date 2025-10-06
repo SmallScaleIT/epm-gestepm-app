@@ -32,7 +32,7 @@ public class HasActiveSigningChecker {
 
         final SigningDto signing = signingList.get(0);
 
-        if (signing.getDetailUrl().contains("/shares/no-programmed/")) {
+        if (signing.getDetailUrl().contains("/shares/no-programmed/") || signing.getDetailUrl().contains("/shares/programmed/")) {
             return;
         }
 
