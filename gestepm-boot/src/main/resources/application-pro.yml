@@ -20,7 +20,7 @@ gestepm:
   mails:
     admin: jrodriguez@epmgastech.com
     rrhh: jsanchez@epmgastech.com
-    notify: rherve@epmgastech.com, cmarcos@epmgastech.com
+    notify: rherve@epmgastech.com
   signing:
     ftp:
       server: 92.54.16.80

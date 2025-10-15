@@ -553,7 +553,23 @@
                 url: '/shares/no-programmed/' + share.id + '/inspections/{id}',
                 permission: 'edit_no_programmed_shares'
             },
-            {action: 'file-pdf', url: '/v1/shares/no-programmed/' + share.id + '/inspections/{id}/export'}
+            {
+                action: 'file-pdf',
+                url: '/v1/shares/no-programmed/' + share.id + '/inspections/{id}/export'
+            },
+            {
+                action: 'file',
+                url: '/v1/shares/no-programmed/' + share.id + '/inspections/{id}/export-materials',
+                permission: 'edit_shares',
+                conditionGroups: [
+                    {
+                        conditions: [
+                            { key: 'action', value: [ 'DIAGNOSIS', 'INTERVENTION' ], operation: '===' },
+                            { key: 'endDate', value: [ undefined ], operation: '!==' }
+                        ]
+                    }
+                ]
+            },
         ]
         if (share.state !== 'CLOSED') {
             actions.push({action: 'delete', permission: 'edit_no_programmed_shares'});

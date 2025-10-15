@@ -355,6 +355,10 @@ function checkConditionGroups(data, conditionGroups) {
                     if (condition.operation === '===') {
                         return condition.value.includes(data.type);
                     }
+                } else if (condition.key === 'action') {
+                    if (condition.operation === '===') {
+                        return condition.value.includes(data.action);
+                    }
                 }
                 return false;
             });
