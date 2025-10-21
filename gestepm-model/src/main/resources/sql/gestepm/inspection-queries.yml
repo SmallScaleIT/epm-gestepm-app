@@ -23,7 +23,7 @@ sql:
       i.topic_id,
       i.modified_at,
       i.modified_by,
-      GROUP_CONCAT(ifi.inspection_file_id) AS inspection_file_ids,
+      GROUP_CONCAT(DISTINCT ifi.inspection_file_id) AS inspection_file_ids,
       GROUP_CONCAT(CONCAT_WS('|', im.inspection_material_id, im.units, im.description, im.reference)) AS inspection_materials
     FROM ${sch-gestepm}.inspection i
     LEFT JOIN ${sch-gestepm}.no_programmed_share nps ON i.no_programmed_share_id = nps.no_programmed_share_id
