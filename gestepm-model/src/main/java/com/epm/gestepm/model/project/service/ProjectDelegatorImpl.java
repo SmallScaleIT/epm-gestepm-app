@@ -10,8 +10,8 @@ import com.epm.gestepm.modelapi.customer.dto.finder.CustomerByProjectIdFinderDto
 import com.epm.gestepm.modelapi.customer.service.CustomerService;
 import com.epm.gestepm.modelapi.deprecated.project.dto.Project;
 import com.epm.gestepm.modelapi.deprecated.project.service.ProjectOldService;
-import com.epm.gestepm.modelapi.family.dto.Family;
-import com.epm.gestepm.modelapi.family.service.FamilyService;
+import com.epm.gestepm.modelapi.deprecated.family.dto.Family;
+import com.epm.gestepm.modelapi.deprecated.family.service.FamilyService;
 import com.epm.gestepm.modelapi.project.dto.ProjectDto;
 import com.epm.gestepm.modelapi.project.dto.creator.ProjectCreateDto;
 import com.epm.gestepm.modelapi.project.dto.creator.ProjectLeaderCreateDto;

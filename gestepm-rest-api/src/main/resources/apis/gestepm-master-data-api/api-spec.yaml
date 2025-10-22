@@ -15,11 +15,7 @@ paths:
       operationId: list-activity-centers-v1
       responses:
         '200':
-          description: '**OK**'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ResActivityCenterList'
+          $ref: '#/components/responses/ActivityCenterList'
       description: list-activity-centers-v1
       parameters:
         - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-meta
@@ -55,11 +51,7 @@ paths:
       operationId: create-activity-center-v1
       responses:
         '200':
-          description: '**OK**'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ResActivityCenter'
+          $ref: '#/components/responses/ActivityCenter'
         '404':
           description: country-not-found
           content:
@@ -74,10 +66,7 @@ paths:
                 $ref: ../../base-api-spec.yaml#/components/schemas/ResError
       description: create-activity-center-v1
       requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ReqCreateActivityCenter'
+        $ref: '#/components/requestBodies/CreateActivityCenter'
       tags:
         - activity-centers-v1
   '/v1/activity-centers/{id}':
@@ -92,11 +81,7 @@ paths:
       summary: V1 - Find activity center
       responses:
         '200':
-          description: '**OK**'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ResActivityCenter'
+          $ref: '#/components/responses/ActivityCenter'
         '404':
           description: activity-center-not-found
           content:
@@ -116,11 +101,7 @@ paths:
       operationId: update-activity-center-v1
       responses:
         '200':
-          description: '**OK**'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ResActivityCenter'
+          $ref: '#/components/responses/ActivityCenter'
         '404':
           description: activity-center-not-found | country-not-found
           content:
@@ -130,10 +111,7 @@ paths:
       description: update-activity-center-v1
       parameters: []
       requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ReqUpdateActivityCenter'
+        $ref: '#/components/requestBodies/UpdateActivityCenter'
       tags:
         - activity-centers-v1
     delete:
@@ -160,11 +138,7 @@ paths:
       summary: V1 - List countries
       responses:
         '200':
-          description: '**OK**'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ResCountryList'
+          $ref: '#/components/responses/CountryList'
       operationId: list-countries-v1
       description: list-countries-v1
       parameters:
@@ -200,11 +174,7 @@ paths:
       operationId: create-country-v1
       responses:
         '200':
-          description: '**OK**'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ResCountry'
+          $ref: '#/components/responses/Country'
         '409':
           description: country-already-exist
           content:
@@ -213,10 +183,7 @@ paths:
                 $ref: ../../base-api-spec.yaml#/components/schemas/ResError
       description: create-country-v1
       requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ReqCreateCountry'
+        $ref: '#/components/requestBodies/CreateCountry'
       tags:
         - countries-v1
     parameters: []
@@ -232,11 +199,7 @@ paths:
       summary: V1 - Find country
       responses:
         '200':
-          description: '**OK**'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ResCountry'
+          $ref: '#/components/responses/Country'
         '404':
           description: country-not-found
       operationId: find-country-by-id-v1
@@ -251,19 +214,12 @@ paths:
       operationId: update-country-v1
       responses:
         '200':
-          description: '**OK**'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ResCountry'
+          $ref: '#/components/responses/Country'
         '404':
           description: country-not-found
       description: update-country-v1
       requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ReqUpdateCountry'
+        $ref: '#/components/requestBodies/UpdateCountry'
       tags:
         - countries-v1
     delete:
@@ -285,23 +241,18 @@ paths:
       description: delete-country-v1
       tags:
         - countries-v1
-  /v1/levels:
+  /v1/families:
     get:
-      summary: V1 - List levels
-      tags:
-        - levels-v1
+      summary: V1 - List families
       responses:
         '200':
-          description: '**OK**'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ResLevelList'
-      operationId: list-levels-v1
-      description: list-levels-v1
+          $ref: '#/components/responses/FamilyList'
+      operationId: list-families-v1
+      description: list-families-v1
       parameters:
         - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-meta
         - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-links
+        - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-expand
         - $ref: ../../base-api-spec.yaml#/components/parameters/filter-pagination-offset
         - $ref: ../../base-api-spec.yaml#/components/parameters/filter-pagination-limit
         - $ref: ../../base-api-spec.yaml#/components/parameters/filter-order
@@ -312,100 +263,71 @@ paths:
               type: integer
           in: query
           name: ids
-          description: List of level ids to filter.
+          description: List of family ids to filter.
         - schema:
             type: string
           in: query
-          name: name
-          description: Search by level name.
-    parameters: []
+          name: nameContains
+          description: Search by family name contains.
+      tags:
+        - families-v1
     post:
-      summary: V1 - Create level
-      operationId: create-level-v1
+      summary: V1 - Create family
+      operationId: create-family-v1
       responses:
         '200':
-          description: '**OK**'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ResLevel'
+          $ref: '#/components/responses/Family'
         '409':
-          description: level-already-exists
+          description: family-already-exist
           content:
             application/json:
               schema:
                 $ref: ../../base-api-spec.yaml#/components/schemas/ResError
-      tags:
-        - levels-v1
-      description: create-level-v1
+      description: create-family-v1
       requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ReqCreateLevel'
-  '/v1/levels/{id}':
+        $ref: '#/components/requestBodies/CreateFamily'
+      tags:
+        - families-v1
+    parameters: []
+  '/v1/families/{id}':
     parameters:
       - schema:
           type: integer
         name: id
         in: path
         required: true
-        description: Level id.
+        description: Family id.
     get:
-      summary: V1 - Find level
-      tags:
-        - levels-v1
+      summary: V1 - Find family
       responses:
         '200':
-          description: '**OK**'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ResLevel'
+          $ref: '#/components/responses/Family'
         '404':
-          description: level-not-found
-          content:
-            application/json:
-              schema:
-                $ref: ../../base-api-spec.yaml#/components/schemas/ResError
-      operationId: find-level-by-id-v1
-      description: find-level-by-id-v1
+          description: family-not-found
+      operationId: find-family-by-id-v1
+      description: find-family-by-id-v1
       parameters:
         - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-meta
         - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-links
+        - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-expand
+      tags:
+        - families-v1
     put:
-      summary: V1 - Update Level
-      operationId: update-level-v1
+      summary: V1 - Update family
+      operationId: update-family-v1
       responses:
         '200':
-          description: '**OK**'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ResLevel'
+          $ref: '#/components/responses/Family'
         '404':
-          description: level-not-found
-          content:
-            application/json:
-              schema:
-                $ref: ../../base-api-spec.yaml#/components/schemas/ResError
-        '409':
-          description: level-already-exists
-          content:
-            application/json:
-              schema:
-                $ref: ../../base-api-spec.yaml#/components/schemas/ResError
-      tags:
-        - levels-v1
-      description: update-level-v1
+          description: family-not-found
+      description: update-family-v1
       requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ReqUpdateLevel'
+        $ref: '#/components/requestBodies/UpdateFamily'
+      tags:
+        - families-v1
     delete:
-      summary: V1 - Delete level
-      operationId: delete-level-v1
+      summary: V1 - Delete family
+      operationId: delete-family-v1
       responses:
         '200':
           description: '**OK**'
@@ -414,14 +336,14 @@ paths:
               schema:
                 $ref: ../../base-api-spec.yaml#/components/schemas/ResSuccess
         '404':
-          description: level-not-found
+          description: family-not-found
           content:
             application/json:
               schema:
                 $ref: ../../base-api-spec.yaml#/components/schemas/ResError
+      description: delete-family-v1
       tags:
-        - levels-v1
-      description: delete-level-v1
+        - families-v1
   /v1/holidays:
     get:
       summary: V1 - List holidays
@@ -429,11 +351,7 @@ paths:
         - holidays-v1
       responses:
         '200':
-          description: '**OK**'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ResHolidayList'
+          $ref: '#/components/responses/HolidayList'
       operationId: list-holidays-v1
       description: list-holidays-v1
       parameters:
@@ -487,11 +405,7 @@ paths:
       operationId: create-holiday-v1
       responses:
         '200':
-          description: '**OK**'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ResHoliday'
+          $ref: '#/components/responses/Holiday'
         '404':
           description: country-not-found | activity-center-not-found
           content:
@@ -502,10 +416,7 @@ paths:
         - holidays-v1
       description: create-holiday-v1
       requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ReqCreateHoliday'
+        $ref: '#/components/requestBodies/CreateHoliday'
     parameters: []
   '/v1/holidays/{id}':
     parameters:
@@ -521,11 +432,7 @@ paths:
         - holidays-v1
       responses:
         '200':
-          description: '**OK**'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ResHoliday'
+          $ref: '#/components/responses/Holiday'
         '404':
           description: holiday-not-found
           content:
@@ -543,11 +450,7 @@ paths:
       operationId: update-holiday-v1
       responses:
         '200':
-          description: '**OK**'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ResHoliday'
+          $ref: '#/components/responses/Holiday'
         '404':
           description: holiday-not-found | country-not-found | activity-center-not-found
           content:
@@ -559,10 +462,7 @@ paths:
       description: update-holiday-v1
       parameters: []
       requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ReqUpdateHoliday'
+        $ref: '#/components/requestBodies/UpdateHoliday'
     delete:
       summary: V1 - Delete holiday
       operationId: delete-holiday-v1
@@ -582,6 +482,121 @@ paths:
       tags:
         - holidays-v1
       description: delete-holiday-v1
+  /v1/levels:
+    get:
+      summary: V1 - List levels
+      tags:
+        - levels-v1
+      responses:
+        '200':
+          $ref: '#/components/responses/LevelList'
+      operationId: list-levels-v1
+      description: list-levels-v1
+      parameters:
+        - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-meta
+        - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-links
+        - $ref: ../../base-api-spec.yaml#/components/parameters/filter-pagination-offset
+        - $ref: ../../base-api-spec.yaml#/components/parameters/filter-pagination-limit
+        - $ref: ../../base-api-spec.yaml#/components/parameters/filter-order
+        - $ref: ../../base-api-spec.yaml#/components/parameters/filter-order-by
+        - schema:
+            type: array
+            items:
+              type: integer
+          in: query
+          name: ids
+          description: List of level ids to filter.
+        - schema:
+            type: string
+          in: query
+          name: name
+          description: Search by level name.
+    parameters: []
+    post:
+      summary: V1 - Create level
+      operationId: create-level-v1
+      responses:
+        '200':
+          $ref: '#/components/responses/Level'
+        '409':
+          description: level-already-exists
+          content:
+            application/json:
+              schema:
+                $ref: ../../base-api-spec.yaml#/components/schemas/ResError
+      tags:
+        - levels-v1
+      description: create-level-v1
+      requestBody:
+        $ref: '#/components/requestBodies/CreateLevel'
+  '/v1/levels/{id}':
+    parameters:
+      - schema:
+          type: integer
+        name: id
+        in: path
+        required: true
+        description: Level id.
+    get:
+      summary: V1 - Find level
+      tags:
+        - levels-v1
+      responses:
+        '200':
+          $ref: '#/components/responses/Level'
+        '404':
+          description: level-not-found
+          content:
+            application/json:
+              schema:
+                $ref: ../../base-api-spec.yaml#/components/schemas/ResError
+      operationId: find-level-by-id-v1
+      description: find-level-by-id-v1
+      parameters:
+        - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-meta
+        - $ref: ../../base-api-spec.yaml#/components/parameters/api-opt-links
+    put:
+      summary: V1 - Update Level
+      operationId: update-level-v1
+      responses:
+        '200':
+          $ref: '#/components/responses/Level'
+        '404':
+          description: level-not-found
+          content:
+            application/json:
+              schema:
+                $ref: ../../base-api-spec.yaml#/components/schemas/ResError
+        '409':
+          description: level-already-exists
+          content:
+            application/json:
+              schema:
+                $ref: ../../base-api-spec.yaml#/components/schemas/ResError
+      tags:
+        - levels-v1
+      description: update-level-v1
+      requestBody:
+        $ref: '#/components/requestBodies/UpdateLevel'
+    delete:
+      summary: V1 - Delete level
+      operationId: delete-level-v1
+      responses:
+        '200':
+          description: '**OK**'
+          content:
+            application/json:
+              schema:
+                $ref: ../../base-api-spec.yaml#/components/schemas/ResSuccess
+        '404':
+          description: level-not-found
+          content:
+            application/json:
+              schema:
+                $ref: ../../base-api-spec.yaml#/components/schemas/ResError
+      tags:
+        - levels-v1
+      description: delete-level-v1
 components:
   schemas:
     ActivityCenter:
@@ -598,46 +613,6 @@ components:
         - id
         - name
         - country
-    ResActivityCenter:
-      title: ResActivityCenter
-      type: object
-      properties:
-        metadata:
-          $ref: ../../base-api-spec.yaml#/components/schemas/Meta
-        data:
-          $ref: '#/components/schemas/ActivityCenter'
-    ResActivityCenterList:
-      title: ResActivityCenterList
-      type: object
-      properties:
-        metadata:
-          $ref: ../../base-api-spec.yaml#/components/schemas/Meta
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/ActivityCenter'
-    ReqCreateActivityCenter:
-      title: ReqCreateActivityCenter
-      type: object
-      properties:
-        name:
-          type: string
-        countryId:
-          type: integer
-      required:
-        - name
-        - countryId
-    ReqUpdateActivityCenter:
-      title: ReqUpdateActivityCenter
-      type: object
-      properties:
-        name:
-          type: string
-        countryId:
-          type: integer
-      required:
-        - name
-        - countryId
     Country:
       title: Country
       type: object
@@ -652,95 +627,31 @@ components:
         - id
         - name
         - tag
-    ResCountry:
-      title: ResCountry
-      type: object
-      properties:
-        metadata:
-          $ref: ../../base-api-spec.yaml#/components/schemas/Meta
-        data:
-          $ref: '#/components/schemas/Country'
-    ResCountryList:
-      title: ResCountryList
-      type: object
-      properties:
-        metadata:
-          $ref: ../../base-api-spec.yaml#/components/schemas/Meta
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Country'
-    ReqCreateCountry:
-      title: ReqCreateCountry
-      type: object
-      properties:
-        name:
-          type: string
-        tag:
-          type: string
-      required:
-        - name
-        - tag
-    ReqUpdateCountry:
-      title: ReqUpdateCountry
-      type: object
-      properties:
-        name:
-          type: string
-        tag:
-          type: string
-      required:
-        - name
-        - tag
-    Level:
-      title: Level
+    Family:
+      title: Family
+      x-stoplight:
+        id: imwhwbl42myae
       type: object
       properties:
         id:
           type: integer
-        name:
+        nameES:
           type: string
-        hourPrice:
-          type: number
-          format: double
-    ResLevel:
-      title: ResLevel
-      type: object
-      properties:
-        metadata:
-          $ref: ../../base-api-spec.yaml#/components/schemas/Meta
-        data:
-          $ref: '#/components/schemas/Level'
-    ResLevelList:
-      title: ResLevelList
-      type: object
-      properties:
-        metadata:
-          $ref: ../../base-api-spec.yaml#/components/schemas/Meta
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Level'
-    ReqCreateLevel:
-      title: ReqCreateLevel
-      type: object
-      properties:
-        name:
+          x-stoplight:
+            id: 9xwqfzmj0dvbj
+        nameFR:
           type: string
-        hourPrice:
-          type: number
-          format: double
-    ReqUpdateLevel:
-      title: ReqUpdateLevel
-      type: object
-      properties:
-        id:
-          type: integer
-        name:
-          type: string
-        hourPrice:
-          type: number
-          format: double
+          x-stoplight:
+            id: 2iwg4se8kuqrn
+        common:
+          type: boolean
+          x-stoplight:
+            id: 5kv52er4b9n4k
+      required:
+        - id
+        - nameES
+        - nameFR
+        - common
     Holiday:
       title: Holiday
       type: object
@@ -768,90 +679,364 @@ components:
         - day
         - month
         - country
-    ResHoliday:
-      title: ResHoliday
+    Level:
+      title: Level
       type: object
       properties:
-        metadata:
-          $ref: ../../base-api-spec.yaml#/components/schemas/Meta
-        data:
-          $ref: '#/components/schemas/Holiday'
-    ResHolidayList:
-      title: ResHolidayList
-      type: object
-      properties:
-        metadata:
-          $ref: ../../base-api-spec.yaml#/components/schemas/Meta
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Holiday'
-    ReqCreateHoliday:
-      title: ReqCreateHoliday
-      type: object
-      properties:
+        id:
+          type: integer
         name:
           type: string
-        day:
-          type: integer
-          format: date
-          x-stoplight:
-            id: 2a6rkcj20se9p
-        month:
-          type: integer
-          x-stoplight:
-            id: p4syeg8po8egs
-        countryId:
-          type: integer
-          x-stoplight:
-            id: 9pehpomct5i1h
-        activityCenterId:
-          type: integer
-      required:
-        - name
-        - day
-        - month
-        - countryId
-    ReqUpdateHoliday:
-      title: ReqUpdateHoliday
-      x-stoplight:
-        id: 3bb80b3a7980f
-      type: object
-      properties:
-        name:
-          type: string
-        day:
-          type: integer
-          format: date
-          x-stoplight:
-            id: oilck61kmi3ao
-        month:
-          type: integer
-          x-stoplight:
-            id: 9dr95aln03na4
-        countryId:
-          type: integer
-          x-stoplight:
-            id: kx43a8zjy9qbo
-        activityCenterId:
-          type: integer
-      required:
-        - name
-        - day
-        - month
-        - countryId
+        hourPrice:
+          type: number
+          format: double
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
+  requestBodies:
+    CreateFamily:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              nameES:
+                type: string
+                x-stoplight:
+                  id: g1t4dy1dxy79l
+              nameFR:
+                type: string
+                x-stoplight:
+                  id: uwlrrnvmtle6f
+              common:
+                type: boolean
+                x-stoplight:
+                  id: vvarli1utola2
+                default: false
+            required:
+              - nameES
+              - nameFR
+              - common
+    UpdateFamily:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              nameES:
+                type: string
+                x-stoplight:
+                  id: jsh6259w9rite
+              nameFR:
+                type: string
+                x-stoplight:
+                  id: i8a9o1h57i0wl
+              common:
+                type: boolean
+                x-stoplight:
+                  id: qoe7b9zqjslaf
+            required:
+              - nameES
+              - nameFR
+              - common
+    CreateActivityCenter:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                x-stoplight:
+                  id: yelqobrl7nota
+              countryId:
+                type: integer
+                x-stoplight:
+                  id: 3n4jfs00mz7j5
+            required:
+              - name
+              - countryId
+    UpdateActivityCenter:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                x-stoplight:
+                  id: 3wyi5e220efb6
+              countryId:
+                type: integer
+                x-stoplight:
+                  id: jy70gnxajvuvb
+            required:
+              - name
+              - countryId
+    CreateCountry:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                x-stoplight:
+                  id: bs3l819usi6cd
+              tag:
+                type: string
+                x-stoplight:
+                  id: 9gpg3hhbufvm2
+            required:
+              - name
+              - tag
+    UpdateCountry:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                x-stoplight:
+                  id: ouu032r6k5vkf
+              tag:
+                type: string
+                x-stoplight:
+                  id: dh5kbwi4qxgr8
+            required:
+              - name
+              - tag
+    CreateLevel:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                x-stoplight:
+                  id: 2xouqqsdn1djz
+              hourPrice:
+                type: number
+                x-stoplight:
+                  id: jylxv3p19zzlp
+                format: double
+            required:
+              - name
+              - hourPrice
+    UpdateLevel:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                x-stoplight:
+                  id: pd9uem96vgk4z
+              hourPrice:
+                type: number
+                x-stoplight:
+                  id: bxaesrr3lwo82
+                format: double
+            required:
+              - name
+              - hourPrice
+    CreateHoliday:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                x-stoplight:
+                  id: nsm2znskqszj8
+              day:
+                type: integer
+                format: date
+                x-stoplight:
+                  id: lzheiivqtn4ej
+              month:
+                type: integer
+                x-stoplight:
+                  id: wlhzqj9h50ndi
+              countryId:
+                type: integer
+                x-stoplight:
+                  id: amvgmks8wysk2
+              activityCenterId:
+                type: integer
+                x-stoplight:
+                  id: 3bhw5f7222106
+            required:
+              - name
+              - day
+              - month
+              - countryId
+    UpdateHoliday:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                x-stoplight:
+                  id: 82engfohghqk2
+              day:
+                type: integer
+                format: date
+                x-stoplight:
+                  id: h4bx1pr9b2t0r
+              month:
+                type: integer
+                x-stoplight:
+                  id: 3hvdazwa8hd61
+              countryId:
+                type: integer
+                x-stoplight:
+                  id: 85lub39np2du6
+              activityCenterId:
+                type: integer
+                x-stoplight:
+                  id: 3q33yfszu21ef
+            required:
+              - name
+              - day
+              - month
+              - countryId
+  responses:
+    ActivityCenter:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              metadata:
+                $ref: ../../base-api-spec.yaml#/components/schemas/Meta
+              data:
+                $ref: '#/components/schemas/ActivityCenter'
+    ActivityCenterList:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              metadata:
+                $ref: ../../base-api-spec.yaml#/components/schemas/Meta
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ActivityCenter'
+    Country:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              metadata:
+                $ref: ../../base-api-spec.yaml#/components/schemas/Meta
+              data:
+                $ref: '#/components/schemas/Country'
+    CountryList:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              metadata:
+                $ref: ../../base-api-spec.yaml#/components/schemas/Meta
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Country'
+    Family:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              metadata:
+                $ref: ../../base-api-spec.yaml#/components/schemas/Meta
+              data:
+                $ref: '#/components/schemas/Family'
+    FamilyList:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              metadata:
+                $ref: ../../base-api-spec.yaml#/components/schemas/Meta
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Family'
+    Holiday:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              metadata:
+                $ref: ../../base-api-spec.yaml#/components/schemas/Meta
+              data:
+                $ref: '#/components/schemas/Holiday'
+    HolidayList:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              metadata:
+                $ref: ../../base-api-spec.yaml#/components/schemas/Meta
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Holiday'
+    Level:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              metadata:
+                $ref: ../../base-api-spec.yaml#/components/schemas/Meta
+              data:
+                $ref: '#/components/schemas/Level'
+    LevelList:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              metadata:
+                $ref: ../../base-api-spec.yaml#/components/schemas/Meta
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Level'
 tags:
   - name: activity-centers-v1
     description: V1 - Activity centers
   - name: countries-v1
     description: V1 - Countries
-  - name: levels-v1
-    description: V1 - Levels
+  - name: families-v1
+    description: V1 - Families
   - name: holidays-v1
     description: V1 - Holidays
-security:
-  - basicAuth: []
+  - name: levels-v1
+    description: V1 - Levels

@@ -1,6 +1,6 @@
 package com.epm.gestepm.modelapi.deprecated.interventionshare.dto;
 
-import com.epm.gestepm.modelapi.family.dto.Family;
+import com.epm.gestepm.modelapi.deprecated.family.dto.Family;
 import com.epm.gestepm.modelapi.deprecated.interventionsharefile.dto.InterventionShareFile;
 import com.epm.gestepm.modelapi.deprecated.interventionsubshare.dto.InterventionSubShare;
 import com.epm.gestepm.modelapi.deprecated.project.dto.Project;

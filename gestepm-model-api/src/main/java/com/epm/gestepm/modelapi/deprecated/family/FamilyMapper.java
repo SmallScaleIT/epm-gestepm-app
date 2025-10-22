@@ -1,15 +1,15 @@
-package com.epm.gestepm.modelapi.family;
+package com.epm.gestepm.modelapi.deprecated.family;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import com.epm.gestepm.modelapi.common.config.ApplicationContextProvider;
 import com.epm.gestepm.modelapi.deprecated.project.dto.ProjectFamilyDTO;
-import com.epm.gestepm.modelapi.family.dto.FamilyDTO;
-import com.epm.gestepm.modelapi.family.service.FamilyService;
+import com.epm.gestepm.modelapi.deprecated.family.dto.FamilyDTO;
+import com.epm.gestepm.modelapi.deprecated.family.service.FamilyService;
 import com.epm.gestepm.modelapi.subfamily.dto.SubFamilyOldDTO;
 import com.epm.gestepm.modelapi.subrole.service.SubRoleService;
-import com.epm.gestepm.modelapi.family.dto.Family;
+import com.epm.gestepm.modelapi.deprecated.family.dto.Family;
 import com.epm.gestepm.modelapi.subfamily.dto.SubFamily;
 import com.epm.gestepm.modelapi.subrole.dto.SubRole;
 

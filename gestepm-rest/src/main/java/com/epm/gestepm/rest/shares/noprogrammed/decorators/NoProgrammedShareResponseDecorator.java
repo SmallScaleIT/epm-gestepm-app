@@ -4,7 +4,7 @@ import com.epm.gestepm.lib.controller.RestRequest;
 import com.epm.gestepm.lib.controller.decorator.BaseResponseDataDecorator;
 import com.epm.gestepm.lib.logging.annotation.EnableExecutionLog;
 import com.epm.gestepm.lib.logging.annotation.LogExecution;
-import com.epm.gestepm.modelapi.family.service.FamilyService;
+import com.epm.gestepm.modelapi.deprecated.family.service.FamilyService;
 import com.epm.gestepm.modelapi.project.service.ProjectService;
 import com.epm.gestepm.modelapi.project.dto.ProjectDto;
 import com.epm.gestepm.modelapi.project.dto.finder.ProjectByIdFinderDto;
@@ -102,10 +102,11 @@ public class NoProgrammedShareResponseDecorator extends BaseResponseDataDecorato
             final Integer id = family.getId();
 
             // FIXME
-            final com.epm.gestepm.modelapi.family.dto.Family familyDto = this.familyService.getById(Long.valueOf(id));
+            final com.epm.gestepm.modelapi.deprecated.family.dto.Family familyDto = this.familyService.getById(Long.valueOf(id));
             final Family response = new Family()
                     .id(id)
-                    .name(request.getLocale().equals("es") ? familyDto.getNameES() : familyDto.getNameFR());
+                    .nameES(familyDto.getNameES())
+                    .nameFR(familyDto.getNameFR());
 
             data.setFamily(response);
         }

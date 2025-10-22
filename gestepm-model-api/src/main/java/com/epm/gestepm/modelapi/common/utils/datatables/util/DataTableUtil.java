@@ -8,7 +8,7 @@ import com.epm.gestepm.modelapi.deprecated.displacementshare.dto.DisplacementSha
 import com.epm.gestepm.modelapi.deprecated.expense.dto.Expense;
 import com.epm.gestepm.modelapi.expensecorrective.dto.ExpenseCorrective;
 import com.epm.gestepm.modelapi.deprecated.expensesheet.dto.ExpenseSheet;
-import com.epm.gestepm.modelapi.family.dto.Family;
+import com.epm.gestepm.modelapi.deprecated.family.dto.Family;
 import com.epm.gestepm.modelapi.holiday.dto.Holiday;
 import com.epm.gestepm.modelapi.deprecated.interventionshare.dto.InterventionShare;
 import com.epm.gestepm.modelapi.deprecated.interventionsubshare.dto.InterventionSubShare;

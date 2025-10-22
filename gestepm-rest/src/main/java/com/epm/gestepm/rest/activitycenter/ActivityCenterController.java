@@ -61,7 +61,7 @@ public class ActivityCenterController extends BaseController implements Activity
     @Override
     @RequirePermits(value = PRMT_READ_AC, action = "Get activity center list")
     @LogExecution(operation = OP_READ)
-    public ResponseEntity<ResActivityCenterList> listActivityCentersV1(final List<String> meta, final Boolean links, Set<String> expand, final Long offset, final Long limit, final String order, final String orderBy, final List<Integer> ids, final String name, final List<Integer> countryIds) {
+    public ResponseEntity<ListActivityCentersV1200Response> listActivityCentersV1(final List<String> meta, final Boolean links, Set<String> expand, final Long offset, final Long limit, final String order, final String orderBy, final List<Integer> ids, final String name, final List<Integer> countryIds) {
 
         final ActivityCenterListRestRequest req = new ActivityCenterListRestRequest(ids, name, countryIds);
 
@@ -84,7 +84,7 @@ public class ActivityCenterController extends BaseController implements Activity
     @Override
     @RequirePermits(value = PRMT_READ_AC, action = "Find activity center")
     @LogExecution(operation = OP_READ)
-    public ResponseEntity<ResActivityCenter> findActivityCenterByIdV1(final Integer id, final List<String> meta, final Boolean links, final Set<String> expand) {
+    public ResponseEntity<CreateActivityCenterV1200Response> findActivityCenterByIdV1(final Integer id, final List<String> meta, final Boolean links, final Set<String> expand) {
 
         final ActivityCenterFindRestRequest req = new ActivityCenterFindRestRequest(id);
 
@@ -104,7 +104,7 @@ public class ActivityCenterController extends BaseController implements Activity
     @Override
     @RequirePermits(value = PRMT_EDIT_AC, action = "Create activity center")
     @LogExecution(operation = OP_CREATE)
-    public ResponseEntity<ResActivityCenter> createActivityCenterV1(final ReqCreateActivityCenter reqCreateActivityCenter) {
+    public ResponseEntity<CreateActivityCenterV1200Response> createActivityCenterV1(final CreateActivityCenterV1Request reqCreateActivityCenter) {
 
         final ActivityCenterCreateDto createDto = getMapper(MapACToActivityCenterCreateDto.class).from(reqCreateActivityCenter);
 
@@ -113,7 +113,7 @@ public class ActivityCenterController extends BaseController implements Activity
         final APIMetadata metadata = this.getDefaultMetadata();
         final ActivityCenter data = getMapper(MapACToActivityCenterResponse.class).from(activityCenterDto);
 
-        final ResActivityCenter response = new ResActivityCenter();
+        final CreateActivityCenterV1200Response response = new CreateActivityCenterV1200Response();
         response.setMetadata(getMapper(MetadataMapper.class).from(metadata));
         response.setData(data);
 
@@ -123,7 +123,7 @@ public class ActivityCenterController extends BaseController implements Activity
     @Override
     @RequirePermits(value = PRMT_EDIT_AC, action = "Update activity center")
     @LogExecution(operation = OP_UPDATE)
-    public ResponseEntity<ResActivityCenter> updateActivityCenterV1(final Integer id, final ReqUpdateActivityCenter reqUpdateActivityCenter) {
+    public ResponseEntity<CreateActivityCenterV1200Response> updateActivityCenterV1(final Integer id, final UpdateActivityCenterV1Request reqUpdateActivityCenter) {
 
         final ActivityCenterUpdateDto updateDto = getMapper(MapACToActivityCenterUpdateDto.class).from(reqUpdateActivityCenter);
         updateDto.setId(id);
@@ -133,7 +133,7 @@ public class ActivityCenterController extends BaseController implements Activity
         final APIMetadata metadata = this.getDefaultMetadata();
         final ActivityCenter data = getMapper(MapACToActivityCenterResponse.class).from(activityCenterDto);
 
-        final ResActivityCenter response = new ResActivityCenter();
+        final CreateActivityCenterV1200Response response = new CreateActivityCenterV1200Response();
         response.setMetadata(getMapper(MetadataMapper.class).from(metadata));
         response.setData(data);
 

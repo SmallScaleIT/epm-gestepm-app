@@ -194,8 +194,8 @@
     </definition>
     
     <!-- Admin Families -->
-    <definition name="admin-families" extends="fullFrameLayout">
-        <put-attribute name="body" value="/ui/jsp/view/admin/families/families.jsp" />
+    <definition name="families" extends="mainFrameLayout">
+        <put-attribute name="body" value="/ui/jsp/view/admin/families/view.jsp" />
     </definition>
     
     <definition name="admin-families-create" extends="fullFrameLayout">

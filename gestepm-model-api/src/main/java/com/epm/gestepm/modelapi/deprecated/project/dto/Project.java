@@ -4,7 +4,7 @@ import com.epm.gestepm.modelapi.deprecated.activitycenter.dto.ActivityCenter;
 import com.epm.gestepm.modelapi.deprecated.customer.dto.Customer;
 import com.epm.gestepm.modelapi.deprecated.displacementshare.dto.DisplacementShare;
 import com.epm.gestepm.modelapi.deprecated.expensesheet.dto.ExpenseSheet;
-import com.epm.gestepm.modelapi.family.dto.Family;
+import com.epm.gestepm.modelapi.deprecated.family.dto.Family;
 import com.epm.gestepm.modelapi.deprecated.interventionprshare.dto.InterventionPrShare;
 import com.epm.gestepm.modelapi.deprecated.interventionshare.dto.InterventionShare;
 import com.epm.gestepm.modelapi.deprecated.materialrequired.dto.MaterialRequired;

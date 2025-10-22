@@ -1,6 +1,6 @@
 package com.epm.gestepm.modelapi.subfamily.dto;
 
-import com.epm.gestepm.modelapi.family.dto.Family;
+import com.epm.gestepm.modelapi.deprecated.family.dto.Family;
 import com.epm.gestepm.modelapi.subrole.dto.SubRole;
 
 import java.util.List;

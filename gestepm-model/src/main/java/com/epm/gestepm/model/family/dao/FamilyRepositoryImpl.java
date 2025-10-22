@@ -17,11 +17,11 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import com.epm.gestepm.modelapi.common.utils.datatables.PaginationCriteria;
-import com.epm.gestepm.modelapi.family.dto.FamilyDTO;
-import com.epm.gestepm.modelapi.family.dto.FamilyTableDTO;
+import com.epm.gestepm.modelapi.deprecated.family.dto.FamilyDTO;
+import com.epm.gestepm.modelapi.deprecated.family.dto.FamilyTableDTO;
 import org.springframework.stereotype.Repository;
 
-import com.epm.gestepm.modelapi.family.dto.Family;
+import com.epm.gestepm.modelapi.deprecated.family.dto.Family;
 import com.epm.gestepm.modelapi.deprecated.project.dto.Project;
 import com.epm.gestepm.modelapi.common.utils.datatables.util.DataTableUtil;
 

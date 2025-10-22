@@ -1,0 +1,81 @@
+sql:
+
+  qry-list-of-fa: |
+
+    SELECT
+      fa.family_id,
+      fa.name_es,
+      fa.name_fr,
+      fa.common
+    FROM ${sch-gestepm}.family fa
+
+    #whereToken #filter
+    GROUP BY fa.family_id
+    #orderByToken
+
+  qry-page-of-fa: |
+
+    ${sql.qry-list-of-fa}
+    ${sql.paginated-query}
+
+  qry-count-of-fa: |
+
+    SELECT COUNT(DISTINCT family_id) AS "count"
+    FROM (
+      SELECT fa.family_id
+      FROM ${sch-gestepm}.family fa
+      #whereToken #filter
+    ) final
+
+  qry-create-fa: |
+
+    INSERT INTO ${sch-gestepm}.family (
+      name_es,
+      name_fr,
+      common
+    )
+    VALUES (
+      :attr_fa_name_es,
+      :attr_fa_name_fr,
+      :attr_fa_common
+    )
+
+  qry-update-fa: |
+
+    UPDATE
+      ${sch-gestepm}.family
+    SET
+      name_es = :attr_fa_name_es,
+      name_fr = :attr_fa_name_fr,
+      common = :attr_fa_common
+    WHERE
+      family_id = :attr_fa_id
+
+  qry-delete-fa: |
+
+    DELETE FROM ${sch-gestepm}.family WHERE family_id = :attr_fa_id
+
+  filter-fa-by-params: |
+
+    -- [AND
+      -- ${sql.predicate-for-fa-ids}
+      -- ${sql.predicate-for-fa-name-contains}
+    -- AND]
+
+  filter-fa-by-id: |
+
+    -- [AND
+      -- ${sql.predicate-for-fa-id}
+    -- AND]
+
+  predicate-for-fa-id: |
+
+    fa.family_id = :attr_fa_id
+
+  predicate-for-fa-ids: |
+
+    fa.family_id IN (:attr_fa_ids)
+
+  predicate-for-fa-name-contains: |
+
+    LOWER(fa.name_es) LIKE LOWER(:attr_fa_name_contains) OR LOWER(fa.name_fr) LIKE LOWER(:attr_fa_name_contains)

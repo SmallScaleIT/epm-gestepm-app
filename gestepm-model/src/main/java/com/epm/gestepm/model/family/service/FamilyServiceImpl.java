@@ -6,8 +6,8 @@ import java.util.Locale;
 
 import com.epm.gestepm.model.family.dao.FamilyRepository;
 import com.epm.gestepm.model.subfamily.dao.SubFamilyRepository;
-import com.epm.gestepm.modelapi.family.dto.FamilyDTO;
-import com.epm.gestepm.modelapi.family.dto.FamilyTableDTO;
+import com.epm.gestepm.modelapi.deprecated.family.dto.FamilyDTO;
+import com.epm.gestepm.modelapi.deprecated.family.dto.FamilyTableDTO;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.poi.ss.usermodel.BorderStyle;
@@ -23,10 +23,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.epm.gestepm.modelapi.family.dto.Family;
+import com.epm.gestepm.modelapi.deprecated.family.dto.Family;
 import com.epm.gestepm.modelapi.deprecated.project.dto.Project;
 import com.epm.gestepm.modelapi.subfamily.dto.SubFamily;
-import com.epm.gestepm.modelapi.family.service.FamilyService;
+import com.epm.gestepm.modelapi.deprecated.family.service.FamilyService;
 import com.epm.gestepm.modelapi.common.utils.ExcelUtils;
 import com.epm.gestepm.modelapi.common.utils.datatables.PaginationCriteria;
 

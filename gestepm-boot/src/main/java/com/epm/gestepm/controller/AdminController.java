@@ -17,10 +17,10 @@ import com.epm.gestepm.modelapi.deprecated.activitycenter.dto.ActivityCenter;
 import com.epm.gestepm.modelapi.deprecated.country.dto.Country;
 import com.epm.gestepm.modelapi.deprecated.user.dto.User;
 import com.epm.gestepm.modelapi.deprecated.user.exception.InvalidUserSessionException;
-import com.epm.gestepm.modelapi.family.FamilyMapper;
-import com.epm.gestepm.modelapi.family.dto.Family;
-import com.epm.gestepm.modelapi.family.dto.FamilyDTO;
-import com.epm.gestepm.modelapi.family.dto.FamilyTableDTO;
+import com.epm.gestepm.modelapi.deprecated.family.FamilyMapper;
+import com.epm.gestepm.modelapi.deprecated.family.dto.Family;
+import com.epm.gestepm.modelapi.deprecated.family.dto.FamilyDTO;
+import com.epm.gestepm.modelapi.deprecated.family.dto.FamilyTableDTO;
 import com.epm.gestepm.modelapi.holiday.dto.Holiday;
 import com.epm.gestepm.modelapi.holiday.dto.HolidayDTO;
 import com.epm.gestepm.modelapi.holiday.dto.HolidayTableDTO;
@@ -209,6 +209,7 @@ public class AdminController {
 		}
 	}
 
+	/*
 	@GetMapping("/families")
 	public String families(Locale locale, Model model, HttpServletRequest request) {
 
@@ -445,4 +446,5 @@ public class AdminController {
 
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
+	*/
 }

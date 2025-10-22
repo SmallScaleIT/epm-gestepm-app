@@ -6,6 +6,7 @@ import com.epm.gestepm.lib.controller.metadata.APIMetadata;
 import com.epm.gestepm.lib.controller.response.ResponseSuccessfulHelper;
 import com.epm.gestepm.lib.logging.annotation.EnableExecutionLog;
 import com.epm.gestepm.lib.logging.annotation.LogExecution;
+import com.epm.gestepm.lib.security.annotation.RequirePermits;
 import com.epm.gestepm.lib.types.Page;
 import com.epm.gestepm.masterdata.api.holiday.dto.HolidayDto;
 import com.epm.gestepm.masterdata.api.holiday.dto.creator.HolidayCreateDto;
@@ -36,6 +37,8 @@ import java.util.Set;
 
 import static com.epm.gestepm.lib.logging.constants.LogLayerMarkers.REST;
 import static com.epm.gestepm.lib.logging.constants.LogOperations.*;
+import static com.epm.gestepm.masterdata.api.holiday.security.HolidayPermission.PRMT_EDIT_H;
+import static com.epm.gestepm.masterdata.api.holiday.security.HolidayPermission.PRMT_READ_H;
 import static org.mapstruct.factory.Mappers.getMapper;
 
 @RestController
@@ -56,9 +59,9 @@ public class HolidayController extends BaseController implements HolidaysV1Api, 
     }
 
     @Override
-    // @RequirePermits(value = PRMT_READ_D, action = "Get holiday list")
+    @RequirePermits(value = PRMT_READ_H, action = "Get holiday list")
     @LogExecution(operation = OP_READ)
-    public ResponseEntity<ResHolidayList> listHolidaysV1(final List<String> meta, final Boolean links, Set<String> expand, final Long offset, final Long limit, final String order, final String orderBy, final List<Integer> ids, final String name, final Integer day, final Integer month, final List<Integer> countryIds, final List<Integer> activityCenterIds) {
+    public ResponseEntity<ListHolidaysV1200Response> listHolidaysV1(final List<String> meta, final Boolean links, Set<String> expand, final Long offset, final Long limit, final String order, final String orderBy, final List<Integer> ids, final String name, final Integer day, final Integer month, final List<Integer> countryIds, final List<Integer> activityCenterIds) {
 
         final HolidayListRestRequest req = new HolidayListRestRequest(ids, name, day, month, countryIds, activityCenterIds);
 
@@ -79,9 +82,9 @@ public class HolidayController extends BaseController implements HolidaysV1Api, 
     }
 
     @Override
-    // @RequirePermits(value = PRMT_READ_D, action = "Find holiday")
+    @RequirePermits(value = PRMT_READ_H, action = "Find holiday")
     @LogExecution(operation = OP_READ)
-    public ResponseEntity<ResHoliday> findHolidayByIdV1(final Integer id, final List<String> meta, final Boolean links, final Set<String> expand) {
+    public ResponseEntity<CreateHolidayV1200Response> findHolidayByIdV1(final Integer id, final List<String> meta, final Boolean links, final Set<String> expand) {
 
         final HolidayFindRestRequest req = new HolidayFindRestRequest(id);
 
@@ -99,9 +102,9 @@ public class HolidayController extends BaseController implements HolidaysV1Api, 
     }
 
     @Override
-    // @RequirePermits(value = PRMT_EDIT_D, action = "Create holiday")
+    @RequirePermits(value = PRMT_EDIT_H, action = "Create holiday")
     @LogExecution(operation = OP_CREATE)
-    public ResponseEntity<ResHoliday> createHolidayV1(final ReqCreateHoliday reqCreateHoliday) {
+    public ResponseEntity<CreateHolidayV1200Response> createHolidayV1(final CreateHolidayV1Request reqCreateHoliday) {
 
         final HolidayCreateDto createDto = getMapper(MapHToHolidayCreateDto.class).from(reqCreateHoliday);
 
@@ -110,7 +113,7 @@ public class HolidayController extends BaseController implements HolidaysV1Api, 
         final APIMetadata metadata = this.getDefaultMetadata();
         final Holiday data = getMapper(MapHToHolidayResponse.class).from(activityCenterDto);
 
-        final ResHoliday response = new ResHoliday();
+        final CreateHolidayV1200Response response = new CreateHolidayV1200Response();
         response.setMetadata(getMapper(MetadataMapper.class).from(metadata));
         response.setData(data);
 
@@ -118,9 +121,9 @@ public class HolidayController extends BaseController implements HolidaysV1Api, 
     }
 
     @Override
-    // @RequirePermits(value = PRMT_EDIT_D, action = "Update holiday")
+    @RequirePermits(value = PRMT_EDIT_H, action = "Update holiday")
     @LogExecution(operation = OP_UPDATE)
-    public ResponseEntity<ResHoliday> updateHolidayV1(final Integer id, final ReqUpdateHoliday reqUpdateHoliday) {
+    public ResponseEntity<CreateHolidayV1200Response> updateHolidayV1(final Integer id, final UpdateHolidayV1Request reqUpdateHoliday) {
 
         final HolidayUpdateDto updateDto = getMapper(MapHToHolidayUpdateDto.class).from(reqUpdateHoliday);
         updateDto.setId(id);
@@ -130,7 +133,7 @@ public class HolidayController extends BaseController implements HolidaysV1Api, 
         final APIMetadata metadata = this.getDefaultMetadata();
         final Holiday data = getMapper(MapHToHolidayResponse.class).from(activityCenterDto);
 
-        final ResHoliday response = new ResHoliday();
+        final CreateHolidayV1200Response response = new CreateHolidayV1200Response();
         response.setMetadata(getMapper(MetadataMapper.class).from(metadata));
         response.setData(data);
 
@@ -138,7 +141,7 @@ public class HolidayController extends BaseController implements HolidaysV1Api, 
     }
 
     @Override
-    // @RequirePermits(value = PRMT_EDIT_D, action = "Delete holiday")
+    @RequirePermits(value = PRMT_EDIT_H, action = "Delete holiday")
     @LogExecution(operation = OP_DELETE)
     public ResponseEntity<ResSuccess> deleteHolidayV1(final Integer id) {
 

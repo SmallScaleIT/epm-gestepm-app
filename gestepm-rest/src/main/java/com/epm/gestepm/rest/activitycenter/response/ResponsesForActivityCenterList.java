@@ -3,7 +3,7 @@ package com.epm.gestepm.rest.activitycenter.response;
 import com.epm.gestepm.lib.controller.metadata.APIMetadata;
 import com.epm.gestepm.rest.common.MetadataMapper;
 import com.epm.gestepm.restapi.openapi.model.ActivityCenter;
-import com.epm.gestepm.restapi.openapi.model.ResActivityCenterList;
+import com.epm.gestepm.restapi.openapi.model.ListActivityCentersV1200Response;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -12,39 +12,39 @@ import static org.mapstruct.factory.Mappers.getMapper;
 
 public interface ResponsesForActivityCenterList {
 
-  default ResponseEntity<ResActivityCenterList> toResActivityCenterListResponse(List<ActivityCenter> data) {
+    default ResponseEntity<ListActivityCentersV1200Response> toResActivityCenterListResponse(List<ActivityCenter> data) {
 
-    final ResActivityCenterList response = new ResActivityCenterList();
-    response.setData(data);
+        final ListActivityCentersV1200Response response = new ListActivityCentersV1200Response();
+        response.setData(data);
 
-    return ResponseEntity.ok().body(response);
-  }
-
-  default ResponseEntity<ResActivityCenterList> toResActivityCenterListResponse(APIMetadata metadata, List<ActivityCenter> data) {
-
-    if (metadata == null) {
-      return toResActivityCenterListResponse(data);
+        return ResponseEntity.ok().body(response);
     }
 
-    final ResActivityCenterList response = new ResActivityCenterList();
-    response.setData(data);
-    response.setMetadata(getMapper(MetadataMapper.class).from(metadata));
+    default ResponseEntity<ListActivityCentersV1200Response> toResActivityCenterListResponse(APIMetadata metadata, List<ActivityCenter> data) {
 
-    return ResponseEntity.ok().body(response);
-  }
+        if (metadata == null) {
+            return toResActivityCenterListResponse(data);
+        }
 
-  default ResponseEntity<ResActivityCenterList> toResActivityCenterListResponse(APIMetadata metadata, List<ActivityCenter> data,
-      Object etag) {
+        final ListActivityCentersV1200Response response = new ListActivityCentersV1200Response();
+        response.setData(data);
+        response.setMetadata(getMapper(MetadataMapper.class).from(metadata));
 
-    if (etag == null) {
-      return toResActivityCenterListResponse(metadata, data);
+        return ResponseEntity.ok().body(response);
     }
 
-    final ResActivityCenterList response = new ResActivityCenterList();
-    response.setData(data);
-    response.setMetadata(getMapper(MetadataMapper.class).from(metadata));
+    default ResponseEntity<ListActivityCentersV1200Response> toResActivityCenterListResponse(APIMetadata metadata, List<ActivityCenter> data,
+                                                                                             Object etag) {
 
-    return ResponseEntity.ok().eTag(String.valueOf(etag)).body(response);
-  }
+        if (etag == null) {
+            return toResActivityCenterListResponse(metadata, data);
+        }
+
+        final ListActivityCentersV1200Response response = new ListActivityCentersV1200Response();
+        response.setData(data);
+        response.setMetadata(getMapper(MetadataMapper.class).from(metadata));
+
+        return ResponseEntity.ok().eTag(String.valueOf(etag)).body(response);
+    }
 
 }

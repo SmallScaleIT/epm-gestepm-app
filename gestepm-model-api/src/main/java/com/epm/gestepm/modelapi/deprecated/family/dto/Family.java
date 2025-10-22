@@ -1,4 +1,4 @@
-package com.epm.gestepm.modelapi.family.dto;
+package com.epm.gestepm.modelapi.deprecated.family.dto;
 
 import com.epm.gestepm.modelapi.deprecated.project.dto.Project;
 import com.epm.gestepm.modelapi.subfamily.dto.SubFamily;

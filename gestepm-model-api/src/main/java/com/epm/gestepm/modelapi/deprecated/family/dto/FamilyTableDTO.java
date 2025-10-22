@@ -1,4 +1,4 @@
-package com.epm.gestepm.modelapi.family.dto;
+package com.epm.gestepm.modelapi.deprecated.family.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
