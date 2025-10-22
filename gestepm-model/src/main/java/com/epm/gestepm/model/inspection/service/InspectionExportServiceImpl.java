@@ -29,21 +29,19 @@ import com.epm.gestepm.modelapi.subfamily.service.SubFamilyService;
 import com.epm.gestepm.modelapi.user.dto.UserDto;
 import com.epm.gestepm.modelapi.user.dto.finder.UserByIdFinderDto;
 import com.epm.gestepm.modelapi.user.service.UserService;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.Image;
-import com.itextpdf.text.Rectangle;
-import com.itextpdf.text.pdf.AcroFields;
-import com.itextpdf.text.pdf.PdfContentByte;
-import com.itextpdf.text.pdf.PdfReader;
-import com.itextpdf.text.pdf.PdfStamper;
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.*;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.MessageSource;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Base64;
 import java.util.List;
 import java.util.Locale;
@@ -66,7 +64,7 @@ public class InspectionExportServiceImpl implements InspectionExportService {
     private final FamilyService familyService;
 
     private final InspectionFileService inspectionFileService;
-    
+
     private final LocaleProvider localeProvider;
 
     private final MessageSource messageSource;
@@ -76,9 +74,9 @@ public class InspectionExportServiceImpl implements InspectionExportService {
     private final ProjectService projectService;
 
     private final ProjectMaterialService projectMaterialService;
-    
+
     private final SubFamilyService subFamilyService;
-    
+
     private final UserService userService;
 
     @Override
@@ -109,7 +107,7 @@ public class InspectionExportServiceImpl implements InspectionExportService {
             acroFields.setField("interventionStartDate", Utiles.transform(inspection.getStartDate(), DATE_FORMAT));
             acroFields.setField("interventionEndDate", Utiles.transform(inspection.getEndDate(), DATE_FORMAT));
             acroFields.setField("technic1", firstTechnical.getFullName());
-            
+
             if (inspection.getSecondTechnicalId() != null) {
                 final UserDto secondTechnical = this.userService.findOrNotFound(new UserByIdFinderDto(inspection.getSecondTechnicalId()));
                 acroFields.setField("technic2", secondTechnical.getFullName());
@@ -131,14 +129,9 @@ public class InspectionExportServiceImpl implements InspectionExportService {
             acroFields.setField("interventionDesc", inspection.getDescription().replaceAll("( *\n *){2,}", "\n"));
             acroFields.setField("clientName", inspection.getClientName());
             acroFields.setField("equipmentHours", inspection.getEquipmentHours() != null ? inspection.getEquipmentHours().toString() : "");
-            acroFields.setField("excelNum", "EXCEL: " + (inspection.getMaterialsFile() != null ? noProgrammedShare.getId() : "S/N"));
 
-            final List<MaterialDto> materials = inspection.getMaterials().stream().limit(5).collect(Collectors.toList());
-
-            for (int i = 0; i < materials.size(); i++) {
-                acroFields.setField("materialDesc" + i, materials.get(i).getDescription());
-                acroFields.setField("materialRef" + i, materials.get(i).getReference());
-                acroFields.setField("materialAmount" + i, materials.get(i).getUnits().toString());
+            if (!CollectionUtils.isEmpty(inspection.getMaterials())) {
+                this.generateMaterialsPage(stamper, inspection);
             }
 
             if (!StringUtils.isBlank(inspection.getSignature()) && !"data:,".equals(inspection.getSignature())) {
@@ -256,5 +249,67 @@ public class InspectionExportServiceImpl implements InspectionExportService {
                 stamper.getOverContent(pageNumber).addImage(image);
             }
         }
+    }
+
+    private void generateMaterialsPage(final PdfStamper stamper, final InspectionDto inspection) throws DocumentException, IOException {
+        final PdfReader reader = stamper.getReader();
+        stamper.insertPage(reader.getNumberOfPages() + 1, reader.getPageSize(1));
+
+        final Rectangle pageSize = reader.getPageSizeWithRotation(Math.min(1, reader.getNumberOfPages()));
+        final PdfContentByte canvas = stamper.getOverContent(reader.getNumberOfPages());
+
+        final PdfPTable table = new PdfPTable(3);
+
+        final float marginL = 60f, marginR = 60f, marginT = 60f;
+        float usableWidth = pageSize.getWidth() - marginL - marginR;
+
+        if (usableWidth < 1f) usableWidth = pageSize.getWidth() - 2f;
+
+        table.setTotalWidth(usableWidth);
+        table.setLockedWidth(true);
+        table.setWidths(new float[]{2f, 1f, 1f});
+
+        final byte[] ttf;
+        try (InputStream in = new ClassPathResource("fonts/trebuc.ttf").getInputStream()) {
+            ttf = in.readAllBytes();
+        }
+
+        final BaseFont base = BaseFont.createFont("trebuc.ttf", BaseFont.WINANSI, BaseFont.EMBEDDED, false, ttf, null);
+        final Font normal = new Font(base, 10, Font.NORMAL);
+        final Font bold = new Font(base, 10, Font.BOLD);
+
+        final Locale locale = new Locale(this.localeProvider.getLocale().orElse("es"));
+        final String[] headers = {
+                this.messageSource.getMessage("description", null, locale),
+                this.messageSource.getMessage("shares.intervention.create.materials.uds", null, locale),
+                this.messageSource.getMessage("shares.intervention.create.materials.ref", null, locale),
+        };
+
+        for (String h : headers) {
+            final PdfPCell cell = new PdfPCell(new Phrase(h, bold));
+            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+            cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+
+            table.addCell(cell);
+        }
+
+        final List<MaterialDto> materials = inspection.getMaterials().stream().limit(5).collect(Collectors.toList());
+
+        materials.forEach(material -> {
+            table.addCell(makeCell(material.getDescription(), normal));
+            table.addCell(makeCell(material.getUnits().toString(), normal));
+            table.addCell(makeCell(material.getReference(), normal));
+        });
+
+        float x = pageSize.getLeft() + marginL;
+        float topY = pageSize.getTop() - marginT;
+
+        table.writeSelectedRows(0, -1, x, topY, canvas);
+    }
+
+    private PdfPCell makeCell(String text, Font font) {
+        final PdfPCell cell = new PdfPCell(new Phrase(text, font));
+        cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        return cell;
     }
 }
