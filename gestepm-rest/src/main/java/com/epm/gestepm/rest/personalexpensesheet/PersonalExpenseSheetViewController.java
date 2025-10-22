@@ -26,6 +26,7 @@ import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -97,7 +98,7 @@ public class PersonalExpenseSheetViewController {
 
         final ProjectFilterDto filterDto = new ProjectFilterDto();
 
-        if (user.getRole().getId() != Constants.ROLE_ADMIN_ID && user.getRole().getId() != Constants.ROLE_TECHNICAL_SUPERVISOR_ID) {
+        if (!Objects.equals(user.getRole().getId(), Constants.ROLE_ADMIN_ID) && !Objects.equals(user.getRole().getId(), Constants.ROLE_TECHNICAL_SUPERVISOR_ID)) {
             filterDto.setMemberIds(List.of(user.getId().intValue()));
         }
 
