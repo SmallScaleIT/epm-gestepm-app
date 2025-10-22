@@ -354,15 +354,7 @@
 		}
 
 		for (var i = 0; i < data.length; i++) {
-
-			// rename key var
-			var x = data[i];
-			x['nameES'] = x['subFamilyNameES'];
-			x['nameFR'] = x['subFamilyNameFR'];
-			delete x['subFamilyNameES'];
-			delete x['subFamilyNameFR'];
-			
-			family.subfamilies.push(x);
+			family.subfamilies.push(data[i]);
 		}
 
 		return family;
