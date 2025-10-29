@@ -26,6 +26,8 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URLConnection;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -63,7 +65,7 @@ public class TopicServiceImpl implements TopicService {
 	@Override
 	public CompletableFuture<Topic> create(String topicTitle, String topicContent, Integer forumId, String userIp, String username, List<MultipartFile> files) {
 
-		long topicTimer = Instant.now().getEpochSecond();
+		long topicTimer = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
 		int hasAttachments = CollectionUtils.isNotEmpty(files) ? 1 : 0;
 		
 		Long userForumId = userForumRepository.findIdByUsername(username);

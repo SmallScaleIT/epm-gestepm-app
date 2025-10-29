@@ -260,7 +260,9 @@ public class InspectionServiceImpl implements InspectionService {
 
             // TODO: add materials file, when refactor no URL enabled. should install documental gestor before...
 
-            final String title = "Re: " + noProgrammedShare.getForumTitle();
+            final Locale userLocale = new Locale(this.localeProvider.getLocale().orElse("es"));
+            final String inspectionType = this.messageSource.getMessage(inspection.getAction().name().toLowerCase(), null, userLocale);
+            final String title = "Re: [" + inspectionType.toUpperCase() + "] " + noProgrammedShare.getForumTitle();
             final String content = stringBuilder.toString();
             final String ip = request.getLocalAddr();
 
